@@ -31,6 +31,9 @@ namespace Roman.RedisManager.Web
 
             app.MapControllers(); 
 
+            // SPA fallback: serve index.html for non-API routes (Angular routing support)
+            app.MapFallbackToFile("index.html");
+
             app.Run();
         }
     }
