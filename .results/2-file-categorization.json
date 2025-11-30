@@ -1,0 +1,89 @@
+{
+  "angular-components": [
+    "./src/Roman.RedisManager.UI/src/app/app.ts"
+  ],
+  "component-templates": [
+    "./src/Roman.RedisManager.UI/src/app/app.html"
+  ],
+  "component-styles": [
+    "./src/Roman.RedisManager.UI/src/app/app.css"
+  ],
+  "routing-configuration": [
+    "./src/Roman.RedisManager.UI/src/app/app.routes.ts"
+  ],
+  "application-configuration": [
+    "./src/Roman.RedisManager.UI/src/app/app.config.ts"
+  ],
+  "application-bootstrap": [
+    "./src/Roman.RedisManager.UI/src/main.ts"
+  ],
+  "html-entry-points": [
+    "./src/Roman.RedisManager.UI/src/index.html"
+  ],
+  "global-styles": [
+    "./src/Roman.RedisManager.UI/src/styles.css"
+  ],
+  "unit-tests": [
+    "./src/Roman.RedisManager.UI/src/app/app.spec.ts"
+  ],
+  "typescript-configuration": [
+    "./src/Roman.RedisManager.UI/tsconfig.json",
+    "./src/Roman.RedisManager.UI/tsconfig.app.json",
+    "./src/Roman.RedisManager.UI/tsconfig.spec.json"
+  ],
+  "angular-configuration": [
+    "./src/Roman.RedisManager.UI/angular.json"
+  ],
+  "package-management": [
+    "./src/Roman.RedisManager.UI/package.json",
+    "./src/Roman.RedisManager.UI/package-lock.json"
+  ],
+  "api-controllers": [
+    "./src/Roman.RedisManager.Web/Controllers/WeatherForecastController.cs"
+  ],
+  "dto-models": [
+    "./src/Roman.RedisManager.Web/Controllers/WeatherForecast.cs"
+  ],
+  "application-entry-point": [
+    "./src/Roman.RedisManager.Web/Program.cs"
+  ],
+  "csharp-project-files": [
+    "./src/Roman.RedisManager.Web/Roman.RedisManager.Web.csproj"
+  ],
+  "backend-configuration": [
+    "./src/Roman.RedisManager.Web/appsettings.json",
+    "./src/Roman.RedisManager.Web/appsettings.Development.json",
+    "./src/Roman.RedisManager.Web/Properties/launchSettings.json"
+  ],
+  "http-test-files": [
+    "./src/Roman.RedisManager.Web/Roman.RedisManager.Web.http"
+  ],
+  "solution-files": [
+    "./Roman.RedisManager.slnx"
+  ],
+  "vscode-configuration": [
+    "./.vscode/launch.json",
+    "./.vscode/tasks.json",
+    "./src/Roman.RedisManager.UI/.vscode/launch.json",
+    "./src/Roman.RedisManager.UI/.vscode/tasks.json",
+    "./src/Roman.RedisManager.UI/.vscode/extensions.json"
+  ],
+  "editor-configuration": [
+    "./src/Roman.RedisManager.UI/.editorconfig"
+  ],
+  "git-configuration": [
+    "./.gitignore",
+    "./.gitattributes",
+    "./src/Roman.RedisManager.UI/.gitignore"
+  ],
+  "documentation": [
+    "./README.md",
+    "./src/Roman.RedisManager.UI/README.md"
+  ],
+  "static-assets": [
+    "./src/Roman.RedisManager.UI/public/favicon.ico"
+  ],
+  "placeholder-files": [
+    "./src/Roman.RedisManager.Web/Controllers/.gitkeep"
+  ]
+}

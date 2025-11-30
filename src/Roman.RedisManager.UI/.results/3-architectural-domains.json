@@ -1,0 +1,62 @@
+{
+    "ui": {
+        "required_patterns": {
+            "component-architecture": "All components must be Angular standalone components with explicit imports array",
+            "ui-library": "PrimeNG components must be used for all UI elements",
+            "signal-based-state": "Component state must use Angular signals (signal() API) instead of traditional properties",
+            "template-separation": "Templates must be in separate .html files, styles in separate .css files"
+        },
+        "architectural_constraints": {
+            "component-architecture": "Components use standalone: true (implicit in Angular 20), no NgModules allowed",
+            "ui-library": "All UI components must import from PrimeNG modules (e.g., ButtonModule), no custom UI framework mixing",
+            "signal-based-state": "Use signal() for reactive state, avoid traditional property binding where signals are more appropriate",
+            "template-separation": "Each component must have three files: .ts (logic), .html (template), .css (styles)"
+        }
+    },
+    "routing": {
+        "required_patterns": {
+            "router-configuration": "Routes must be defined in app.routes.ts as a Routes array",
+            "router-integration": "Router must be provided via provideRouter() in app.config.ts"
+        },
+        "architectural_constraints": {
+            "router-configuration": "All route definitions centralized in ./app/app.routes.ts",
+            "router-integration": "Router outlet must be present in root app.html template"
+        }
+    },
+    "application-bootstrap": {
+        "required_patterns": {
+            "bootstrap-method": "Application must bootstrap using bootstrapApplication() function with standalone root component",
+            "configuration-provider": "All providers must be configured in appConfig object in app.config.ts",
+            "provider-functions": "Use provider functions (provideRouter, provideAnimationsAsync, providePrimeNG, etc.)"
+        },
+        "architectural_constraints": {
+            "bootstrap-method": "main.ts must import and bootstrap the App component using bootstrapApplication()",
+            "configuration-provider": "ApplicationConfig must be exported from app.config.ts and passed to bootstrapApplication()",
+            "provider-functions": "All framework configurations use modern provider functions, no NgModule-based configuration"
+        }
+    },
+    "theming-and-styling": {
+        "required_patterns": {
+            "primeng-theming": "PrimeNG theme must be configured using providePrimeNG with theme preset",
+            "global-styles": "Global styles in src/styles.css",
+            "component-styles": "Component-specific styles in colocated .css files"
+        },
+        "architectural_constraints": {
+            "primeng-theming": "Theme configuration uses Aura preset from @primeuix/themes",
+            "global-styles": "Global styles should be minimal, component styles should be scoped",
+            "component-styles": "Styles referenced via styleUrl property in component decorator"
+        }
+    },
+    "testing": {
+        "required_patterns": {
+            "unit-testing-framework": "Jasmine test framework with Karma runner",
+            "test-file-naming": "Test files must use .spec.ts extension",
+            "test-colocation": "Test files colocated with source files"
+        },
+        "architectural_constraints": {
+            "unit-testing-framework": "All tests use Jasmine syntax (describe, it, expect)",
+            "test-file-naming": "Component tests named as {component-name}.spec.ts",
+            "test-colocation": "Tests live alongside the code they test (e.g., app.spec.ts next to app.ts)"
+        }
+    }
+}
