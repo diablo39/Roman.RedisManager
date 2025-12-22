@@ -1,0 +1,35 @@
+<div class="about-container">
+    <p-card [header]="title()">
+        <div class="info-section">
+            <h2>Roman Redis Manager UI</h2>
+            <p class="version">Wersja: {{ version() }}</p>
+            <p class="description">
+                Nowoczesna aplikacja do zarządzania bazami danych Redis.
+                Stworzona z wykorzystaniem najnowszych technologii webowych.
+            </p>
+        </div>
+
+        <p-divider />
+
+        <div class="tech-section">
+            <h3>Technologie</h3>
+            <div class="tech-list">
+                @for (tech of technologies(); track tech) {
+                <span class="tech-badge">{{ tech }}</span>
+                }
+            </div>
+        </div>
+
+        <p-divider />
+
+        <div class="features-section">
+            <h3>Cechy</h3>
+            <ul>
+                <li>Architektura standalone components</li>
+                <li>Reaktywność oparta na sygnałach</li>
+                <li>Nowoczesny UI z PrimeNG</li>
+                <li>Ścisła typizacja TypeScript</li>
+            </ul>
+        </div>
+    </p-card>
+</div>

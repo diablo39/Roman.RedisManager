@@ -1,0 +1,20 @@
+<div class="home-container">
+  <p-card [header]="title()">
+    <p class="description">{{ description() }}</p>
+    
+    <div class="features">
+      <h2>Funkcje Redis Manager</h2>
+      <ul>
+        <li>Zarządzanie połączeniami Redis</li>
+        <li>Przeglądanie kluczy i wartości</li>
+        <li>Monitorowanie serwera</li>
+        <li>Wykonywanie poleceń Redis</li>
+      </ul>
+    </div>
+
+    <div class="actions">
+      <p-button label="Rozpocznij" icon="pi pi-play" severity="success" />
+      <p-button label="Dokumentacja" icon="pi pi-book" severity="secondary" />
+    </div>
+  </p-card>
+</div>
