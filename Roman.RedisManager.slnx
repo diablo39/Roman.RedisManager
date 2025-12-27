@@ -1,10 +1,10 @@
 <Solution>
   <Folder Name="/src/">
-    <Project Path="F:/Source/Repos/Roman.RedisManager/Roman.RedisManager.Domain/Roman.RedisManager.Domain.csproj" Id="00377196-a335-46b0-9f37-4ef0e144e329" />
-    <Project Path="F:/Source/Repos/Roman.RedisManager/Roman.RedisManager.Infrastructure/Roman.RedisManager.Infrastructure.csproj" Id="0e922aaf-589f-416d-a312-486053066256" />
-    <Project Path="F:/Source/Repos/Roman.RedisManager/src/Roman.RedisManager.Web/Roman.RedisManager.Web.csproj" />
+    <Project Path="src/Roman.RedisManager.Domain/Roman.RedisManager.Domain.csproj" />
+    <Project Path="src/Roman.RedisManager.Infrastructure/Roman.RedisManager.Infrastructure.csproj" />
+    <Project Path="src/Roman.RedisManager.Web/Roman.RedisManager.Web.csproj" />
   </Folder>
   <Folder Name="/tests/">
-    <Project Path="F:/Source/Repos/Roman.RedisManager/tests/Roman.RedisManager.Tests/Roman.RedisManager.Tests.csproj" Id="5055907c-b410-4e36-8807-80e0d99fdc38" />
+    <Project Path="tests/Roman.RedisManager.Tests/Roman.RedisManager.Tests.csproj" />
   </Folder>
 </Solution>

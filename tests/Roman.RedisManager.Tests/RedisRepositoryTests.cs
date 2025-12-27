@@ -19,5 +19,6 @@ namespace Roman.RedisManager.Tests
             result.Keys.ShouldNotBeEmpty();
             result.Iterator.ShouldNotBeNullOrWhiteSpace();
         }
+
     }
 }
