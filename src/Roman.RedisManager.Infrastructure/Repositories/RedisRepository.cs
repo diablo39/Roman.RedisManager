@@ -1,4 +1,5 @@
-﻿using Roman.RedisManager.Domain.Repositories;
+﻿using Roman.RedisManager.Domain.Entities;
+using Roman.RedisManager.Domain.Repositories;
 using StackExchange.Redis;
 using System;
 using System.Collections.Generic;

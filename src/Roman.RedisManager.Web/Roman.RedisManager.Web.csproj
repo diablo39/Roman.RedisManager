@@ -14,4 +14,8 @@
     <Folder Include="wwwroot\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Roman.RedisManager.Infrastructure\Roman.RedisManager.Infrastructure.csproj" />
+  </ItemGroup>
+
 </Project>

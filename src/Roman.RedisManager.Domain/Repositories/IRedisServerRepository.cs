@@ -5,8 +5,8 @@ using System.Text;
 
 namespace Roman.RedisManager.Domain.Repositories
 {
-    public interface IRedisRepository
+    public interface IRedisServerRepository
     {
-        ReadisSearchResult SearchForKeys(string predicate);
+        IEnumerable<RedisServer> ListRedisServers();
     }
 }

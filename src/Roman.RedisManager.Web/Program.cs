@@ -1,4 +1,6 @@
 
+using Roman.RedisManager.Web.Configuration;
+
 namespace Roman.RedisManager.Web
 {
     public class Program
@@ -6,6 +8,12 @@ namespace Roman.RedisManager.Web
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
+
+            builder.Services
+                .AddOptions<RedisConfiguration>()
+                .Bind(builder.Configuration.GetSection(RedisConfiguration.SectionName))
+                .ValidateDataAnnotations()
+                .ValidateOnStart();
 
             // Add services to the container.
 
@@ -26,10 +34,10 @@ namespace Roman.RedisManager.Web
             app.UseAuthorization();
 
 
-            app.UseDefaultFiles(); 
-            app.UseStaticFiles();  
+            app.UseDefaultFiles();
+            app.UseStaticFiles();
 
-            app.MapControllers(); 
+            app.MapControllers();
 
             // SPA fallback: serve index.html for non-API routes (Angular routing support)
             app.MapFallbackToFile("index.html");
