@@ -7,6 +7,6 @@ namespace Roman.RedisManager.Domain.Repositories
 {
     public interface IRedisRepository
     {
-        ReadisSearchResult SearchForKeys(string predicate);
+        RedisSearchResult SearchForKeys(string predicate);
     }
 }

@@ -4,6 +4,7 @@ using StackExchange.Redis;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using RedisKey = Roman.RedisManager.Domain.Entities.RedisKey;
 
 namespace Roman.RedisManager.Infrastructure.Repositories
 {
@@ -15,9 +16,17 @@ namespace Roman.RedisManager.Infrastructure.Repositories
         {
             _redisConnectionMultiplexer = redisConnectionMultiplexer;
         }
-        public ReadisSearchResult SearchForKeys(string predicate)
-        {            
-            throw new NotImplementedException();
+        public RedisSearchResult SearchForKeys(string predicate)
+        {
+            var serverEndpoints = _redisConnectionMultiplexer.GetEndPoints();
+
+            //TODO: fix searching - will not work for Redis Cluster
+            var server = _redisConnectionMultiplexer.GetServer(serverEndpoints.First());
+            var searchResult = server.Keys(pattern: predicate);
+            var cursor = (IScanningCursor)searchResult;
+            var keys = searchResult.Select(e => new RedisKey(e.ToString())).ToList();
+
+            return new RedisSearchResult(keys, cursor.Cursor);
         }
     }
 }
