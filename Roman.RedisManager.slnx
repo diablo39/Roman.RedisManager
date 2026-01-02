@@ -1,4 +1,8 @@
 <Solution>
+  <Folder Name="/Solution Items/">
+    <File Path=".github/copilot-instructions.md" />
+    <File Path="README.md" />
+  </Folder>
   <Folder Name="/src/">
     <Project Path="src/Roman.RedisManager.Application/Roman.RedisManager.Application.csproj" Id="545907d2-2e06-4496-baa9-65d392345a07" />
     <Project Path="src/Roman.RedisManager.Domain/Roman.RedisManager.Domain.csproj" />
