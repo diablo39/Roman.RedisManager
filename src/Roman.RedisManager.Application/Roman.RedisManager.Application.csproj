@@ -6,4 +6,8 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Roman.RedisManager.Domain\Roman.RedisManager.Domain.csproj" />
+  </ItemGroup>
+
 </Project>
