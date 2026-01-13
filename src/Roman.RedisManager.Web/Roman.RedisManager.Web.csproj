@@ -26,6 +26,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<ProjectReference Include="..\Roman.RedisManager.Application\Roman.RedisManager.Application.csproj" />
 		<ProjectReference Include="..\Roman.RedisManager.Infrastructure\Roman.RedisManager.Infrastructure.csproj" />
 	</ItemGroup>
 
