@@ -1,0 +1,9 @@
+{
+  "servers": {
+    "my-mcp-server-4eccf67c": {
+      "url": "https://mcp.vuetifyjs.com/mcp",
+      "type": "http"
+    }
+  },
+  "inputs": []
+}

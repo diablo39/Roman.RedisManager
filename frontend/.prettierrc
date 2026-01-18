@@ -7,6 +7,6 @@
   "printWidth": 100,
   "endOfLine": "crlf",
   "arrowParens": "avoid",
-  "vueIndentScriptAndStyle": false,
+  "vueIndentScriptAndStyle": true,
   "htmlWhitespaceSensitivity": "ignore"
 }

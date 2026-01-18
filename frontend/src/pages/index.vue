@@ -2,10 +2,10 @@
   <v-container fluid>
     <v-sheet
       border="dashed md"
+      class="d-flex align-center justify-center"
       color="surface-light"
       height="400"
       rounded="lg"
-      class="d-flex align-center justify-center"
     >
       <div class="text-h6">Main Content Area</div>
     </v-sheet>
@@ -13,5 +13,5 @@
 </template>
 
 <script lang="ts" setup>
-  //
+console.log('Index page loaded')
 </script>
