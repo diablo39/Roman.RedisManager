@@ -1,11 +1,15 @@
 <template>
-  <v-main>
-    <router-view />
-  </v-main>
+  <v-layout>
+    <v-app-bar color="primary" dark title="Redis Manager" />
 
-  <AppFooter />
+    <v-navigation-drawer>
+      <ServerMenu />
+    </v-navigation-drawer>
+
+    <v-main>
+      <router-view />
+    </v-main>
+  </v-layout>
 </template>
 
-<script lang="ts" setup>
-  //
-</script>
+<script lang="ts" setup></script>
