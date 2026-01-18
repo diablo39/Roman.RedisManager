@@ -10,6 +10,30 @@ This file provides AI coding assistants with comprehensive instructions for gene
 
 ---
 
+## Vuetify MCP Server
+
+This project has access to the **Vuetify Model Context Protocol (MCP) server** which provides real-time access to Vuetify documentation and API information. When working with Vuetify components, directives, or features:
+
+**Available MCP Tools**:
+- `get_component_api_by_version` - Get complete API documentation for any Vuetify component
+- `get_directive_api_by_version` - Get API information for Vuetify directives (v-ripple, etc.)
+- `get_feature_guide` - Access feature documentation (accessibility, theming, etc.)
+- `get_vuetify_api_by_version` - Download and cache Vuetify API types by version
+
+**When to Use MCP Server**:
+- When unsure about component props, events, or slots
+- When implementing complex Vuetify features
+- To verify correct API usage for components
+- To explore available Vuetify component options
+
+**Example Usage**:
+```
+Need v-data-table props? → Use get_component_api_by_version('v-data-table')
+Need theming guide? → Use get_feature_guide('theme')
+```
+
+---
+
 ## Project Context
 
 ### Application Domain
