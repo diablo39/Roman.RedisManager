@@ -1,0 +1,51 @@
+{
+  "vue-components": [
+    "./src/App.vue",
+    "./src/components/AppFooter.vue",
+    "./src/components/HelloWorld.vue"
+  ],
+  "vue-pages": ["./src/pages/index.vue"],
+  "vue-layouts": ["./src/layouts/default.vue"],
+  "pinia-stores": ["./src/stores/app.ts", "./src/stores/index.ts"],
+  "router-configuration": ["./src/router/index.ts"],
+  "plugin-configuration": [
+    "./src/plugins/index.ts",
+    "./src/plugins/vuetify.ts"
+  ],
+  "application-entry": ["./src/main.ts"],
+  "typescript-types": [
+    "./src/auto-imports.d.ts",
+    "./src/components.d.ts",
+    "./src/typed-router.d.ts",
+    "./env.d.ts"
+  ],
+  "build-configuration": [
+    "./vite.config.mts",
+    "./tsconfig.json",
+    "./tsconfig.app.json",
+    "./tsconfig.node.json"
+  ],
+  "linting-configuration": [
+    "./eslint.config.js",
+    "./.eslintrc-auto-import.json"
+  ],
+  "styling": ["./src/styles/settings.scss"],
+  "static-assets": [
+    "./src/assets/logo.png",
+    "./src/assets/logo.svg",
+    "./public/favicon.ico"
+  ],
+  "html-entry": ["./index.html"],
+  "package-management": ["./package.json", "./package-lock.json"],
+  "documentation": [
+    "./README.md",
+    "./src/components/README.md",
+    "./src/layouts/README.md",
+    "./src/pages/README.md",
+    "./src/plugins/README.md",
+    "./src/stores/README.md",
+    "./src/styles/README.md"
+  ],
+  "editor-configuration": ["./.editorconfig", "./.browserslistrc"],
+  "git-configuration": ["./.gitignore"]
+}

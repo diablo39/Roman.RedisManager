@@ -1,0 +1,84 @@
+{
+  "ui": {
+    "required_patterns": {
+      "component-structure": "All Vue components use <script setup lang=\"ts\"> with Composition API",
+      "vuetify-components": "UI built exclusively with Vuetify 3 components (v-container, v-card, v-btn, etc.)",
+      "auto-imported-components": "Components in src/components/ are auto-imported without explicit import statements",
+      "material-design-icons": "Icons use Material Design Icons with mdi- prefix"
+    },
+    "architectural_constraints": {
+      "component-structure": "Components must use Composition API with <script setup> syntax, no Options API",
+      "vuetify-components": "All UI elements should use Vuetify components for consistency with Material Design",
+      "template-first": "Components use <template> with Vuetify components, avoiding JSX/TSX",
+      "styling": "Styling uses Vuetify's theming system and utility classes, custom styles in scoped <style> blocks with SCSS",
+      "responsive": "Must use Vuetify's responsive grid system (v-row, v-col) and breakpoint utilities"
+    }
+  },
+  "routing": {
+    "required_patterns": {
+      "file-based-routing": "Routes auto-generated from src/pages/*.vue files using unplugin-vue-router",
+      "layout-integration": "Routes integrated with layout system via setupLayouts from virtual:generated-layouts",
+      "router-view": "Router rendered through <router-view /> in layouts"
+    },
+    "architectural_constraints": {
+      "file-based-routing": "All routes must be created as .vue files in src/pages/ directory - no manual route registration",
+      "route-naming": "Route paths derived from file names and directory structure in pages/",
+      "typed-routes": "Router is fully typed via typed-router.d.ts, use typed route helpers",
+      "error-handling": "Router includes dynamic import error handling and reload mechanism"
+    }
+  },
+  "state-management": {
+    "required_patterns": {
+      "pinia-stores": "State management uses Pinia stores",
+      "store-definition": "Stores defined with defineStore from auto-imported Pinia",
+      "options-syntax": "Stores use options syntax with state, getters, actions"
+    },
+    "architectural_constraints": {
+      "pinia-only": "Must use Pinia for state management, no Vuex or other libraries",
+      "store-location": "All stores located in src/stores/ directory",
+      "auto-import": "defineStore and storeToRefs are auto-imported, no manual imports needed",
+      "typed": "Stores should be fully typed with TypeScript"
+    }
+  },
+  "design-system": {
+    "required_patterns": {
+      "vuetify-theme": "Theming configured in src/plugins/vuetify.ts with system/light/dark mode support",
+      "material-design": "Follows Material Design principles via Vuetify components",
+      "mdi-icons": "Material Design Icons (@mdi/font) for all iconography",
+      "roboto-font": "Roboto font loaded via @fontsource/roboto"
+    },
+    "architectural_constraints": {
+      "vuetify-theme": "Theme customization must be done through Vuetify's theme configuration or SCSS variables in settings.scss",
+      "no-custom-ui-lib": "Cannot introduce other UI libraries (Bootstrap, Ant Design, etc.) - use Vuetify exclusively",
+      "consistent-spacing": "Use Vuetify spacing utilities (ma-, pa-, etc.) for consistency",
+      "color-system": "Use Vuetify's color system and theme variables"
+    }
+  },
+  "build-system": {
+    "required_patterns": {
+      "vite": "Application built with Vite as build tool",
+      "auto-imports": "Auto-import plugins for Vue APIs, components, and composables",
+      "type-checking": "TypeScript type-checking via vue-tsc",
+      "hot-reload": "Development with HMR via Vite dev server"
+    },
+    "architectural_constraints": {
+      "vite-plugins": "Configuration managed through vite.config.mts with specific plugins (VueRouter, Layouts, AutoImport, Components, Vuetify, Fonts)",
+      "typescript": "Strict TypeScript usage throughout the codebase",
+      "no-manual-imports": "Leverage auto-import system instead of manual imports for Vue APIs, Vuetify components, and custom components",
+      "module-resolution": "Use @ alias for src/ directory imports"
+    }
+  },
+  "layout-system": {
+    "required_patterns": {
+      "layout-files": "Layouts defined in src/layouts/ directory",
+      "layout-structure": "Layouts contain <v-main> wrapper with <router-view /> for page content",
+      "shared-ui": "Common UI elements (headers, footers, nav) placed in layouts"
+    },
+    "architectural_constraints": {
+      "layout-plugin": "Layout system powered by vite-plugin-vue-layouts-next",
+      "default-layout": "Pages use default.vue layout unless specified otherwise",
+      "v-app-structure": "Root App.vue contains <v-app> wrapper for Vuetify",
+      "layout-composition": "Layouts can import and use shared components like AppFooter"
+    }
+  }
+}
