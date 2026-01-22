@@ -3,7 +3,7 @@
     <v-app-bar color="primary" dark title="Redis Manager" />
 
     <v-navigation-drawer>
-      <ServerMenu />
+      <Menu />
     </v-navigation-drawer>
 
     <v-main>
