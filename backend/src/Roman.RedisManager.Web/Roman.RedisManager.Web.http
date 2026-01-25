@@ -1,6 +1,6 @@
-@Roman.RedisManager.Web_HostAddress = http://localhost:5099
+@Roman.RedisManager.Web_HostAddress = https://localhost:7244
 
-GET {{Roman.RedisManager.Web_HostAddress}}/weatherforecast/
-Accept: application/json
+GET {{Roman.RedisManager.Web_HostAddress}}/api/redisservers
 
 ###
+

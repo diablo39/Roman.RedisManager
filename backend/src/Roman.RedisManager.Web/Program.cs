@@ -1,7 +1,8 @@
-using Roman.RedisManager.Web.Configuration;
-using Wolverine;
 using Roman.RedisManager.Domain.Repositories;
 using Roman.RedisManager.Infrastructure.Repositories;
+using Roman.RedisManager.Web.Configuration;
+using System.Reflection;
+using Wolverine;
 
 namespace Roman.RedisManager.Web
 {
@@ -28,8 +29,14 @@ namespace Roman.RedisManager.Web
 
             builder.UseWolverine(opts =>
             {
-                // Other configuration...
-                
+                foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
+                {
+                    if (assembly.GetName().Name!.StartsWith("Roman.RedisManager"))
+                    {
+                        opts.Discovery.IncludeAssembly(assembly);
+                    }
+                }
+
                 // But wait! Optimize Wolverine for usage as *only*
                 // a mediator
                 opts.Durability.Mode = DurabilityMode.MediatorOnly;

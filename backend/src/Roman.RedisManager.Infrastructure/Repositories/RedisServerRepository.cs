@@ -17,11 +17,11 @@ namespace Roman.RedisManager.Infrastructure.Repositories
             _redisConfiguration = redisConfiguration ?? throw new ArgumentNullException(nameof(redisConfiguration));
         }
 
-        public IEnumerable<RedisServer> ListRedisServers()
+        public IReadOnlyCollection<RedisServer> ListRedisServers()
         {
             RedisConfiguration configuration = _redisConfiguration.Value ?? throw new Exception("Configuration can't be null");
             
-            var result = configuration.Servers.Select(e => new RedisServer(e.Name, e.Endpoints.ToList()));
+            var result = configuration.Servers.Select(e => new RedisServer(e.Name, e.Endpoints.ToList())).ToList();
 
             return result;
         }

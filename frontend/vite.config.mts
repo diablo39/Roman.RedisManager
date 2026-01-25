@@ -32,6 +32,7 @@ export default defineConfig({
         enabled: true,
       },
       vueTemplate: true,
+      dirs: ['src/stores'],
     }),
     Components({
       dts: 'src/components.d.ts',
@@ -76,5 +77,12 @@ export default defineConfig({
   },
   server: {
     port: 3000,
+    proxy: {
+      '/api': {
+        target: 'https://localhost:7244',
+        changeOrigin: true,
+        secure: false,
+      },
+    },
   },
 })

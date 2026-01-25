@@ -7,6 +7,6 @@ namespace Roman.RedisManager.Domain.Repositories
 {
     public interface IRedisServerRepository
     {
-        IEnumerable<RedisServer> ListRedisServers();
+        IReadOnlyCollection<RedisServer> ListRedisServers();
     }
 }
