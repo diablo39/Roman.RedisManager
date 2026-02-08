@@ -1,0 +1,132 @@
+{
+  "web-api": {
+    "description": "ASP.NET Core Web API controllers serving as the HTTP presentation layer.",
+    "relevant_files": [
+      "src/Roman.RedisManager.Web/Controllers/RedisServersController.cs",
+      "src/Roman.RedisManager.Web/Program.cs"
+    ],
+    "required_patterns": {
+      "controller-base-class": "All controllers inherit from ControllerBase and use [ApiController] attribute.",
+      "route-convention": "Routes use [Route(\"api/{resource-name}\")] with kebab-case resource names.",
+      "mediator-dispatch": "Controllers do not call repositories directly. All business logic is dispatched via IMessageBus (Wolverine) using InvokeAsync<TResult>.",
+      "constructor-injection": "Controllers receive dependencies through constructor injection using expression-bodied constructors."
+    },
+    "architectural_constraints": {
+      "no-direct-repository-access": "Controllers must NOT inject or use repository interfaces directly — they must go through Wolverine IMessageBus.",
+      "no-business-logic": "Controllers contain zero business logic; they only map HTTP requests to CQRS messages and return results.",
+      "api-prefix": "All API endpoints are prefixed with 'api/'."
+    }
+  },
+  "cqrs-messaging": {
+    "description": "CQRS pattern implemented via Wolverine mediator for in-process query/command handling.",
+    "relevant_files": [
+      "src/Roman.RedisManager.Application/CQRS/RedisServersQueryHandler.cs"
+    ],
+    "required_patterns": {
+      "static-handler-class": "Handler classes are static classes with a static Handle method.",
+      "handler-method-signature": "The Handle method takes the query/command object as the first parameter, followed by dependencies (repositories, services) that Wolverine resolves via DI.",
+      "message-types": "Query classes are plain C# classes with public get/set properties. Result types are C# records.",
+      "dto-mapping": "Handlers map domain entities to DTOs before returning results. DTOs are defined alongside the handler.",
+      "namespace-convention": "Handlers use the namespace Roman.RedisManager.Web.Wolverine."
+    },
+    "architectural_constraints": {
+      "wolverine-discovery": "Handlers must be in assemblies whose names start with 'Roman.RedisManager' to be auto-discovered.",
+      "mediator-only": "Wolverine is configured in MediatorOnly mode — no durable messaging or external transport.",
+      "handler-location": "Handlers live in src/Roman.RedisManager.Application/CQRS/."
+    }
+  },
+  "domain-model": {
+    "description": "Core domain entities and repository interfaces — the innermost layer with no external dependencies.",
+    "relevant_files": [
+      "src/Roman.RedisManager.Domain/Entities/RedisServer.cs",
+      "src/Roman.RedisManager.Domain/Entities/RedisKey.cs",
+      "src/Roman.RedisManager.Domain/Entities/RedisSearchResult.cs",
+      "src/Roman.RedisManager.Domain/Repositories/IRedisRepository.cs",
+      "src/Roman.RedisManager.Domain/Repositories/IRedisServerRepository.cs"
+    ],
+    "required_patterns": {
+      "entity-encapsulation": "Entity properties use 'internal set' or 'protected set' to restrict mutation to the domain layer.",
+      "primary-constructors": "Simple entities use C# primary constructors (e.g., RedisKey(string key)).",
+      "traditional-constructors": "Complex entities use explicit constructors with parameter assignment.",
+      "computed-properties": "Derived/computed properties use expression-bodied getters (e.g., HasMoreResults).",
+      "repository-interface-location": "Repository interfaces live in Domain/Repositories/ and return domain entities."
+    },
+    "architectural_constraints": {
+      "no-external-dependencies": "The Domain project has zero NuGet package references — only framework types.",
+      "no-infrastructure-concerns": "Domain entities must not reference StackExchange.Redis, configuration, or ASP.NET types.",
+      "immutable-after-construction": "Entity state is set via constructors; setters are internal/protected."
+    }
+  },
+  "data-layer": {
+    "description": "Infrastructure implementations of repository interfaces using StackExchange.Redis and Options pattern.",
+    "relevant_files": [
+      "src/Roman.RedisManager.Infrastructure/Repositories/RedisRepository.cs",
+      "src/Roman.RedisManager.Infrastructure/Repositories/RedisServerRepository.cs"
+    ],
+    "required_patterns": {
+      "repository-pattern": "Each repository class implements an interface from Domain/Repositories/.",
+      "constructor-injection": "Repositories receive dependencies (IConnectionMultiplexer, IOptions<T>) via constructor injection.",
+      "null-guard": "Constructor parameters are validated with null-checks (throw ArgumentNullException).",
+      "domain-entity-mapping": "Repository methods return domain entity types, not Redis-specific types."
+    },
+    "architectural_constraints": {
+      "infrastructure-only-redis": "StackExchange.Redis types (IConnectionMultiplexer, IServer, etc.) are confined to the Infrastructure project.",
+      "options-pattern": "Configuration is injected via IOptions<RedisConfiguration>, not read directly from IConfiguration.",
+      "di-registration": "Repository implementations are registered in Program.cs as singletons."
+    }
+  },
+  "configuration": {
+    "description": "Strongly-typed configuration classes validated via data annotations, bound from appsettings.json.",
+    "relevant_files": [
+      "src/Roman.RedisManager.Infrastructure/Configuration/RedisConfiguration.cs",
+      "src/Roman.RedisManager.Infrastructure/Configuration/RedisServerConfiguration.cs",
+      "src/Roman.RedisManager.Web/appsettings.json"
+    ],
+    "required_patterns": {
+      "options-pattern": "Configuration classes use [Required], [MinLength], and [ConfigurationKeyName] attributes.",
+      "section-name-constant": "Root configuration classes define a const string SectionName for the config section key.",
+      "required-properties": "Properties use the 'required' modifier for mandatory settings.",
+      "validation-on-start": "Configuration is validated at startup via ValidateDataAnnotations() and ValidateOnStart()."
+    },
+    "architectural_constraints": {
+      "cross-layer-namespace": "Configuration classes physically live in Infrastructure/Configuration/ but use the namespace Roman.RedisManager.Web.Configuration.",
+      "no-secrets-in-config": "Credentials (User, Password) are nullable optional properties; sensitive values should use external secret stores.",
+      "flat-binding": "Configuration maps directly to a JSON section — no custom binders."
+    }
+  },
+  "testing": {
+    "description": "Unit and integration tests using xUnit and Shouldly assertion library.",
+    "relevant_files": [
+      "tests/Roman.RedisManager.Tests/RedisRepositoryTests.cs",
+      "tests/Roman.RedisManager.Tests/RedisServerRepositoryTests.cs",
+      "tests/Roman.RedisManager.Tests/GlobalUsings.cs"
+    ],
+    "required_patterns": {
+      "xunit-facts": "Tests use [Fact] attribute (no [Theory] parameterized tests currently).",
+      "shouldly-assertions": "Assertions use Shouldly methods (ShouldNotBeNull, ShouldNotBeEmpty, ShouldAllBe, ShouldContain).",
+      "arrange-act-assert": "Tests follow AAA pattern: create repository with real or configured dependencies, call method, assert.",
+      "helper-methods": "Shared test data is created via private helper methods (e.g., GetConfiguration()).",
+      "global-usings": "Xunit and Shouldly are imported via GlobalUsings.cs."
+    },
+    "architectural_constraints": {
+      "test-project-references": "Test project references Domain and Infrastructure only — not Web or Application.",
+      "no-mocking-framework": "No mocking library (Moq, NSubstitute) is used; tests use real implementations with configured options.",
+      "integration-style": "RedisRepositoryTests require a live Redis connection; RedisServerRepositoryTests use in-memory configuration."
+    }
+  },
+  "extensions": {
+    "description": "Reusable extension method utilities in a standalone project.",
+    "relevant_files": [
+      "src/Roman.RedisManager.Extensions/StringExtensions.cs"
+    ],
+    "required_patterns": {
+      "static-extension-class": "Extension methods are in static classes named {Type}Extensions.",
+      "single-responsibility": "Each extension class focuses on one type (e.g., StringExtensions for string).",
+      "global-using-import": "Extension namespaces are imported via GlobalUsings.cs in consuming projects."
+    },
+    "architectural_constraints": {
+      "no-external-dependencies": "Extensions project has zero NuGet dependencies — framework-only.",
+      "pure-functions": "Extension methods are pure functions with no side effects or state."
+    }
+  }
+}
