@@ -1,21 +1,20 @@
 <template>
   <v-card class="fill-height">
     <v-expansion-panels v-model="openPanels" density="comfortable" variant="accordion">
-      <v-expansion-panel :value="0" title="Redis Servers">
+      <v-expansion-panel :value="0" title="Servers">
         <v-expansion-panel-text class="pa-0">
           <v-infinite-scroll :height="300" :items="servers" @load="onLoad">
             <template v-for="server in servers" :key="server.id">
               <v-list-item
                 prepend-icon="mdi-database"
                 :title="server.name"
-                @click="selectServer(server)"
+                :to="`/redis/${server.id}`"
                 nav
-                to="/"
               />
             </template>
 
             <template #empty>
-              <div class="pa-4 text-center text-caption text-medium-emphasis">No more servers</div>
+              <!-- <div class="pa-4 text-center text-caption text-medium-emphasis">No more servers</div> -->
             </template>
 
             <template #error="{ props }">
@@ -40,18 +39,10 @@
 </template>
 
 <script setup lang="ts">
-  import type { RedisServerDto } from '@/api/redisServers'
-
-  const router = useRouter()
   const redisServersStore = useRedisServersStore()
   const { servers, hasNext } = storeToRefs(redisServersStore)
 
   const openPanels = ref([0])
-
-  function selectServer(server: RedisServerDto) {
-    console.log('Selected server:', server)
-    // TODO: Replace with real selection handling when implemented
-  }
 
   async function onLoad({
     done,
