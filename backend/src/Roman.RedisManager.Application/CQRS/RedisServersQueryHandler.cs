@@ -3,6 +3,14 @@ using Roman.RedisManager.Domain.Repositories;
 
 namespace Roman.RedisManager.Web.Wolverine
 {
+    public class RedisServersQuery
+    {
+        public int PageSize { get; set; }
+
+        public int PageNumber { get; set; }
+
+    }
+
     public record RedisServerDto(string Name, string Id);
 
     public record RedisServersQueryResult(
@@ -22,7 +30,7 @@ namespace Roman.RedisManager.Web.Wolverine
             var pagedServers = allServers
                 .Skip(skip)
                 .Take(query.PageSize)
-                .Select(s => new RedisServerDto(s.Name, s.Name))
+                .Select(s => new RedisServerDto(s.Name, s.Name.ToMd5Hash()))
                 .ToList();
 
             return new RedisServersQueryResult(pagedServers, totalCount, query.PageNumber, query.PageSize);

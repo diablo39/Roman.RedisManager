@@ -5,7 +5,7 @@
     "version": "1.0.0"
   },
   "paths": {
-    "/api/RedisServers": {
+    "/api/redis-servers": {
       "get": {
         "tags": [
           "RedisServers"

@@ -5,11 +5,11 @@ using Wolverine;
 
 namespace Roman.RedisManager.Web.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/redis-servers")]
     [ApiController]
     public class RedisServersController : ControllerBase
     {
-        // GET: api/RedisServers
+        // GET: api/redis-servers
         private readonly IMessageBus _bus;
 
         public RedisServersController(IMessageBus bus) => _bus = bus;

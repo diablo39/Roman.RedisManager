@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Roman.RedisManager.Domain\Roman.RedisManager.Domain.csproj" />
+    <ProjectReference Include="..\Roman.RedisManager.Extensions\Roman.RedisManager.Extensions.csproj" />
   </ItemGroup>
 
 </Project>
