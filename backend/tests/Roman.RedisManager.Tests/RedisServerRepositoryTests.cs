@@ -1,8 +1,8 @@
 using Microsoft.Extensions.Options;
 using Roman.RedisManager.Domain.Entities;
 using Roman.RedisManager.Domain.Repositories;
+using Roman.RedisManager.Infrastructure.Configuration;
 using Roman.RedisManager.Infrastructure.Repositories;
-using Roman.RedisManager.Web.Configuration;
 using System.Linq;
 
 namespace Roman.RedisManager.Tests

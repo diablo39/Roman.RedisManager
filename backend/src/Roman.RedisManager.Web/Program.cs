@@ -1,7 +1,6 @@
 using Roman.RedisManager.Domain.Repositories;
+using Roman.RedisManager.Infrastructure.Configuration;
 using Roman.RedisManager.Infrastructure.Repositories;
-using Roman.RedisManager.Web.Configuration;
-using System.Reflection;
 using Wolverine;
 
 namespace Roman.RedisManager.Web

@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using System.ComponentModel.DataAnnotations;
 
-namespace Roman.RedisManager.Web.Configuration
+namespace Roman.RedisManager.Infrastructure.Configuration
 {
     public class RedisConfiguration
     {

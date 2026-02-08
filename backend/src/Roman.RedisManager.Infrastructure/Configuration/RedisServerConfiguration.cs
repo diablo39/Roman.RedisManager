@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
 
-namespace Roman.RedisManager.Web.Configuration
+namespace Roman.RedisManager.Infrastructure.Configuration
 {
     public class RedisServerConfiguration
     {
