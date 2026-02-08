@@ -48,12 +48,14 @@ namespace Roman.RedisManager.Tests
                     new RedisServerGroupConfiguration
                     {
                         Name = "Test server 1",
-                        Endpoints = ["localhost:6379"]
+                        Endpoints = ["localhost:6379"],
+                        GroupType = GroupType.Standalone
                     },
                     new RedisServerGroupConfiguration
                     {
                         Name = "Test server 2",
-                        Endpoints = ["localhost:16379"]
+                        Endpoints = ["localhost:16379"],
+                        GroupType = GroupType.Cluster
                     }
                 ]
             };

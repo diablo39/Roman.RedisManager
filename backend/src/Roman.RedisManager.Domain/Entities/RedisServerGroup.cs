@@ -6,10 +6,13 @@ namespace Roman.RedisManager.Domain.Entities
 
         public IEnumerable<string> Endpoints { get; internal set; }
 
-        public RedisServerGroup(string name, IEnumerable<string> endpoints)
+        public GroupType GroupType { get; internal set; }
+
+        public RedisServerGroup(string name, IEnumerable<string> endpoints, GroupType groupType)
         {
             Name = name;
             Endpoints = endpoints;
+            GroupType = groupType;
         }
 
     }

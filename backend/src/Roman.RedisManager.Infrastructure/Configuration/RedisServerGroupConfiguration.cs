@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Configuration;
+using Roman.RedisManager.Domain.Entities;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
 
@@ -16,10 +17,10 @@ namespace Roman.RedisManager.Infrastructure.Configuration
         [ConfigurationKeyName("Endpoints")]
         public required IEnumerable<string> Endpoints { get; set; }
 
-        [ConfigurationKeyName("Password")]
-        public string? Password { get; set; }
+        [Required]
+        [ConfigurationKeyName("GroupType")]
+        public required GroupType GroupType { get; set; }
 
-        [ConfigurationKeyName("User")]
-        public string? User { get; set; }
+ 
     }
 }

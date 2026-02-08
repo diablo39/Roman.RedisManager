@@ -65,10 +65,17 @@
   },
   "components": {
     "schemas": {
+      "GroupType": {
+        "enum": [
+          "Standalone",
+          "Cluster"
+        ]
+      },
       "RedisServerGroupDto": {
         "required": [
           "name",
-          "id"
+          "id",
+          "groupType"
         ],
         "type": "object",
         "properties": {
@@ -77,6 +84,9 @@
           },
           "id": {
             "type": "string"
+          },
+          "groupType": {
+            "$ref": "#/components/schemas/GroupType"
           }
         }
       },

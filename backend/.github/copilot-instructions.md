@@ -1,5 +1,9 @@
 # Copilot Instructions — Roman.RedisManager
 
+## Important Note
+
+All questions should be printed as a numbered list of options.
+
 ## 1. Overview
 
 This file enables AI coding assistants (GitHub Copilot, etc.) to generate features that are **consistent with the existing architecture, conventions, and patterns** of the Roman.RedisManager codebase.
