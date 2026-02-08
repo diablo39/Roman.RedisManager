@@ -7,7 +7,7 @@ namespace Roman.RedisManager.Tests
 {
     public class RedisRepositoryTests
     {
-        [Fact]
+        [Fact(Skip = "Requires local Redis instance")]
         public void SearchForKeys_ShouldReturnNonNullAndNonEmptyKeys()
         {
             // Arrange

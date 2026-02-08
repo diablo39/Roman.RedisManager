@@ -1,10 +1,10 @@
-﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Configuration;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
 
 namespace Roman.RedisManager.Infrastructure.Configuration
 {
-    public class RedisServerConfiguration
+    public class RedisServerGroupConfiguration
     {
         [Required]
         [MinLength(1)]

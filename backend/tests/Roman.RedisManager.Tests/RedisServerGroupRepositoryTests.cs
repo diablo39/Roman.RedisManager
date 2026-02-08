@@ -7,16 +7,16 @@ using System.Linq;
 
 namespace Roman.RedisManager.Tests
 {
-    public class RedisServerRepositoryTests
+    public class RedisServerGroupRepositoryTests
     {
         [Fact]
-        public void ListRedisServers_WhenCalled_ReturnsNonNullAndNonEmptyCollection()
+        public void ListRedisServerGroups_WhenCalled_ReturnsNonNullAndNonEmptyCollection()
         {
             // Arrange
-            IRedisServerRepository repository = new RedisServerRepository(Options.Create(GetConfiguration()));
+            IRedisServerGroupRepository repository = new RedisServerGroupRepository(Options.Create(GetConfiguration()));
 
             // Act
-            var result = repository.ListRedisServers();
+            var result = repository.ListRedisServerGroups();
 
             // Assert
             result.ShouldNotBeNull();
@@ -24,33 +24,33 @@ namespace Roman.RedisManager.Tests
         }
 
         [Fact]
-        public void ListRedisServers_ReturnedServers_HaveNameAndEndpoints()
+        public void ListRedisServerGroups_ReturnedServerGroups_HaveNameAndEndpoints()
         {
             // Arrange
-            IRedisServerRepository repository = new RedisServerRepository(Options.Create(GetConfiguration()));
+            IRedisServerGroupRepository repository = new RedisServerGroupRepository(Options.Create(GetConfiguration()));
 
             // Act
-            var servers = repository.ListRedisServers().ToList();
+            var serverGroups = repository.ListRedisServerGroups().ToList();
 
             // Assert
-            servers.ShouldAllBe(server => !string.IsNullOrWhiteSpace(server.Name));
-            servers.ShouldAllBe(server => server.Endpoints != null && server.Endpoints.Any());
+            serverGroups.ShouldAllBe(serverGroup => !string.IsNullOrWhiteSpace(serverGroup.Name));
+            serverGroups.ShouldAllBe(serverGroup => serverGroup.Endpoints != null && serverGroup.Endpoints.Any());
 
             // Additional check for endpoint format
-            servers.SelectMany(s => s.Endpoints).ShouldContain(e => e.Contains(':'));
+            serverGroups.SelectMany(s => s.Endpoints).ShouldContain(e => e.Contains(':'));
         }
 
         private RedisConfiguration GetConfiguration()
         {
             return new RedisConfiguration
             {
-                Servers = [
-                    new RedisServerConfiguration
+                ServerGroups = [
+                    new RedisServerGroupConfiguration
                     {
                         Name = "Test server 1",
                         Endpoints = ["localhost:6379"]
                     },
-                    new RedisServerConfiguration
+                    new RedisServerGroupConfiguration
                     {
                         Name = "Test server 2",
                         Endpoints = ["localhost:16379"]

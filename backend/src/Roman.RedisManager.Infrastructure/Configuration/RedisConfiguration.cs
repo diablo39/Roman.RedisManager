@@ -9,7 +9,7 @@ namespace Roman.RedisManager.Infrastructure.Configuration
 
         [Required]
         [MinLength(1)]
-        [ConfigurationKeyName("Servers")]
-        public required IEnumerable<RedisServerConfiguration> Servers { get; set; }
+        [ConfigurationKeyName("ServerGroups")]
+        public required IEnumerable<RedisServerGroupConfiguration> ServerGroups { get; set; }
     }
 }

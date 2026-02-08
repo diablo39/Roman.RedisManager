@@ -18,7 +18,7 @@ namespace Roman.RedisManager.Web
                 .ValidateOnStart();
 
             // Register repositories
-            builder.Services.AddSingleton<IRedisServerRepository, RedisServerRepository>();
+            builder.Services.AddSingleton<IRedisServerGroupRepository, RedisServerGroupRepository>();
 
             // Add services to the container.
 

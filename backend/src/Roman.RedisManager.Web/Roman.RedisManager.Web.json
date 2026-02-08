@@ -5,10 +5,10 @@
     "version": "1.0.0"
   },
   "paths": {
-    "/api/redis-servers": {
+    "/api/redis-server-groups": {
       "get": {
         "tags": [
-          "RedisServers"
+          "RedisServerGroups"
         ],
         "parameters": [
           {
@@ -44,17 +44,17 @@
             "content": {
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/RedisServersQueryResult"
+                  "$ref": "#/components/schemas/RedisServerGroupsQueryResult"
                 }
               },
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/RedisServersQueryResult"
+                  "$ref": "#/components/schemas/RedisServerGroupsQueryResult"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/RedisServersQueryResult"
+                  "$ref": "#/components/schemas/RedisServerGroupsQueryResult"
                 }
               }
             }
@@ -65,7 +65,7 @@
   },
   "components": {
     "schemas": {
-      "RedisServerDto": {
+      "RedisServerGroupDto": {
         "required": [
           "name",
           "id"
@@ -80,19 +80,19 @@
           }
         }
       },
-      "RedisServersQueryResult": {
+      "RedisServerGroupsQueryResult": {
         "required": [
-          "servers",
+          "serverGroups",
           "totalCount",
           "pageNumber",
           "pageSize"
         ],
         "type": "object",
         "properties": {
-          "servers": {
+          "serverGroups": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/RedisServerDto"
+              "$ref": "#/components/schemas/RedisServerGroupDto"
             }
           },
           "totalCount": {
@@ -125,7 +125,7 @@
   },
   "tags": [
     {
-      "name": "RedisServers"
+      "name": "RedisServerGroups"
     }
   ]
 }
