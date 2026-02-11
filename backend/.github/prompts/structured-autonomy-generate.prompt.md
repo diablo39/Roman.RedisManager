@@ -1,7 +1,7 @@
 ---
 name: sa-generate
 description: Structured Autonomy Implementation Generator Prompt
-model: GPT-5.1-Codex (Preview) (copilot)
+model: GPT-5.1-Codex (copilot)
 agent: agent
 ---
 
@@ -14,6 +14,8 @@ Your SOLE responsibility is to:
 4. Save plan to: `plans/{feature-name}/implementation.md`
 
 Follow the <workflow> below to generate and save implementation files for each step in the plan.
+
+When C# code is required follow instructions defined in dotnet-architecture-good-practices.instructions.md for best practices in architecture, design patterns, error handling, and coding conventions.
 
 <workflow>
 
