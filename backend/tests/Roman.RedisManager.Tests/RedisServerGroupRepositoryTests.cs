@@ -34,30 +34,31 @@ namespace Roman.RedisManager.Tests
 
             // Assert
             serverGroups.ShouldAllBe(serverGroup => !string.IsNullOrWhiteSpace(serverGroup.Name));
-            serverGroups.ShouldAllBe(serverGroup => serverGroup.Endpoints != null && serverGroup.Endpoints.Any());
+            serverGroups.ShouldAllBe(serverGroup => !string.IsNullOrWhiteSpace(serverGroup.ConnectionString));
 
-            // Additional check for endpoint format
-            serverGroups.SelectMany(s => s.Endpoints).ShouldContain(e => e.Contains(':'));
+            // Additional check for connection string format
+            serverGroups.Select(s => s.ConnectionString).ShouldContain(e => e.Contains(':'));
         }
 
         private RedisConfiguration GetConfiguration()
         {
             return new RedisConfiguration
             {
-                ServerGroups = [
+                ServerGroups = new[]
+                {
                     new RedisServerGroupConfiguration
                     {
                         Name = "Test server 1",
-                        Endpoints = ["localhost:6379"],
+                        ConnectionString = "localhost:6379",
                         GroupType = GroupType.Standalone
                     },
                     new RedisServerGroupConfiguration
                     {
                         Name = "Test server 2",
-                        Endpoints = ["localhost:16379"],
+                        ConnectionString = "localhost:16379",
                         GroupType = GroupType.Cluster
                     }
-                ]
+                }
             };
         }
     }

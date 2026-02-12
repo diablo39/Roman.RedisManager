@@ -6,7 +6,7 @@ namespace Roman.RedisManager.Domain.Repositories
 {
     public interface IRedisRepository
     {
-        RedisSearchResult SearchForKeys(string predicate);
+        Task<RedisSearchResult> SearchForKeysAsync(string groupId, string predicate);
 
         Task<IReadOnlyCollection<RedisServerNode>> GetServerNodesAsync(string groupId);
     }

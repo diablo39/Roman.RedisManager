@@ -14,8 +14,8 @@ namespace Roman.RedisManager.Infrastructure.Configuration
 
         [Required]
         [MinLength(1)]
-        [ConfigurationKeyName("Endpoints")]
-        public required IEnumerable<string> Endpoints { get; set; }
+        [ConfigurationKeyName("ConnectionString")]
+        public required string ConnectionString { get; set; }
 
         [Required]
         [ConfigurationKeyName("GroupType")]

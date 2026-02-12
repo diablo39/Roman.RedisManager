@@ -1,5 +1,6 @@
 using Roman.RedisManager.Domain.Repositories;
 using Roman.RedisManager.Infrastructure.Configuration;
+using Roman.RedisManager.Infrastructure.Redis;
 using Roman.RedisManager.Infrastructure.Repositories;
 using Wolverine;
 
@@ -17,13 +18,11 @@ namespace Roman.RedisManager.Web
                 .ValidateDataAnnotations()
                 .ValidateOnStart();
 
-            // Register repositories
+            builder.Services.AddSingleton<IRedisConnectionManager, RedisConnectionManager>();
             builder.Services.AddSingleton<IRedisServerGroupRepository, RedisServerGroupRepository>();
-
-            // Add services to the container.
+            builder.Services.AddSingleton<IRedisRepository, RedisRepository>();
 
             builder.Services.AddControllers();
-            // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
             builder.Services.AddOpenApi();
 
             builder.UseWolverine(opts =>
@@ -36,14 +35,11 @@ namespace Roman.RedisManager.Web
                     }
                 }
 
-                // But wait! Optimize Wolverine for usage as *only*
-                // a mediator
                 opts.Durability.Mode = DurabilityMode.MediatorOnly;
             });
 
             var app = builder.Build();
 
-            // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
                 app.MapOpenApi();
@@ -57,15 +53,12 @@ namespace Roman.RedisManager.Web
 
             app.UseAuthorization();
 
-
             app.UseDefaultFiles();
             app.UseStaticFiles();
 
             app.MapControllers();
 
-            // SPA fallback: serve index.html for non-API routes (Angular routing support)
             app.MapFallbackToFile("index.html");
-
 
             app.Run();
         }

@@ -1,6 +1,11 @@
 @Roman.RedisManager.Web_HostAddress = https://localhost:7244
+@RedisServerGroupId = 00000000000000000000000000000000
 
 GET {{Roman.RedisManager.Web_HostAddress}}/api/redis-server-groups
+
+###
+
+GET {{Roman.RedisManager.Web_HostAddress}}/api/redis-server-groups/{{RedisServerGroupId}}
 
 ###
 

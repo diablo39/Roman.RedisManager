@@ -4,14 +4,14 @@ namespace Roman.RedisManager.Domain.Entities
     {
         public string Name { get; internal set; }
 
-        public IEnumerable<string> Endpoints { get; internal set; }
+        public string ConnectionString { get; internal set; }
 
         public GroupType GroupType { get; internal set; }
 
-        public RedisServerGroup(string name, IEnumerable<string> endpoints, GroupType groupType)
+        public RedisServerGroup(string name, string connectionString, GroupType groupType)
         {
             Name = name;
-            Endpoints = endpoints;
+            ConnectionString = connectionString;
             GroupType = groupType;
         }
 
