@@ -1,7 +1,6 @@
 ﻿using Microsoft.Extensions.Options;
 using Roman.RedisManager.Domain.Entities;
 using Roman.RedisManager.Domain.Repositories;
-using Roman.RedisManager.Extensions;
 using Roman.RedisManager.Infrastructure.Configuration;
 using Roman.RedisManager.Infrastructure.Exceptions;
 using Roman.RedisManager.Infrastructure.Redis;
@@ -27,9 +26,9 @@ namespace Roman.RedisManager.Infrastructure.Repositories
             _redisConfiguration = redisConfiguration ?? throw new ArgumentNullException(nameof(redisConfiguration));
         }
 
-        public async Task<RedisSearchResult> SearchForKeysAsync(string groupId, string predicate)
+        public async Task<RedisSearchResult> SearchForKeysAsync(Guid groupId, string predicate)
         {
-            if (string.IsNullOrWhiteSpace(groupId))
+            if (groupId == Guid.Empty)
             {
                 throw new ArgumentException("Group identifier is required.", nameof(groupId));
             }
@@ -64,9 +63,9 @@ namespace Roman.RedisManager.Infrastructure.Repositories
             }
         }
 
-        public async Task<IReadOnlyCollection<RedisServerNode>> GetServerNodesAsync(string groupId)
+        public async Task<IReadOnlyCollection<RedisServerNode>> GetServerNodesAsync(Guid groupId)
         {
-            if (string.IsNullOrWhiteSpace(groupId))
+            if (groupId == Guid.Empty)
             {
                 throw new ArgumentException("Group identifier is required.", nameof(groupId));
             }

@@ -27,15 +27,16 @@ namespace Roman.RedisManager.Infrastructure.Redis
             _redisConfiguration = redisConfiguration ?? throw new ArgumentNullException(nameof(redisConfiguration));
         }
 
-        public async Task<IConnectionMultiplexer> GetConnectionAsync(string groupId)
+        public async Task<IConnectionMultiplexer> GetConnectionAsync(Guid groupId)
         {
-            if (string.IsNullOrWhiteSpace(groupId))
+            if (groupId == Guid.Empty)
             {
-                throw new ArgumentException("Group identifier cannot be null or whitespace.", nameof(groupId));
+                throw new ArgumentException("Group identifier cannot be empty.", nameof(groupId));
             }
 
-            var serverGroup = _redisConfiguration.Value .ResolveServerGroup(groupId);
-            var connectionTask = _connections.GetOrAdd(groupId, _ => CreateConnectionAsync(serverGroup));
+            var groupKey = groupId.ToString();
+            var serverGroup = _redisConfiguration.Value.ResolveServerGroup(groupId);
+            var connectionTask = _connections.GetOrAdd(groupKey, _ => CreateConnectionAsync(serverGroup));
 
             try
             {
@@ -43,7 +44,7 @@ namespace Roman.RedisManager.Infrastructure.Redis
             }
             catch
             {
-                _connections.TryRemove(groupId, out _);
+                _connections.TryRemove(groupKey, out _);
                 throw;
             }
         }

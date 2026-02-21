@@ -5,8 +5,12 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace Roman.RedisManager.Infrastructure.Configuration
 {
-    public class RedisServerGroupConfiguration
+    public class RedisServerGroupConfiguration : IValidatableObject
     {
+        [Required]
+        [ConfigurationKeyName("Id")]
+        public required Guid Id { get; set; }
+
         [Required]
         [MinLength(1)]
         [ConfigurationKeyName("Name")]
@@ -21,6 +25,12 @@ namespace Roman.RedisManager.Infrastructure.Configuration
         [ConfigurationKeyName("GroupType")]
         public required GroupType GroupType { get; set; }
 
- 
+        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+        {
+            if (Id == Guid.Empty)
+            {
+                yield return new ValidationResult("Id must be a non-empty GUID.", new[] { nameof(Id) });
+            }
+        }
     }
 }

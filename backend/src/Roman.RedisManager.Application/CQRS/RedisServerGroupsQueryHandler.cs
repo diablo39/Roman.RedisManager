@@ -11,7 +11,7 @@ namespace Roman.RedisManager.Web.Wolverine
 
     }
 
-    public record RedisServerGroupDto(string Name, string Id, GroupType GroupType);
+    public record RedisServerGroupDto(string Name, Guid Id, GroupType GroupType);
 
     public record RedisServerGroupsQueryResult(
         List<RedisServerGroupDto> ServerGroups,
@@ -30,7 +30,7 @@ namespace Roman.RedisManager.Web.Wolverine
             var pagedServerGroups = allServerGroups
                 .Skip(skip)
                 .Take(query.PageSize)
-                .Select(s => new RedisServerGroupDto(s.Name, s.Name.ToMd5Hash(), s.GroupType))
+                .Select(s => new RedisServerGroupDto(s.Name, s.Id, s.GroupType))
                 .ToList();
 
             return new RedisServerGroupsQueryResult(pagedServerGroups, totalCount, query.PageNumber, query.PageSize);

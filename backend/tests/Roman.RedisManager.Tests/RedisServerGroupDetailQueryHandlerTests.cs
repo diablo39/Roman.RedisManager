@@ -15,14 +15,14 @@ namespace Roman.RedisManager.Tests
         {
             var repository = new InMemoryRedisRepository(new Dictionary<string, IReadOnlyCollection<RedisServerNode>>
             {
-                ["group-a"] = new List<RedisServerNode>
+                ["11111111-1111-1111-1111-111111111111"] = new List<RedisServerNode>
                 {
                     new RedisServerNode("127.0.0.1", 6379, "master"),
                     new RedisServerNode("127.0.0.1", 6380, "slave")
                 }
             });
 
-            var query = new RedisServerGroupDetailQuery { Id = "group-a" };
+            var query = new RedisServerGroupDetailQuery { Id = Guid.Parse("11111111-1111-1111-1111-111111111111") };
 
             var result = await RedisServerGroupDetailQueryHandler.Handle(query, repository);
 
@@ -36,7 +36,7 @@ namespace Roman.RedisManager.Tests
         public async Task Handle_MissingGroup_ThrowsKeyNotFoundException()
         {
             var repository = new InMemoryRedisRepository(new Dictionary<string, IReadOnlyCollection<RedisServerNode>>());
-            var query = new RedisServerGroupDetailQuery { Id = "missing" };
+            var query = new RedisServerGroupDetailQuery { Id = Guid.Parse("00000000-0000-0000-0000-000000000000") };
 
             await Should.ThrowAsync<KeyNotFoundException>(() => RedisServerGroupDetailQueryHandler.Handle(query, repository));
         }

@@ -1,5 +1,6 @@
 @Roman.RedisManager.Web_HostAddress = https://localhost:7244
-@RedisServerGroupId = 00000000000000000000000000000000
+# GUID value for the server group identifier
+@RedisServerGroupId = 11111111-1111-1111-1111-111111111111
 
 GET {{Roman.RedisManager.Web_HostAddress}}/api/redis-server-groups
 

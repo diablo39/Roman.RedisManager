@@ -21,7 +21,9 @@ namespace Roman.RedisManager.Infrastructure.Repositories
         {
             RedisConfiguration configuration = _redisConfiguration.Value ?? throw new Exception("Configuration can't be null");
             
-            var result = configuration.ServerGroups.Select(e => new RedisServerGroup(e.Name, e.ConnectionString, e.GroupType)).ToList();
+            var result = configuration.ServerGroups
+                .Select(e => new RedisServerGroup(e.Id, e.Name, e.ConnectionString, e.GroupType))
+                .ToList();
 
             return result;
         }

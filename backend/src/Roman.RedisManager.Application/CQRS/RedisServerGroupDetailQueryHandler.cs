@@ -8,7 +8,7 @@ namespace Roman.RedisManager.Web.Wolverine
 {
     public class RedisServerGroupDetailQuery
     {
-        public string Id { get; set; } = string.Empty;
+        public Guid Id { get; set; }
     }
 
     public record RedisServerNodeDto(string Host, int Port, string Role);

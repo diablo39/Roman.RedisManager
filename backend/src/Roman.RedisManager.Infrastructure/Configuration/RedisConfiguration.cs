@@ -3,7 +3,6 @@ using System.ComponentModel.DataAnnotations;
 using System;
 using System.Linq;
 using System.Collections.Generic;
-using Roman.RedisManager.Extensions;
 
 namespace Roman.RedisManager.Infrastructure.Configuration
 {
@@ -24,9 +23,9 @@ namespace Roman.RedisManager.Infrastructure.Configuration
         /// <exception cref="ArgumentException">Thrown when <paramref name="groupId"/> is null, empty, or whitespace.</exception>
         /// <exception cref="InvalidOperationException">Thrown when the Redis server group configuration is unavailable.</exception>
         /// <exception cref="KeyNotFoundException">Thrown when no server group matches the provided <paramref name="groupId"/>.</exception>
-        public RedisServerGroupConfiguration ResolveServerGroup(string groupId)
+        public RedisServerGroupConfiguration ResolveServerGroup(Guid groupId)
         {
-            if (string.IsNullOrWhiteSpace(groupId))
+            if (groupId == Guid.Empty)
             {
                 throw new ArgumentException("Group identifier is required.", nameof(groupId));
             }
@@ -34,7 +33,7 @@ namespace Roman.RedisManager.Infrastructure.Configuration
             var configuration = ServerGroups ?? throw new InvalidOperationException("Redis configuration is unavailable.");
 
             var serverGroup = configuration.FirstOrDefault(group =>
-                group.Name.ToMd5Hash().Equals(groupId, StringComparison.OrdinalIgnoreCase));
+                group.Id == groupId);
 
             if (serverGroup is null)
             {

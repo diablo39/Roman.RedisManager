@@ -1,7 +1,6 @@
 ﻿using Microsoft.Extensions.Options;
 using Roman.RedisManager.Domain.Entities;
 using Roman.RedisManager.Domain.Repositories;
-using Roman.RedisManager.Extensions;
 using Roman.RedisManager.Infrastructure.Configuration;
 using Roman.RedisManager.Infrastructure.Redis;
 using Roman.RedisManager.Infrastructure.Repositories;
@@ -24,6 +23,7 @@ namespace Roman.RedisManager.Tests
                 [
                     new RedisServerGroupConfiguration
                     {
+                        Id = Guid.Parse("33333333-3333-3333-3333-333333333333"),
                         Name = "placeholder",
                         ConnectionString = "localhost:6379",
                         GroupType = GroupType.Standalone
@@ -34,7 +34,7 @@ namespace Roman.RedisManager.Tests
             await using IRedisConnectionManager connectionManager = new SimpleConnectionManager(connectionMultiplexer);
 
             IRedisRepository redisRepository = new RedisRepository(connectionManager, options);
-            var groupId = "placeholder".ToMd5Hash();
+            var groupId = options.Value.ServerGroups.First().Id.ToString();
 
             // Act
             RedisSearchResult result = await redisRepository.SearchForKeysAsync(groupId, predicate: string.Empty);

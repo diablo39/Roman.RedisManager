@@ -73,7 +73,8 @@
             "in": "path",
             "required": true,
             "schema": {
-              "type": "string"
+              "type": "string",
+              "format": "uuid"
             }
           }
         ],
@@ -197,7 +198,8 @@
             "type": "string"
           },
           "id": {
-            "type": "string"
+            "type": "string",
+            "format": "uuid"
           },
           "groupType": {
             "$ref": "#/components/schemas/GroupType"

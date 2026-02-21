@@ -5,6 +5,6 @@ namespace Roman.RedisManager.Infrastructure.Redis
 {
     public interface IRedisConnectionManager : IAsyncDisposable
     {
-        Task<IConnectionMultiplexer> GetConnectionAsync(string groupId);
+        Task<IConnectionMultiplexer> GetConnectionAsync(Guid groupId);
     }
 }
