@@ -113,16 +113,56 @@ namespace Roman.RedisManager.Infrastructure.Repositories
 
         private static async Task<List<RedisServerNode>> ReadStandaloneNodesAsync(IServer server)
         {
-            var nodes = new List<RedisServerNode>();
-            var (host, port) = ResolveEndpoint(server.EndPoint);
-            nodes.Add(new RedisServerNode(host, port, "master"));
-
             var sections = await server.InfoAsync("replication").ConfigureAwait(false);
             var replicationSection = sections.FirstOrDefault();
 
             if (replicationSection is null)
             {
-                return nodes;
+                return new List<RedisServerNode>();
+            }
+
+            // Check if the current server is a slave
+            var roleEntry = replicationSection.FirstOrDefault(kvp => kvp.Key.Equals("role", StringComparison.OrdinalIgnoreCase));
+            var isSlaveNode = roleEntry.Value?.Equals("slave", StringComparison.OrdinalIgnoreCase) ?? false;
+
+            // If it's a slave, find and connect to the master
+            if (isSlaveNode)
+            {
+                var masterHost = replicationSection.FirstOrDefault(kvp => kvp.Key.Equals("master_host", StringComparison.OrdinalIgnoreCase)).Value;
+                var masterPortString = replicationSection.FirstOrDefault(kvp => kvp.Key.Equals("master_port", StringComparison.OrdinalIgnoreCase)).Value;
+
+                if (!string.IsNullOrWhiteSpace(masterHost) && 
+                    int.TryParse(masterPortString, NumberStyles.Integer, CultureInfo.InvariantCulture, out var masterPort))
+                {
+                    try
+                    {
+                        var masterConnection = await ConnectionMultiplexer.ConnectAsync($"{masterHost}:{masterPort}").ConfigureAwait(false);
+                        try
+                        {
+                            var masterServer = GetServer(masterConnection);
+                            var masterNodes = await ReadStandaloneNodesAsync(masterServer).ConfigureAwait(false);
+                            return masterNodes;
+                        }
+                        finally
+                        {
+                            await masterConnection.CloseAsync().ConfigureAwait(false);
+                            masterConnection.Dispose();
+                        }
+                    }
+                    catch
+                    {
+                        // If we can't connect to master, continue with the slave information
+                    }
+                }
+            }
+
+            // Original logic for master node
+            var nodes = new List<RedisServerNode>();
+            var endpoint = server.EndPoint;
+            if (endpoint is not null)
+            {
+                var (host, port) = ResolveEndpoint(endpoint);
+                nodes.Add(new RedisServerNode(host, port, "master"));
             }
 
             foreach (var entry in replicationSection.Where(kvp => kvp.Key.StartsWith("slave", StringComparison.OrdinalIgnoreCase)))
@@ -155,9 +195,10 @@ namespace Roman.RedisManager.Infrastructure.Repositories
             }
 
             return clusterNodes.Nodes
+                .Where(node => node.EndPoint is not null)
                 .Select(node =>
                 {
-                    var (host, port) = ResolveEndpoint(node.EndPoint);
+                    var (host, port) = ResolveEndpoint(node.EndPoint!);
                     var role = node.IsReplica ? "slave" : "master";
                     return new RedisServerNode(host, port, role);
                 })

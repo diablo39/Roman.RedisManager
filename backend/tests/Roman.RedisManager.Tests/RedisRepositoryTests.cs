@@ -20,15 +20,15 @@ namespace Roman.RedisManager.Tests
 
             var options = Options.Create(new RedisConfiguration
             {
-                ServerGroups = new[]
-                {
+                ServerGroups =
+                [
                     new RedisServerGroupConfiguration
                     {
                         Name = "placeholder",
                         ConnectionString = "localhost:6379",
                         GroupType = GroupType.Standalone
                     }
-                }
+                ]
             });
 
             await using IRedisConnectionManager connectionManager = new SimpleConnectionManager(connectionMultiplexer);
