@@ -7,7 +7,7 @@ using Roman.RedisManager.Domain.Entities;
 using Xunit;
 using Shouldly;
 
-namespace Roman.RedisManager.Tests
+namespace Roman.RedisManager.Tests.Domain.Configuration
 {
     public class RedisConfigurationTests
     {
@@ -23,7 +23,7 @@ namespace Roman.RedisManager.Tests
                         Id = Guid.Parse("abc00000-0000-0000-0000-000000000000"),
                         Name = "foo",
                         ConnectionString = "conn",
-                        GroupType = Domain.Entities.GroupType.Standalone
+                        GroupType = GroupType.Standalone
                     }
                 }
             };
@@ -47,7 +47,7 @@ namespace Roman.RedisManager.Tests
                         Id = Guid.NewGuid(),
                         Name = "foo",
                         ConnectionString = "conn",
-                        GroupType = Domain.Entities.GroupType.Standalone
+                        GroupType = GroupType.Standalone
                     }
                 }
             };
@@ -69,7 +69,7 @@ namespace Roman.RedisManager.Tests
                         Id = Guid.Parse("11111111-1111-1111-1111-111111111111"),
                         Name = "foo",
                         ConnectionString = "conn",
-                        GroupType = Domain.Entities.GroupType.Standalone
+                        GroupType = GroupType.Standalone
                     }
                 }
             };
@@ -86,7 +86,7 @@ namespace Roman.RedisManager.Tests
                 Id = Guid.Empty,
                 Name = "foo",
                 ConnectionString = "conn",
-                GroupType = Domain.Entities.GroupType.Standalone
+                GroupType = GroupType.Standalone
             };
 
             var context = new ValidationContext(config);

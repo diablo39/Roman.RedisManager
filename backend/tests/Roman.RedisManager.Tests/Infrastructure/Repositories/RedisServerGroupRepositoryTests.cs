@@ -5,7 +5,7 @@ using Roman.RedisManager.Infrastructure.Configuration;
 using Roman.RedisManager.Infrastructure.Repositories;
 using System.Linq;
 
-namespace Roman.RedisManager.Tests
+namespace Roman.RedisManager.Tests.Infrastructure.Repositories
 {
     public class RedisServerGroupRepositoryTests
     {

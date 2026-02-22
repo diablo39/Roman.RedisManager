@@ -8,7 +8,7 @@ using StackExchange.Redis;
 using System;
 using System.Threading.Tasks;
 
-namespace Roman.RedisManager.Tests
+namespace Roman.RedisManager.Tests.Infrastructure.Repositories
 {
     public class RedisRepositoryTests
     {
