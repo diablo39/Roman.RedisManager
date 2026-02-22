@@ -9,5 +9,7 @@ namespace Roman.RedisManager.Domain.Repositories
         Task<RedisSearchResult> SearchForKeysAsync(Guid groupId, string predicate);
 
         Task<IReadOnlyCollection<RedisServerNode>> GetServerNodesAsync(Guid groupId);
+
+        Task<RedisInfo> GetInfoAsync(Guid groupId, string host, int port);
     }
 }

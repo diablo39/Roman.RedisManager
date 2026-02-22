@@ -77,25 +77,6 @@ namespace Roman.RedisManager.Tests
             Should.Throw<KeyNotFoundException>(() => config.ResolveServerGroup(Guid.Parse("22222222-2222-2222-2222-222222222222")));
         }
 
-        [Fact]
-        public void ResolveServerGroup_WithUnknownGuid_ThrowsKeyNotFoundException()
-        {
-            var config = new RedisConfiguration
-            {
-                ServerGroups = new[]
-                {
-                    new RedisServerGroupConfiguration
-                    {
-                        Id = Guid.Parse("11111111-1111-1111-1111-111111111111"),
-                        Name = "foo",
-                        ConnectionString = "conn",
-                        GroupType = Domain.Entities.GroupType.Standalone
-                    }
-                }
-            };
-
-            Should.Throw<KeyNotFoundException>(() => config.ResolveServerGroup("22222222-2222-2222-2222-222222222222"));
-        }
 
         [Fact]
         public void ServerGroupConfiguration_WithEmptyId_FailsValidation()

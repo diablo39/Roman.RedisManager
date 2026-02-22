@@ -13,9 +13,9 @@ namespace Roman.RedisManager.Tests
         [Fact]
         public async Task Handle_ExistingGroup_ReturnsNodes()
         {
-            var repository = new InMemoryRedisRepository(new Dictionary<string, IReadOnlyCollection<RedisServerNode>>
+            var repository = new InMemoryRedisRepository(new Dictionary<Guid, IReadOnlyCollection<RedisServerNode>>
             {
-                ["11111111-1111-1111-1111-111111111111"] = new List<RedisServerNode>
+                [Guid.Parse("11111111-1111-1111-1111-111111111111")] = new List<RedisServerNode>
                 {
                     new RedisServerNode("127.0.0.1", 6379, "master"),
                     new RedisServerNode("127.0.0.1", 6380, "slave")
@@ -35,7 +35,7 @@ namespace Roman.RedisManager.Tests
         [Fact]
         public async Task Handle_MissingGroup_ThrowsKeyNotFoundException()
         {
-            var repository = new InMemoryRedisRepository(new Dictionary<string, IReadOnlyCollection<RedisServerNode>>());
+            var repository = new InMemoryRedisRepository(new Dictionary<Guid, IReadOnlyCollection<RedisServerNode>>());
             var query = new RedisServerGroupDetailQuery { Id = Guid.Parse("00000000-0000-0000-0000-000000000000") };
 
             await Should.ThrowAsync<KeyNotFoundException>(() => RedisServerGroupDetailQueryHandler.Handle(query, repository));
@@ -43,19 +43,19 @@ namespace Roman.RedisManager.Tests
 
         private sealed class InMemoryRedisRepository : IRedisRepository
         {
-            private readonly IReadOnlyDictionary<string, IReadOnlyCollection<RedisServerNode>> _nodes;
+            private readonly IReadOnlyDictionary<Guid, IReadOnlyCollection<RedisServerNode>> _nodes;
 
-            public InMemoryRedisRepository(IReadOnlyDictionary<string, IReadOnlyCollection<RedisServerNode>> nodes)
+            public InMemoryRedisRepository(IReadOnlyDictionary<Guid, IReadOnlyCollection<RedisServerNode>> nodes)
             {
                 _nodes = nodes;
             }
 
-            public Task<RedisSearchResult> SearchForKeysAsync(string groupId, string predicate)
+            public Task<RedisSearchResult> SearchForKeysAsync(Guid groupId, string predicate)
             {
                 return Task.FromResult(new RedisSearchResult(Array.Empty<RedisKey>(), 0));
             }
 
-            public Task<IReadOnlyCollection<RedisServerNode>> GetServerNodesAsync(string groupId)
+            public Task<IReadOnlyCollection<RedisServerNode>> GetServerNodesAsync(Guid groupId)
             {
                 if (!_nodes.TryGetValue(groupId, out var nodes))
                 {
@@ -63,6 +63,12 @@ namespace Roman.RedisManager.Tests
                 }
 
                 return Task.FromResult(nodes);
+            }
+
+            public Task<RedisInfo> GetInfoAsync(Guid groupId, string host, int port)
+            {
+                // not used in these tests
+                return Task.FromResult(new RedisInfo(new Dictionary<string, IReadOnlyDictionary<string, string>>()));
             }
         }
     }

@@ -100,6 +100,62 @@ namespace Roman.RedisManager.Infrastructure.Repositories
             }
         }
 
+        public async Task<RedisInfo> GetInfoAsync(Guid groupId, string host, int port)
+        {
+            if (groupId == Guid.Empty)
+            {
+                throw new ArgumentException("Group identifier is required.", nameof(groupId));
+            }
+
+            if (string.IsNullOrWhiteSpace(host))
+            {
+                throw new ArgumentException("Host is required.", nameof(host));
+            }
+
+            if (port <= 0)
+            {
+                throw new ArgumentException("Port must be a positive integer.", nameof(port));
+            }
+
+            // ensure group exists; we don't actually use connection string here but validation is important
+            _ = _redisConfiguration.Value.ResolveServerGroup(groupId);
+
+            try
+            {
+                var connection = await _connectionManager.GetConnectionAsync(groupId).ConfigureAwait(false);
+                var server = connection.GetServer(host, port);
+
+                // Use strongly-typed InfoAsync rather than raw execution
+                var infoSections = await server.InfoAsync().ConfigureAwait(false);
+                var sections = new Dictionary<string, IReadOnlyDictionary<string, string>>(StringComparer.OrdinalIgnoreCase);
+
+                foreach (var sec in infoSections)
+                {
+                    var fieldDict = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+                    foreach (var kvp in sec)
+                    {
+                        fieldDict[kvp.Key] = kvp.Value;
+                    }
+
+                    sections[sec.Key] = fieldDict;
+                }
+
+                return new RedisInfo(sections);
+            }
+            catch (RedisConnectionException ex)
+            {
+                throw new RedisConnectionFailureException("Failed to execute INFO command for the requested instance.", ex);
+            }
+            catch (RedisTimeoutException ex)
+            {
+                throw new RedisConnectionFailureException("Timed out while executing INFO command.", ex);
+            }
+            catch (RedisServerException ex)
+            {
+                throw new RedisConnectionFailureException("Redis server returned an error while executing INFO.", ex);
+            }
+        }
+
         
 
         private static IServer GetServer(IConnectionMultiplexer connection)

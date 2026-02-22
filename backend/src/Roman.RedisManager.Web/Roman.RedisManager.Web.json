@@ -5,6 +5,64 @@
     "version": "1.0.0"
   },
   "paths": {
+    "/api/commands/info": {
+      "get": {
+        "tags": [
+          "RedisInfo"
+        ],
+        "parameters": [
+          {
+            "name": "groupId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "host",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "port",
+            "in": "query",
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/RedisInfoQueryResult"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RedisInfoQueryResult"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RedisInfoQueryResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/redis-server-groups": {
       "get": {
         "tags": [
@@ -172,6 +230,23 @@
           }
         }
       },
+      "RedisInfoQueryResult": {
+        "required": [
+          "sections"
+        ],
+        "type": "object",
+        "properties": {
+          "sections": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
       "RedisServerGroupDetailQueryResult": {
         "required": [
           "nodes"
@@ -274,6 +349,9 @@
     }
   },
   "tags": [
+    {
+      "name": "RedisInfo"
+    },
     {
       "name": "RedisServerGroups"
     }
