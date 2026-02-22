@@ -6,17 +6,26 @@ using Roman.RedisManager.Infrastructure.Redis;
 using Roman.RedisManager.Infrastructure.Repositories;
 using StackExchange.Redis;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Roman.RedisManager.Tests.Infrastructure.Repositories
 {
+    [Collection("Redis")]
     public class RedisRepositoryTests
     {
-        [Fact(Skip = "Requires local Redis instance")]
+        private readonly RedisContainerFixture _fixture;
+
+        public RedisRepositoryTests(RedisContainerFixture fixture) => _fixture = fixture;
+
+        [Fact]
         public async Task SearchForKeysAsync_ShouldReturnNonNullAndNonEmptyKeys()
         {
-            // Arrange
-            var connectionMultiplexer = ConnectionMultiplexer.Connect("localhost:6379");
+            var redisContainer = _fixture.Container;
+            var connectionMultiplexer = ConnectionMultiplexer.Connect(_fixture.ConnectionString + ",allowAdmin=true");
+
+            // seed a key to ensure search returns something
+            await connectionMultiplexer.GetDatabase().StringSetAsync("seed", "value");
 
             var options = Options.Create(new RedisConfiguration
             {
@@ -26,7 +35,7 @@ namespace Roman.RedisManager.Tests.Infrastructure.Repositories
                     {
                         Id = Guid.Parse("33333333-3333-3333-3333-333333333333"),
                         Name = "placeholder",
-                        ConnectionString = "localhost:6379",
+                        ConnectionString = redisContainer.GetConnectionString(),
                         GroupType = GroupType.Standalone
                     }
                 ]
@@ -45,11 +54,11 @@ namespace Roman.RedisManager.Tests.Infrastructure.Repositories
             result.Keys.ShouldNotBeEmpty();
         }
 
-        [Fact(Skip = "Requires local Redis instance")]
+        [Fact]
         public async Task GetInfoAsync_ShouldReturnStructuredInfo()
         {
-            // Arrange
-            var connectionMultiplexer = ConnectionMultiplexer.Connect("localhost:6379");
+            var redisContainer = _fixture.Container;
+            var connectionMultiplexer = ConnectionMultiplexer.Connect(_fixture.ConnectionString + ",allowAdmin=true");
 
             var options = Options.Create(new RedisConfiguration
             {
@@ -59,7 +68,7 @@ namespace Roman.RedisManager.Tests.Infrastructure.Repositories
                     {
                         Id = Guid.Parse("44444444-4444-4444-4444-444444444444"),
                         Name = "placeholder",
-                        ConnectionString = "localhost:6379",
+                        ConnectionString = redisContainer.GetConnectionString(),
                         GroupType = GroupType.Standalone
                     }
                 ]
@@ -71,7 +80,11 @@ namespace Roman.RedisManager.Tests.Infrastructure.Repositories
             var groupId = options.Value.ServerGroups.First().Id;
 
             // Act
-            RedisInfo info = await redisRepository.GetInfoAsync(groupId, "localhost", 6379);
+            // use the actual host/port published by the container
+            var endpointParts = redisContainer.GetConnectionString().Split(':');
+            var host = endpointParts[0];
+            var port = int.Parse(endpointParts[1]);
+            RedisInfo info = await redisRepository.GetInfoAsync(groupId, host, port);
 
             // Assert
             info.ShouldNotBeNull();
@@ -90,13 +103,13 @@ namespace Roman.RedisManager.Tests.Infrastructure.Repositories
                     {
                         Id = Guid.Parse("55555555-5555-5555-5555-555555555555"),
                         Name = "placeholder",
-                        ConnectionString = "localhost:6379",
+                        ConnectionString = _fixture.ConnectionString,
                         GroupType = GroupType.Standalone
                     }
                 ]
             });
 
-            await using IRedisConnectionManager connectionManager = new SimpleConnectionManager(ConnectionMultiplexer.Connect("localhost:6379"));
+            await using IRedisConnectionManager connectionManager = new SimpleConnectionManager(ConnectionMultiplexer.Connect(_fixture.ConnectionString + ",allowAdmin=true"));
             IRedisRepository redisRepository = new RedisRepository(connectionManager, options);
             var groupId = options.Value.ServerGroups.First().Id;
 
