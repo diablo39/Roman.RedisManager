@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Options;
 using Roman.RedisManager.Domain.Entities;
 using Roman.RedisManager.Domain.Repositories;
-using Roman.RedisManager.Infrastructure.Configuration;
+using Roman.RedisManager.Domain.Configuration;
 using Roman.RedisManager.Infrastructure.Exceptions;
 using Roman.RedisManager.Infrastructure.Redis;
 using StackExchange.Redis;

@@ -7,6 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Options" Version="10.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Roman.RedisManager.Domain\Roman.RedisManager.Domain.csproj" />
     <ProjectReference Include="..\Roman.RedisManager.Extensions\Roman.RedisManager.Extensions.csproj" />
   </ItemGroup>

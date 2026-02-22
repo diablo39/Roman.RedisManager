@@ -1,7 +1,7 @@
 using Microsoft.Extensions.Options;
 using Roman.RedisManager.Domain.Entities;
 using Roman.RedisManager.Extensions;
-using Roman.RedisManager.Infrastructure.Configuration;
+using Roman.RedisManager.Domain.Configuration;
 using StackExchange.Redis;
 using System;
 using System.Collections.Concurrent;

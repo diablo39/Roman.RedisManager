@@ -1,10 +1,10 @@
-﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Configuration;
 using System.ComponentModel.DataAnnotations;
 using System;
 using System.Linq;
 using System.Collections.Generic;
 
-namespace Roman.RedisManager.Infrastructure.Configuration
+namespace Roman.RedisManager.Domain.Configuration
 {
     public class RedisConfiguration
     {
@@ -20,7 +20,7 @@ namespace Roman.RedisManager.Infrastructure.Configuration
         /// </summary>
         /// <param name="groupId">The identifier of the server group to resolve.</param>
         /// <returns>The matching <see cref="RedisServerGroupConfiguration"/>.</returns>
-        /// <exception cref="ArgumentException">Thrown when <paramref name="groupId"/> is null, empty, or whitespace.</exception>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="groupId"/> is empty.</exception>
         /// <exception cref="InvalidOperationException">Thrown when the Redis server group configuration is unavailable.</exception>
         /// <exception cref="KeyNotFoundException">Thrown when no server group matches the provided <paramref name="groupId"/>.</exception>
         public RedisServerGroupConfiguration ResolveServerGroup(Guid groupId)

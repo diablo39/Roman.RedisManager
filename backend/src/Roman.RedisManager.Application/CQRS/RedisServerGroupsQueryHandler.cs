@@ -1,5 +1,6 @@
+using Microsoft.Extensions.Options;
+using Roman.RedisManager.Domain.Configuration;
 using Roman.RedisManager.Domain.Entities;
-using Roman.RedisManager.Domain.Repositories;
 
 namespace Roman.RedisManager.Application.CQRS
 {
@@ -8,7 +9,6 @@ namespace Roman.RedisManager.Application.CQRS
         public int PageSize { get; set; }
 
         public int PageNumber { get; set; }
-
     }
 
     public record RedisServerGroupDto(string Name, Guid Id, GroupType GroupType);
@@ -21,16 +21,17 @@ namespace Roman.RedisManager.Application.CQRS
 
     public static class RedisServerGroupsQueryHandler
     {
-        public static RedisServerGroupsQueryResult Handle(RedisServerGroupsQuery query, IRedisServerGroupRepository repository)
+        public static RedisServerGroupsQueryResult Handle(RedisServerGroupsQuery query, IOptions<RedisConfiguration> configuration)
         {
-            var allServerGroups = repository.ListRedisServerGroups().ToList();
+            var allServerGroups = configuration.Value.ServerGroups
+                .Select(e => new RedisServerGroupDto(e.Name, e.Id, e.GroupType))
+                .ToList();
 
             var totalCount = allServerGroups.Count;
             var skip = (query.PageNumber - 1) * query.PageSize;
             var pagedServerGroups = allServerGroups
                 .Skip(skip)
                 .Take(query.PageSize)
-                .Select(s => new RedisServerGroupDto(s.Name, s.Id, s.GroupType))
                 .ToList();
 
             return new RedisServerGroupsQueryResult(pagedServerGroups, totalCount, query.PageNumber, query.PageSize);

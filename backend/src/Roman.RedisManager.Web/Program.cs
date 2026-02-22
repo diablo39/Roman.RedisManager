@@ -1,5 +1,5 @@
+using Roman.RedisManager.Domain.Configuration;
 using Roman.RedisManager.Domain.Repositories;
-using Roman.RedisManager.Infrastructure.Configuration;
 using Roman.RedisManager.Infrastructure.Redis;
 using Roman.RedisManager.Infrastructure.Repositories;
 using Wolverine;
@@ -19,7 +19,6 @@ namespace Roman.RedisManager.Web
                 .ValidateOnStart();
 
             builder.Services.AddSingleton<IRedisConnectionManager, RedisConnectionManager>();
-            builder.Services.AddSingleton<IRedisServerGroupRepository, RedisServerGroupRepository>();
             builder.Services.AddSingleton<IRedisRepository, RedisRepository>();
 
             builder.Services.AddControllers();

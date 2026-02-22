@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using Microsoft.Extensions.Options;
-using Roman.RedisManager.Infrastructure.Configuration;
+using Roman.RedisManager.Domain.Configuration;
 using Roman.RedisManager.Domain.Entities;
 using Xunit;
 using Shouldly;

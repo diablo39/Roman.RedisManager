@@ -1,9 +1,8 @@
 using Microsoft.Extensions.Configuration;
 using Roman.RedisManager.Domain.Entities;
 using System.ComponentModel.DataAnnotations;
-using System.Diagnostics.CodeAnalysis;
 
-namespace Roman.RedisManager.Infrastructure.Configuration
+namespace Roman.RedisManager.Domain.Configuration
 {
     public class RedisServerGroupConfiguration : IValidatableObject
     {
