@@ -7,7 +7,7 @@ using Wolverine;
 namespace Roman.RedisManager.Web.Controllers
 {
     [ApiController]
-    [Route("api/commands/info")]
+    [Route("api/commands/redis-info")]
     public class RedisInfoController(IMessageBus bus) : ControllerBase
     {
         private readonly IMessageBus _bus = bus;

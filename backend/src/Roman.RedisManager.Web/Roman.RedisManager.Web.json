@@ -5,7 +5,7 @@
     "version": "1.0.0"
   },
   "paths": {
-    "/api/commands/info": {
+    "/api/commands/redis-info": {
       "get": {
         "tags": [
           "RedisInfo"

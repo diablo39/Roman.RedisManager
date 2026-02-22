@@ -9,7 +9,7 @@ GET {{Roman.RedisManager.Web_HostAddress}}/api/redis-server-groups
 GET {{Roman.RedisManager.Web_HostAddress}}/api/redis-server-groups/{{RedisServerGroupId}}
 
 ### Redis INFO
-GET {{Roman.RedisManager.Web_HostAddress}}/api/commands/info?groupId={{RedisServerGroupId}}&host=localhost&port=6379
+GET {{Roman.RedisManager.Web_HostAddress}}/api/commands/redis-info?groupId={{RedisServerGroupId}}&host=localhost&port=6379
 
 ###
 
