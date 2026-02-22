@@ -161,7 +161,7 @@ When implementing a new feature, follow this decision tree to determine which fi
 - **Entities:** `Roman.RedisManager.Domain.Entities`
 - **Repository interfaces:** `Roman.RedisManager.Domain.Repositories`
 - **Repository implementations:** `Roman.RedisManager.Infrastructure.Repositories`
-- **CQRS handlers:** `Roman.RedisManager.Web.Wolverine`
+- **CQRS handlers:** `Roman.RedisManager.Application.CQRS`
 - **Configuration:** `Roman.RedisManager.Web.Configuration`
 - **Extensions:** `Roman.RedisManager.Extensions`
 - **Controllers:** `Roman.RedisManager.Web.Controllers`
@@ -178,7 +178,7 @@ These constraints **must** be followed when generating code. Violating them will
 - ✅ Handlers are **static classes** with **static `Handle`/`HandleAsync` methods**.
 - ✅ First parameter is the message; additional parameters are DI-injected by Wolverine.
 - ✅ Handlers live in `src/Roman.RedisManager.Application/CQRS/`.
-- ✅ Handlers use namespace `Roman.RedisManager.Web.Wolverine`.
+- ✅ Handlers use namespace `Roman.RedisManager.Application.CQRS`.
 - ❌ Controllers must **never** call repositories or services directly.
 - ❌ Do not use `[Handler]` attributes — Wolverine uses convention-based discovery.
 
@@ -228,7 +228,7 @@ Copilot should generate:
    - `RedisKeyDto` record.
    - `RedisKeysQueryResult` record.
    - `RedisKeysQueryHandler` static class with `Handle(RedisKeysQuery query, IRedisRepository repository)`.
-   - Namespace: `Roman.RedisManager.Web.Wolverine`.
+   - Namespace: `Roman.RedisManager.Application.CQRS`.
 
 2. **`src/Roman.RedisManager.Web/Controllers/RedisKeysController.cs`**
    - `[Route("api/redis-keys")]`, `[ApiController]`.
@@ -259,7 +259,7 @@ Copilot should generate:
 
 3. **`src/Roman.RedisManager.Application/CQRS/RedisHealthQueryHandler.cs`**
    - `RedisHealthQuery`, `RedisHealthQueryResult` record, `RedisHealthQueryHandler` static class.
-   - Namespace: `Roman.RedisManager.Web.Wolverine`.
+   - Namespace: `Roman.RedisManager.Application.CQRS`.
 
 4. **`src/Roman.RedisManager.Web/Controllers/RedisHealthController.cs`**
    - `[Route("api/redis-health")]`.
