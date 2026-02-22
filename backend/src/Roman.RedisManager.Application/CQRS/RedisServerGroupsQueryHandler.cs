@@ -1,7 +1,7 @@
 using Roman.RedisManager.Domain.Entities;
 using Roman.RedisManager.Domain.Repositories;
 
-namespace Roman.RedisManager.Web.Wolverine
+namespace Roman.RedisManager.Application.CQRS
 {
     public class RedisServerGroupsQuery
     {

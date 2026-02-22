@@ -1,11 +1,11 @@
+using Roman.RedisManager.Application.CQRS;
 using Roman.RedisManager.Domain.Entities;
 using Roman.RedisManager.Domain.Repositories;
-using Roman.RedisManager.Web.Wolverine;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Roman.RedisManager.Tests
+namespace Roman.RedisManager.Tests.Application.CQRS
 {
     public class RedisInfoQueryHandlerTests
     {

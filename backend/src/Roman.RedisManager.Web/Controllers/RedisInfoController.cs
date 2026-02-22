@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
-using Roman.RedisManager.Web.Wolverine;
+using Roman.RedisManager.Application.CQRS;
 using System;
 using System.Threading.Tasks;
 using Wolverine;
