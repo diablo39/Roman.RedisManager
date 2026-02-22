@@ -5,9 +5,7 @@ using Roman.RedisManager.Infrastructure.Configuration;
 using Roman.RedisManager.Infrastructure.Redis;
 using Roman.RedisManager.Infrastructure.Repositories;
 using StackExchange.Redis;
-using System;
-using System.Linq;
-using System.Threading.Tasks;
+using Moq;
 
 namespace Roman.RedisManager.Tests.Infrastructure.Repositories
 {
@@ -52,6 +50,98 @@ namespace Roman.RedisManager.Tests.Infrastructure.Repositories
             // Assert
             result.ShouldNotBeNull();
             result.Keys.ShouldNotBeEmpty();
+        }
+
+        [Fact]
+        public async Task GetServerNodesAsync_ShouldReturnAtLeastOneNode()
+        {
+            var redisContainer = _fixture.Container;
+            var connectionMultiplexer = ConnectionMultiplexer.Connect(_fixture.ConnectionString + ",allowAdmin=true");
+
+            var options = Options.Create(new RedisConfiguration
+            {
+                ServerGroups =
+                [
+                    new RedisServerGroupConfiguration
+                    {
+                        Id = Guid.Parse("66666666-6666-6666-6666-666666666666"),
+                        Name = "placeholder",
+                        ConnectionString = redisContainer.GetConnectionString(),
+                        GroupType = GroupType.Standalone
+                    }
+                ]
+            });
+
+            await using IRedisConnectionManager connectionManager = new SimpleConnectionManager(connectionMultiplexer);
+
+            IRedisRepository redisRepository = new RedisRepository(connectionManager, options);
+            var groupId = options.Value.ServerGroups.First().Id;
+
+            // Act
+            var nodes = await redisRepository.GetServerNodesAsync(groupId);
+
+            // Assert
+            nodes.ShouldNotBeNull();
+            nodes.ShouldNotBeEmpty();
+            nodes.All(n => n.Role == "master" || n.Role == "slave").ShouldBeTrue();
+        }
+
+        [Fact]
+        public async Task GetServerNodesAsync_InvalidGroupId_ThrowsKeyNotFoundException()
+        {
+            var options = Options.Create(new RedisConfiguration
+            {
+                ServerGroups =
+                [
+                    new RedisServerGroupConfiguration
+                    {
+                        Id = Guid.Parse("77777777-7777-7777-7777-777777777777"),
+                        Name = "placeholder",
+                        ConnectionString = _fixture.ConnectionString,
+                        GroupType = GroupType.Standalone
+                    }
+                ]
+            });
+
+            await using IRedisConnectionManager connectionManager = new SimpleConnectionManager(ConnectionMultiplexer.Connect(_fixture.ConnectionString + ",allowAdmin=true"));
+            IRedisRepository redisRepository = new RedisRepository(connectionManager, options);
+
+            await Should.ThrowAsync<KeyNotFoundException>(() => redisRepository.GetServerNodesAsync(Guid.NewGuid()));
+        }
+
+        [Fact]
+        public async Task GetServerNodesAsync_ClusterGroup_ReturnsNodesSameAsStandalone()
+        {
+            // cluster behaviour currently mirrors standalone; container does not actually run a cluster,
+            // but the lookup logic should still return results when GroupType.Cluster is specified.
+            var redisContainer = _fixture.Container;
+            var connectionMultiplexer = ConnectionMultiplexer.Connect(_fixture.ConnectionString + ",allowAdmin=true");
+
+            var options = Options.Create(new RedisConfiguration
+            {
+                ServerGroups =
+                [
+                    new RedisServerGroupConfiguration
+                    {
+                        Id = Guid.Parse("88888888-8888-8888-8888-888888888888"),
+                        Name = "placeholder",
+                        ConnectionString = redisContainer.GetConnectionString(),
+                        GroupType = GroupType.Cluster
+                    }
+                ]
+            });
+
+            await using IRedisConnectionManager connectionManager = new SimpleConnectionManager(connectionMultiplexer);
+            IRedisRepository redisRepository = new RedisRepository(connectionManager, options);
+            var groupId = options.Value.ServerGroups.First().Id;
+
+            // Act
+            var nodes = await redisRepository.GetServerNodesAsync(groupId);
+
+            // Assert
+            nodes.ShouldNotBeNull();
+            nodes.ShouldNotBeEmpty();
+            nodes.All(n => n.Role == "master" || n.Role == "slave").ShouldBeTrue();
         }
 
         [Fact]
@@ -123,6 +213,47 @@ namespace Roman.RedisManager.Tests.Infrastructure.Repositories
                 () => redisRepository.GetInfoAsync(groupId, "localhost", 0));
         }
 
+        [Fact]
+        public async Task GetServerNodesAsync_RolesReflectIsReplicaProperty()
+        {
+            var masterEndpoint = new System.Net.IPEndPoint(System.Net.IPAddress.Loopback, 6379);
+            var slaveEndpoint = new System.Net.IPEndPoint(System.Net.IPAddress.Loopback, 6380);
+
+            var masterServer = new Mock<IServer>();
+            masterServer.Setup(s => s.EndPoint).Returns(masterEndpoint);
+            masterServer.Setup(s => s.IsReplica).Returns(false);
+
+            var slaveServer = new Mock<IServer>();
+            slaveServer.Setup(s => s.EndPoint).Returns(slaveEndpoint);
+            slaveServer.Setup(s => s.IsReplica).Returns(true);
+
+            var connection = new Mock<IConnectionMultiplexer>();
+            connection.Setup(c => c.GetServers()).Returns(new[] { masterServer.Object, slaveServer.Object });
+
+            var testGroupId = Guid.Parse("12345678-1234-1234-1234-123456789012");
+            var options = Options.Create(new RedisConfiguration
+            {
+                ServerGroups =
+                [
+                    new RedisServerGroupConfiguration
+                    {
+                        Id = testGroupId,
+                        Name = "test",
+                        ConnectionString = "localhost:6379",
+                        GroupType = GroupType.Standalone
+                    }
+                ]
+            });
+            await using IRedisConnectionManager connectionManager = new SimpleConnectionManager(connection.Object);
+            IRedisRepository repository = new RedisRepository(connectionManager, options);
+
+            var nodes = await repository.GetServerNodesAsync(testGroupId);
+
+            nodes.ShouldNotBeNull();
+            nodes.ShouldContain(n => n.Role == "master");
+            nodes.ShouldContain(n => n.Role == "slave");
+        }
+
         private sealed class SimpleConnectionManager : IRedisConnectionManager
         {
             private readonly IConnectionMultiplexer _multiplexer;
@@ -137,6 +268,5 @@ namespace Roman.RedisManager.Tests.Infrastructure.Repositories
                 return ValueTask.CompletedTask;
             }
         }
-
     }
 }

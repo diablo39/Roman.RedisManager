@@ -11,7 +11,7 @@ namespace Roman.RedisManager.Tests.Infrastructure.Repositories
 
         public async Task InitializeAsync()
         {
-            Container = new RedisBuilder("redis:7.0").Build();
+            Container = new RedisBuilder("redis:8.6.0").Build();
             await Container.StartAsync();
         }
 
