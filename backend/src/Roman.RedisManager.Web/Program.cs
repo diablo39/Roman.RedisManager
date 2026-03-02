@@ -20,6 +20,12 @@ namespace Roman.RedisManager.Web
 
             builder.Services.AddSingleton<IRedisConnectionManager, RedisConnectionManager>();
             builder.Services.AddSingleton<IRedisRepository, RedisRepository>();
+            builder.Services.AddSingleton<IRedisKeyRepository, RedisKeyRepository>();
+            builder.Services.AddSingleton<IRedisStringRepository, RedisStringRepository>();
+            builder.Services.AddSingleton<IRedisListRepository, RedisListRepository>();
+            builder.Services.AddSingleton<IRedisSetRepository, RedisSetRepository>();
+            builder.Services.AddSingleton<IRedisHashRepository, RedisHashRepository>();
+            builder.Services.AddSingleton<IRedisSortedSetRepository, RedisSortedSetRepository>();
 
             builder.Services.AddControllers();
             builder.Services.AddOpenApi();

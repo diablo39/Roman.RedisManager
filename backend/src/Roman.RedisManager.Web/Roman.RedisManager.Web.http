@@ -13,3 +13,187 @@ GET {{Roman.RedisManager.Web_HostAddress}}/api/commands/redis-info?groupId={{Red
 
 ###
 
+### Redis Key Search — all keys (standalone)
+GET {{Roman.RedisManager.Web_HostAddress}}/api/redis-keys?groupId={{RedisServerGroupId}}&pattern=*&cursor=0&pageSize=100
+
+###
+
+### Redis Key Search — pattern filter (standalone)
+GET {{Roman.RedisManager.Web_HostAddress}}/api/redis-keys?groupId={{RedisServerGroupId}}&pattern=session:*&cursor=0&pageSize=50
+
+###
+
+### Redis Key Search — cluster across masters (no host/port needed)
+GET {{Roman.RedisManager.Web_HostAddress}}/api/redis-keys?groupId={{RedisServerGroupId}}&pattern=*&cursor=0&pageSize=100
+
+###
+
+###
+
+### Redis Key Search — continuation with cursor from a previous response (string-valued cursor)
+GET {{Roman.RedisManager.Web_HostAddress}}/api/redis-keys?groupId={{RedisServerGroupId}}&pattern=*&cursor=12345&pageSize=100
+
+###
+
+### --- PHASE 1: String + Key Operations ---
+
+### Set a string value
+POST {{Roman.RedisManager.Web_HostAddress}}/api/redis-strings
+Content-Type: application/json
+
+{ "groupId": "{{RedisServerGroupId}}", "key": "test:string", "value": "hello world" }
+
+###
+
+### Set a string value with TTL (30 seconds)
+POST {{Roman.RedisManager.Web_HostAddress}}/api/redis-strings
+Content-Type: application/json
+
+{ "groupId": "{{RedisServerGroupId}}", "key": "test:string:ttl", "value": "expires soon", "ttl": "00:00:30" }
+
+###
+
+### Set a string value with NX condition (only if not exists — should return success: false if key exists)
+POST {{Roman.RedisManager.Web_HostAddress}}/api/redis-strings
+Content-Type: application/json
+
+{ "groupId": "{{RedisServerGroupId}}", "key": "test:string", "value": "should not overwrite", "condition": "NotExists" }
+
+###
+
+### Get a string value
+GET {{Roman.RedisManager.Web_HostAddress}}/api/redis-strings?groupId={{RedisServerGroupId}}&key=test:string
+
+###
+
+### Get key metadata (type + TTL)
+GET {{Roman.RedisManager.Web_HostAddress}}/api/redis-keys/test:string/metadata?groupId={{RedisServerGroupId}}
+
+###
+
+### Get key value (auto-detect type)
+GET {{Roman.RedisManager.Web_HostAddress}}/api/redis-keys/test:string/value?groupId={{RedisServerGroupId}}
+
+###
+
+### Delete a key
+DELETE {{Roman.RedisManager.Web_HostAddress}}/api/redis-keys/test:string?groupId={{RedisServerGroupId}}
+
+###
+
+### Delete non-existent key (should return deleted: false)
+DELETE {{Roman.RedisManager.Web_HostAddress}}/api/redis-keys/test:string?groupId={{RedisServerGroupId}}
+
+###
+
+### --- PHASE 2: List + Set ---
+
+### Push to list (right-push)
+POST {{Roman.RedisManager.Web_HostAddress}}/api/redis-lists
+Content-Type: application/json
+
+{ "groupId": "{{RedisServerGroupId}}", "key": "test:list", "values": ["a", "b", "c"], "direction": "Right" }
+
+###
+
+### Push to list (left-push)
+POST {{Roman.RedisManager.Web_HostAddress}}/api/redis-lists
+Content-Type: application/json
+
+{ "groupId": "{{RedisServerGroupId}}", "key": "test:list", "values": ["z"], "direction": "Left" }
+
+###
+
+### Get list range (all elements)
+GET {{Roman.RedisManager.Web_HostAddress}}/api/redis-lists?groupId={{RedisServerGroupId}}&key=test:list&start=0&stop=-1
+
+###
+
+### Remove element from list (count=0 removes all occurrences)
+POST {{Roman.RedisManager.Web_HostAddress}}/api/redis-lists/remove
+Content-Type: application/json
+
+{ "groupId": "{{RedisServerGroupId}}", "key": "test:list", "value": "b", "count": 1 }
+
+###
+
+### Add members to set
+POST {{Roman.RedisManager.Web_HostAddress}}/api/redis-sets
+Content-Type: application/json
+
+{ "groupId": "{{RedisServerGroupId}}", "key": "test:set", "members": ["x", "y", "z"] }
+
+###
+
+### Get set members (cursor-based scan)
+GET {{Roman.RedisManager.Web_HostAddress}}/api/redis-sets?groupId={{RedisServerGroupId}}&key=test:set&cursor=0&pageSize=100
+
+###
+
+### Remove members from set
+POST {{Roman.RedisManager.Web_HostAddress}}/api/redis-sets/remove
+Content-Type: application/json
+
+{ "groupId": "{{RedisServerGroupId}}", "key": "test:set", "members": ["y"] }
+
+###
+
+### --- PHASE 3: Hash + Sorted Set ---
+
+### Set hash fields
+POST {{Roman.RedisManager.Web_HostAddress}}/api/redis-hashes
+Content-Type: application/json
+
+{ "groupId": "{{RedisServerGroupId}}", "key": "test:hash", "fields": { "name": "Alice", "age": "30", "city": "Warsaw" } }
+
+###
+
+### Set hash fields with TTL
+POST {{Roman.RedisManager.Web_HostAddress}}/api/redis-hashes
+Content-Type: application/json
+
+{ "groupId": "{{RedisServerGroupId}}", "key": "test:hash:ttl", "fields": { "name": "Bob" }, "ttl": "00:05:00" }
+
+###
+
+### Get hash fields (cursor scan)
+GET {{Roman.RedisManager.Web_HostAddress}}/api/redis-hashes?groupId={{RedisServerGroupId}}&key=test:hash&cursor=0&pageSize=100
+
+###
+
+### Remove hash fields
+POST {{Roman.RedisManager.Web_HostAddress}}/api/redis-hashes/remove
+Content-Type: application/json
+
+{ "groupId": "{{RedisServerGroupId}}", "key": "test:hash", "fields": ["city"] }
+
+###
+
+### Add members to sorted set
+POST {{Roman.RedisManager.Web_HostAddress}}/api/redis-sorted-sets
+Content-Type: application/json
+
+{ "groupId": "{{RedisServerGroupId}}", "key": "test:zset", "entries": [{ "member": "alpha", "score": 1.0 }, { "member": "beta", "score": 2.5 }, { "member": "gamma", "score": 3.0 }] }
+
+###
+
+### Add sorted set members with TTL
+POST {{Roman.RedisManager.Web_HostAddress}}/api/redis-sorted-sets
+Content-Type: application/json
+
+{ "groupId": "{{RedisServerGroupId}}", "key": "test:zset:ttl", "entries": [{ "member": "a", "score": 1.0 }], "ttl": "00:10:00" }
+
+###
+
+### Get sorted set range (all elements by rank)
+GET {{Roman.RedisManager.Web_HostAddress}}/api/redis-sorted-sets?groupId={{RedisServerGroupId}}&key=test:zset&start=0&stop=-1
+
+###
+
+### Remove members from sorted set
+POST {{Roman.RedisManager.Web_HostAddress}}/api/redis-sorted-sets/remove
+Content-Type: application/json
+
+{ "groupId": "{{RedisServerGroupId}}", "key": "test:zset", "members": ["beta"] }
+
+###

@@ -50,7 +50,8 @@ namespace Roman.RedisManager.Tests.Application.CQRS
                 _nodes = nodes;
             }
 
-            public Task<RedisSearchResult> SearchForKeysAsync(Guid groupId, string predicate)
+            public Task<RedisSearchResult> SearchForKeysAsync(
+                Guid groupId, string pattern, string cursor, int pageSize)
             {
                 return Task.FromResult(new RedisSearchResult(Array.Empty<RedisKey>(), 0));
             }

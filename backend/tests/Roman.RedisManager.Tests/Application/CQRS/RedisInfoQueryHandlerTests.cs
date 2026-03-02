@@ -49,7 +49,8 @@ namespace Roman.RedisManager.Tests.Application.CQRS
             private readonly RedisInfo? _info;
             public StubRedisRepository(RedisInfo? info) => _info = info;
 
-            public Task<RedisSearchResult> SearchForKeysAsync(Guid groupId, string predicate) =>
+            public Task<RedisSearchResult> SearchForKeysAsync(
+                Guid groupId, string pattern, string cursor, int pageSize) =>
                 Task.FromResult(new RedisSearchResult(Array.Empty<RedisKey>(), 0));
 
             public Task<IReadOnlyCollection<RedisServerNode>> GetServerNodesAsync(Guid groupId) =>

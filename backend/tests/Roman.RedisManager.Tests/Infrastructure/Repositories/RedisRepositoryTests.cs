@@ -45,7 +45,8 @@ namespace Roman.RedisManager.Tests.Infrastructure.Repositories
             var groupId = options.Value.ServerGroups.First().Id;
 
             // Act
-            RedisSearchResult result = await redisRepository.SearchForKeysAsync(groupId, predicate: string.Empty);
+            RedisSearchResult result = await redisRepository.SearchForKeysAsync(
+                groupId, pattern: "*", cursor: "0", pageSize: 50);
 
             // Assert
             result.ShouldNotBeNull();
@@ -252,6 +253,141 @@ namespace Roman.RedisManager.Tests.Infrastructure.Repositories
             nodes.ShouldNotBeNull();
             nodes.ShouldContain(n => n.Role == "master");
             nodes.ShouldContain(n => n.Role == "slave");
+        }
+
+        [Fact]
+        public async Task SearchForKeysAsync_WithSmallPageSize_ReturnsBoundedPage()
+        {
+            var connectionMultiplexer = ConnectionMultiplexer.Connect(_fixture.ConnectionString + ",allowAdmin=true");
+            var db = connectionMultiplexer.GetDatabase();
+
+            for (int i = 0; i < 20; i++)
+            {
+                await db.StringSetAsync($"paging-test:{i}", "v");
+            }
+
+            var options = Options.Create(new RedisConfiguration
+            {
+                ServerGroups =
+                [
+                    new RedisServerGroupConfiguration
+                    {
+                        Id = Guid.Parse("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"),
+                        Name = "placeholder",
+                        ConnectionString = _fixture.Container.GetConnectionString(),
+                        GroupType = GroupType.Standalone
+                    }
+                ]
+            });
+
+            await using IRedisConnectionManager connectionManager = new SimpleConnectionManager(connectionMultiplexer);
+            IRedisRepository repository = new RedisRepository(connectionManager, options);
+            var groupId = options.Value.ServerGroups.First().Id;
+
+            var result = await repository.SearchForKeysAsync(
+                groupId, pattern: "paging-test:*", cursor: "0", pageSize: 5);
+
+            result.ShouldNotBeNull();
+            result.Keys.Count().ShouldBeLessThanOrEqualTo(5);
+        }
+
+        [Fact]
+        public async Task SearchForKeysAsync_WithInitialCursor_CanIterateThroughKeys()
+        {
+            var connectionMultiplexer = ConnectionMultiplexer.Connect(_fixture.ConnectionString + ",allowAdmin=true");
+            var db = connectionMultiplexer.GetDatabase();
+
+            for (int i = 0; i < 30; i++)
+            {
+                await db.StringSetAsync($"cursor-chain:{i}", "v");
+            }
+
+            var options = Options.Create(new RedisConfiguration
+            {
+                ServerGroups =
+                [
+                    new RedisServerGroupConfiguration
+                    {
+                        Id = Guid.Parse("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb"),
+                        Name = "placeholder",
+                        ConnectionString = _fixture.Container.GetConnectionString(),
+                        GroupType = GroupType.Standalone
+                    }
+                ]
+            });
+
+            await using IRedisConnectionManager connectionManager = new SimpleConnectionManager(connectionMultiplexer);
+            IRedisRepository repository = new RedisRepository(connectionManager, options);
+            var groupId = options.Value.ServerGroups.First().Id;
+
+            var page1 = await repository.SearchForKeysAsync(
+                groupId, pattern: "cursor-chain:*", cursor: "0", pageSize: 5);
+
+            page1.ShouldNotBeNull();
+
+            if (page1.HasMoreResults)
+            {
+                var page2 = await repository.SearchForKeysAsync(
+                    groupId, pattern: "cursor-chain:*", cursor: page1.Cursor.ToString(), pageSize: 5);
+
+                page2.ShouldNotBeNull();
+            }
+        }
+
+        [Fact]
+        public async Task SearchForKeysAsync_ClusterMode_DefaultsAcrossMasters()
+        {
+            var options = Options.Create(new RedisConfiguration
+            {
+                ServerGroups =
+                [
+                    new RedisServerGroupConfiguration
+                    {
+                        Id = Guid.Parse("cccccccc-cccc-cccc-cccc-cccccccccccc"),
+                        Name = "placeholder",
+                        ConnectionString = _fixture.ConnectionString,
+                        GroupType = GroupType.Cluster
+                    }
+                ]
+            });
+
+            await using IRedisConnectionManager connectionManager = new SimpleConnectionManager(
+                ConnectionMultiplexer.Connect(_fixture.ConnectionString + ",allowAdmin=true"));
+            IRedisRepository repository = new RedisRepository(connectionManager, options);
+            var groupId = options.Value.ServerGroups.First().Id;
+
+            // We expect the call to succeed and return a result; since our test container
+            // isn't actually clustered we won't exercise multiple masters, but we can at
+            // least verify that the API no longer throws and that NodeCursors is present.
+            var result = await repository.SearchForKeysAsync(groupId, pattern: "*", cursor: "0", pageSize: 50);
+            result.ShouldNotBeNull();
+            result.NodeCursors.ShouldNotBeNull();
+        }
+
+        [Fact]
+        public async Task SearchForKeysAsync_EmptyGroupId_ThrowsArgumentException()
+        {
+            var options = Options.Create(new RedisConfiguration
+            {
+                ServerGroups =
+                [
+                    new RedisServerGroupConfiguration
+                    {
+                        Id = Guid.Parse("dddddddd-dddd-dddd-dddd-dddddddddddd"),
+                        Name = "placeholder",
+                        ConnectionString = _fixture.ConnectionString,
+                        GroupType = GroupType.Standalone
+                    }
+                ]
+            });
+
+            await using IRedisConnectionManager connectionManager = new SimpleConnectionManager(
+                ConnectionMultiplexer.Connect(_fixture.ConnectionString + ",allowAdmin=true"));
+            IRedisRepository repository = new RedisRepository(connectionManager, options);
+
+            await Should.ThrowAsync<ArgumentException>(() =>
+                repository.SearchForKeysAsync(
+                    Guid.Empty, pattern: "*", cursor: "0", pageSize: 100));
         }
 
         private sealed class SimpleConnectionManager : IRedisConnectionManager
