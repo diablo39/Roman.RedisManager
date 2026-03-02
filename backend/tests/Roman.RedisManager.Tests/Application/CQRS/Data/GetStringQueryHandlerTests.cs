@@ -1,8 +1,8 @@
-using Roman.RedisManager.Application.CQRS;
+using Roman.RedisManager.Application.CQRS.Data;
 using Roman.RedisManager.Domain.Entities.RedisData;
 using Roman.RedisManager.Domain.Repositories;
 
-namespace Roman.RedisManager.Tests.Application.CQRS
+namespace Roman.RedisManager.Tests.Application.CQRS.Data
 {
     public class GetStringQueryHandlerTests
     {
