@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Roman.RedisManager.Application.CQRS;
-using Roman.RedisManager.Domain.Entities;
+using Roman.RedisManager.Domain.Entities.RedisData;
 using Roman.RedisManager.Infrastructure.Exceptions;
 using Wolverine;
 
@@ -20,7 +20,7 @@ namespace Roman.RedisManager.Web.Controllers
         string Value,
         long Count = 0);
 
-    [Route("api/redis-lists")]
+    [Route("api/redis/data/lists")]
     [ApiController]
     public class RedisListsController(IMessageBus bus) : ControllerBase
     {

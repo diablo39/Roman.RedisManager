@@ -17,7 +17,7 @@ namespace Roman.RedisManager.Web.Controllers
         string Key,
         IReadOnlyCollection<string> Fields);
 
-    [Route("api/redis-hashes")]
+    [Route("api/redis/data/hashes")]
     [ApiController]
     public class RedisHashesController(IMessageBus bus) : ControllerBase
     {

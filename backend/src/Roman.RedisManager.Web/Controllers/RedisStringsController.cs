@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Roman.RedisManager.Application.CQRS;
-using Roman.RedisManager.Domain.Entities;
+using Roman.RedisManager.Domain.Entities.RedisData;
 using Roman.RedisManager.Infrastructure.Exceptions;
 using Wolverine;
 
@@ -14,7 +14,7 @@ namespace Roman.RedisManager.Web.Controllers
         TimeSpan? Ttl,
         SetCondition Condition = SetCondition.None);
 
-    [Route("api/redis-strings")]
+    [Route("api/redis/data/strings")]
     [ApiController]
     public class RedisStringsController(IMessageBus bus) : ControllerBase
     {

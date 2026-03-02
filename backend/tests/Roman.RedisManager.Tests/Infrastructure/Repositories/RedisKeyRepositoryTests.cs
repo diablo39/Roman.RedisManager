@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Options;
 using Roman.RedisManager.Domain.Configuration;
-using Roman.RedisManager.Domain.Entities;
+using Roman.RedisManager.Domain.Entities.RedisData;
+using Roman.RedisManager.Domain.Entities.Server;
 using Roman.RedisManager.Domain.Repositories;
 using Roman.RedisManager.Infrastructure.Redis;
 using Roman.RedisManager.Infrastructure.Repositories;

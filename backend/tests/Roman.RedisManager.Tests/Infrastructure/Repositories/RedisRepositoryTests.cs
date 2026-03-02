@@ -6,6 +6,7 @@ using Roman.RedisManager.Infrastructure.Redis;
 using Roman.RedisManager.Infrastructure.Repositories;
 using StackExchange.Redis;
 using Moq;
+using Roman.RedisManager.Domain.Entities.Server;
 
 namespace Roman.RedisManager.Tests.Infrastructure.Repositories
 {

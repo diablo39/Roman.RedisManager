@@ -1,4 +1,4 @@
-namespace Roman.RedisManager.Domain.Entities
+namespace Roman.RedisManager.Domain.Entities.RedisData
 {
     public class RedisSortedSetEntry
     {

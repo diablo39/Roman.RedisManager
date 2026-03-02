@@ -17,7 +17,7 @@ namespace Roman.RedisManager.Web.Controllers
         string Key,
         IReadOnlyCollection<string> Members);
 
-    [Route("api/redis-sets")]
+    [Route("api/redis/data/sets")]
     [ApiController]
     public class RedisSetsController(IMessageBus bus) : ControllerBase
     {

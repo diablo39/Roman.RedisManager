@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using Microsoft.Extensions.Options;
 using Roman.RedisManager.Domain.Configuration;
-using Roman.RedisManager.Domain.Entities;
 using Xunit;
 using Shouldly;
+using Roman.RedisManager.Domain.Entities.Server;
 
 namespace Roman.RedisManager.Tests.Domain.Configuration
 {

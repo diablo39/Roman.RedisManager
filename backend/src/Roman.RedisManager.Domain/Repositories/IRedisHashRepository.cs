@@ -1,4 +1,5 @@
 using Roman.RedisManager.Domain.Entities;
+using Roman.RedisManager.Domain.Entities.RedisData;
 
 namespace Roman.RedisManager.Domain.Repositories
 {

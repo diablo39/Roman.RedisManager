@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace Roman.RedisManager.Domain.Entities
+namespace Roman.RedisManager.Domain.Entities.RedisData
 {
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public enum RedisDataType

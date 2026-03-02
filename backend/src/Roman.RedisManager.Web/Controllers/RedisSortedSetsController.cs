@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Roman.RedisManager.Application.CQRS;
-using Roman.RedisManager.Domain.Entities;
+using Roman.RedisManager.Domain.Entities.RedisData;
 using Roman.RedisManager.Infrastructure.Exceptions;
 using Wolverine;
 
@@ -18,7 +18,7 @@ namespace Roman.RedisManager.Web.Controllers
         string Key,
         IReadOnlyCollection<string> Members);
 
-    [Route("api/redis-sorted-sets")]
+    [Route("api/redis/data/sorted-sets")]
     [ApiController]
     public class RedisSortedSetsController(IMessageBus bus) : ControllerBase
     {

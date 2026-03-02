@@ -1,4 +1,5 @@
 ﻿using Roman.RedisManager.Domain.Entities;
+using Roman.RedisManager.Domain.Entities.Server;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 

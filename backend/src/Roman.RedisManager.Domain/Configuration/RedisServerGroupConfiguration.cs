@@ -1,5 +1,5 @@
 using Microsoft.Extensions.Configuration;
-using Roman.RedisManager.Domain.Entities;
+using Roman.RedisManager.Domain.Entities.Server;
 using System.ComponentModel.DataAnnotations;
 
 namespace Roman.RedisManager.Domain.Configuration

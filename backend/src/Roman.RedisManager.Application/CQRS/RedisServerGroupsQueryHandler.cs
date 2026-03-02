@@ -1,6 +1,6 @@
 using Microsoft.Extensions.Options;
 using Roman.RedisManager.Domain.Configuration;
-using Roman.RedisManager.Domain.Entities;
+using Roman.RedisManager.Domain.Entities.Server;
 
 namespace Roman.RedisManager.Application.CQRS
 {

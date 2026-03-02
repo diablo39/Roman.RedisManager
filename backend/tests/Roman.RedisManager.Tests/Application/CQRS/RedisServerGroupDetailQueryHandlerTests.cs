@@ -1,5 +1,6 @@
 using Roman.RedisManager.Application.CQRS;
 using Roman.RedisManager.Domain.Entities;
+using Roman.RedisManager.Domain.Entities.Server;
 using Roman.RedisManager.Domain.Repositories;
 using System;
 using System.Collections.Generic;

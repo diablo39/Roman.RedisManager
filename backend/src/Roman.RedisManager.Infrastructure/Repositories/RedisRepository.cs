@@ -8,6 +8,7 @@ using StackExchange.Redis;
 using System.Net;
 using System.Net.Sockets;
 using RedisKey = Roman.RedisManager.Domain.Entities.RedisKey;
+using Roman.RedisManager.Domain.Entities.Server;
 
 namespace Roman.RedisManager.Infrastructure.Repositories
 {
@@ -52,7 +53,7 @@ namespace Roman.RedisManager.Infrastructure.Repositories
                 var effectivePattern = string.IsNullOrEmpty(pattern) ? "*" : pattern;
 
                 // determine behaviour based on group type
-                if (group.GroupType == Domain.Entities.GroupType.Cluster)
+                if (group.GroupType == GroupType.Cluster)
                 {
                     // perform scan across all master nodes in sequence, using a composite cursor string
                     var masters = connection.GetServers()
@@ -199,7 +200,7 @@ namespace Roman.RedisManager.Infrastructure.Repositories
                     }
                     
                     // for cluster groups, skip unspecified endpoints
-                    if (group.GroupType == Domain.Entities.GroupType.Cluster &&
+                    if (group.GroupType == GroupType.Cluster &&
                         candidate.EndPoint.AddressFamily == AddressFamily.Unspecified)
                     {
                         continue;

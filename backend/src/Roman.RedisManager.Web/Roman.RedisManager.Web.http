@@ -38,7 +38,7 @@ GET {{Roman.RedisManager.Web_HostAddress}}/api/redis-keys?groupId={{RedisServerG
 ### --- PHASE 1: String + Key Operations ---
 
 ### Set a string value
-POST {{Roman.RedisManager.Web_HostAddress}}/api/redis-strings
+POST {{Roman.RedisManager.Web_HostAddress}}/api/redis/data/strings
 Content-Type: application/json
 
 { "groupId": "{{RedisServerGroupId}}", "key": "test:string", "value": "hello world" }
@@ -46,7 +46,7 @@ Content-Type: application/json
 ###
 
 ### Set a string value with TTL (30 seconds)
-POST {{Roman.RedisManager.Web_HostAddress}}/api/redis-strings
+POST {{Roman.RedisManager.Web_HostAddress}}/api/redis/data/strings
 Content-Type: application/json
 
 { "groupId": "{{RedisServerGroupId}}", "key": "test:string:ttl", "value": "expires soon", "ttl": "00:00:30" }
@@ -54,7 +54,7 @@ Content-Type: application/json
 ###
 
 ### Set a string value with NX condition (only if not exists — should return success: false if key exists)
-POST {{Roman.RedisManager.Web_HostAddress}}/api/redis-strings
+POST {{Roman.RedisManager.Web_HostAddress}}/api/redis/data/strings
 Content-Type: application/json
 
 { "groupId": "{{RedisServerGroupId}}", "key": "test:string", "value": "should not overwrite", "condition": "NotExists" }
@@ -62,7 +62,7 @@ Content-Type: application/json
 ###
 
 ### Get a string value
-GET {{Roman.RedisManager.Web_HostAddress}}/api/redis-strings?groupId={{RedisServerGroupId}}&key=test:string
+GET {{Roman.RedisManager.Web_HostAddress}}/api/redis/data/strings?groupId={{RedisServerGroupId}}&key=test:string
 
 ###
 
@@ -89,7 +89,7 @@ DELETE {{Roman.RedisManager.Web_HostAddress}}/api/redis-keys/test:string?groupId
 ### --- PHASE 2: List + Set ---
 
 ### Push to list (right-push)
-POST {{Roman.RedisManager.Web_HostAddress}}/api/redis-lists
+POST {{Roman.RedisManager.Web_HostAddress}}/api/redis/data/lists
 Content-Type: application/json
 
 { "groupId": "{{RedisServerGroupId}}", "key": "test:list", "values": ["a", "b", "c"], "direction": "Right" }
@@ -97,7 +97,7 @@ Content-Type: application/json
 ###
 
 ### Push to list (left-push)
-POST {{Roman.RedisManager.Web_HostAddress}}/api/redis-lists
+POST {{Roman.RedisManager.Web_HostAddress}}/api/redis/data/lists
 Content-Type: application/json
 
 { "groupId": "{{RedisServerGroupId}}", "key": "test:list", "values": ["z"], "direction": "Left" }
@@ -105,12 +105,12 @@ Content-Type: application/json
 ###
 
 ### Get list range (all elements)
-GET {{Roman.RedisManager.Web_HostAddress}}/api/redis-lists?groupId={{RedisServerGroupId}}&key=test:list&start=0&stop=-1
+GET {{Roman.RedisManager.Web_HostAddress}}/api/redis/data/lists?groupId={{RedisServerGroupId}}&key=test:list&start=0&stop=-1
 
 ###
 
 ### Remove element from list (count=0 removes all occurrences)
-POST {{Roman.RedisManager.Web_HostAddress}}/api/redis-lists/remove
+POST {{Roman.RedisManager.Web_HostAddress}}/api/redis/data/lists/remove
 Content-Type: application/json
 
 { "groupId": "{{RedisServerGroupId}}", "key": "test:list", "value": "b", "count": 1 }
@@ -118,7 +118,7 @@ Content-Type: application/json
 ###
 
 ### Add members to set
-POST {{Roman.RedisManager.Web_HostAddress}}/api/redis-sets
+POST {{Roman.RedisManager.Web_HostAddress}}/api/redis/data/sets
 Content-Type: application/json
 
 { "groupId": "{{RedisServerGroupId}}", "key": "test:set", "members": ["x", "y", "z"] }
@@ -126,12 +126,12 @@ Content-Type: application/json
 ###
 
 ### Get set members (cursor-based scan)
-GET {{Roman.RedisManager.Web_HostAddress}}/api/redis-sets?groupId={{RedisServerGroupId}}&key=test:set&cursor=0&pageSize=100
+GET {{Roman.RedisManager.Web_HostAddress}}/api/redis/data/sets?groupId={{RedisServerGroupId}}&key=test:set&cursor=0&pageSize=100
 
 ###
 
 ### Remove members from set
-POST {{Roman.RedisManager.Web_HostAddress}}/api/redis-sets/remove
+POST {{Roman.RedisManager.Web_HostAddress}}/api/redis/data/sets/remove
 Content-Type: application/json
 
 { "groupId": "{{RedisServerGroupId}}", "key": "test:set", "members": ["y"] }
@@ -141,7 +141,7 @@ Content-Type: application/json
 ### --- PHASE 3: Hash + Sorted Set ---
 
 ### Set hash fields
-POST {{Roman.RedisManager.Web_HostAddress}}/api/redis-hashes
+POST {{Roman.RedisManager.Web_HostAddress}}/api/redis/data/hashes
 Content-Type: application/json
 
 { "groupId": "{{RedisServerGroupId}}", "key": "test:hash", "fields": { "name": "Alice", "age": "30", "city": "Warsaw" } }
@@ -149,7 +149,7 @@ Content-Type: application/json
 ###
 
 ### Set hash fields with TTL
-POST {{Roman.RedisManager.Web_HostAddress}}/api/redis-hashes
+POST {{Roman.RedisManager.Web_HostAddress}}/api/redis/data/hashes
 Content-Type: application/json
 
 { "groupId": "{{RedisServerGroupId}}", "key": "test:hash:ttl", "fields": { "name": "Bob" }, "ttl": "00:05:00" }
@@ -157,12 +157,12 @@ Content-Type: application/json
 ###
 
 ### Get hash fields (cursor scan)
-GET {{Roman.RedisManager.Web_HostAddress}}/api/redis-hashes?groupId={{RedisServerGroupId}}&key=test:hash&cursor=0&pageSize=100
+GET {{Roman.RedisManager.Web_HostAddress}}/api/redis/data/hashes?groupId={{RedisServerGroupId}}&key=test:hash&cursor=0&pageSize=100
 
 ###
 
 ### Remove hash fields
-POST {{Roman.RedisManager.Web_HostAddress}}/api/redis-hashes/remove
+POST {{Roman.RedisManager.Web_HostAddress}}/api/redis/data/hashes/remove
 Content-Type: application/json
 
 { "groupId": "{{RedisServerGroupId}}", "key": "test:hash", "fields": ["city"] }
@@ -170,7 +170,7 @@ Content-Type: application/json
 ###
 
 ### Add members to sorted set
-POST {{Roman.RedisManager.Web_HostAddress}}/api/redis-sorted-sets
+POST {{Roman.RedisManager.Web_HostAddress}}/api/redis/data/sorted-sets
 Content-Type: application/json
 
 { "groupId": "{{RedisServerGroupId}}", "key": "test:zset", "entries": [{ "member": "alpha", "score": 1.0 }, { "member": "beta", "score": 2.5 }, { "member": "gamma", "score": 3.0 }] }
@@ -178,7 +178,7 @@ Content-Type: application/json
 ###
 
 ### Add sorted set members with TTL
-POST {{Roman.RedisManager.Web_HostAddress}}/api/redis-sorted-sets
+POST {{Roman.RedisManager.Web_HostAddress}}/api/redis/data/sorted-sets
 Content-Type: application/json
 
 { "groupId": "{{RedisServerGroupId}}", "key": "test:zset:ttl", "entries": [{ "member": "a", "score": 1.0 }], "ttl": "00:10:00" }
@@ -186,12 +186,12 @@ Content-Type: application/json
 ###
 
 ### Get sorted set range (all elements by rank)
-GET {{Roman.RedisManager.Web_HostAddress}}/api/redis-sorted-sets?groupId={{RedisServerGroupId}}&key=test:zset&start=0&stop=-1
+GET {{Roman.RedisManager.Web_HostAddress}}/api/redis/data/sorted-sets?groupId={{RedisServerGroupId}}&key=test:zset&start=0&stop=-1
 
 ###
 
 ### Remove members from sorted set
-POST {{Roman.RedisManager.Web_HostAddress}}/api/redis-sorted-sets/remove
+POST {{Roman.RedisManager.Web_HostAddress}}/api/redis/data/sorted-sets/remove
 Content-Type: application/json
 
 { "groupId": "{{RedisServerGroupId}}", "key": "test:zset", "members": ["beta"] }

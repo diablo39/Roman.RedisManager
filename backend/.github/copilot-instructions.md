@@ -4,6 +4,8 @@
 
 All questions should be printed as a numbered list of options.
 
+Try to re-use existing code and if it is not possible, follow the conventions and patterns documented in this file to ensure consistency with the existing codebase.
+
 ## 1. Overview
 
 This file enables AI coding assistants (GitHub Copilot, etc.) to generate features that are **consistent with the existing architecture, conventions, and patterns** of the Roman.RedisManager codebase.

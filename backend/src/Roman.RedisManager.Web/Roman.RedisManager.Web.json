@@ -5,7 +5,7 @@
     "version": "1.0.0"
   },
   "paths": {
-    "/api/redis-hashes": {
+    "/api/redis/data/hashes": {
       "post": {
         "tags": [
           "RedisHashes"
@@ -250,7 +250,7 @@
         }
       }
     },
-    "/api/redis-hashes/remove": {
+    "/api/redis/data/hashes/remove": {
       "post": {
         "tags": [
           "RedisHashes"
@@ -801,7 +801,7 @@
         }
       }
     },
-    "/api/redis-lists": {
+    "/api/redis/data/lists": {
       "post": {
         "tags": [
           "RedisLists"
@@ -1046,7 +1046,7 @@
         }
       }
     },
-    "/api/redis-lists/remove": {
+    "/api/redis/data/lists/remove": {
       "post": {
         "tags": [
           "RedisLists"
@@ -1278,7 +1278,7 @@
         }
       }
     },
-    "/api/redis-sets": {
+    "/api/redis/data/sets": {
       "post": {
         "tags": [
           "RedisSets"
@@ -1523,7 +1523,7 @@
         }
       }
     },
-    "/api/redis-sets/remove": {
+    "/api/redis/data/sets/remove": {
       "post": {
         "tags": [
           "RedisSets"
@@ -1635,7 +1635,7 @@
         }
       }
     },
-    "/api/redis-sorted-sets": {
+    "/api/redis/data/sorted-sets": {
       "post": {
         "tags": [
           "RedisSortedSets"
@@ -1880,7 +1880,7 @@
         }
       }
     },
-    "/api/redis-sorted-sets/remove": {
+    "/api/redis/data/sorted-sets/remove": {
       "post": {
         "tags": [
           "RedisSortedSets"
@@ -1992,7 +1992,7 @@
         }
       }
     },
-    "/api/redis-strings": {
+    "/api/redis/data/strings": {
       "post": {
         "tags": [
           "RedisStrings"

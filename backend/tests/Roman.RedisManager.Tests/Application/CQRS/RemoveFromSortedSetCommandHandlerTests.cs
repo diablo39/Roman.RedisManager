@@ -1,5 +1,5 @@
 using Roman.RedisManager.Application.CQRS;
-using Roman.RedisManager.Domain.Entities;
+using Roman.RedisManager.Domain.Entities.RedisData;
 using Roman.RedisManager.Domain.Repositories;
 
 namespace Roman.RedisManager.Tests.Application.CQRS
