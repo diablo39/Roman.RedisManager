@@ -38,6 +38,7 @@ namespace Roman.RedisManager.Tests.Application.CQRS
 
             var result = await GetListRangeQueryHandler.Handle(query, stub);
 
+            result.ShouldNotBeNull();
             result.Values.ShouldBeEmpty();
         }
 

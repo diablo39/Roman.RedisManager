@@ -31,6 +31,8 @@ namespace Roman.RedisManager.Tests.Application.CQRS
             result.Nodes.Count.ShouldBe(2);
             result.Nodes.ShouldContain(node => node.Role == "master");
             result.Nodes.ShouldContain(node => node.Role == "slave");
+            result.Nodes.ShouldContain(node => node.Host == "127.0.0.1" && node.Port == 6379 && node.Role == "master");
+            result.Nodes.ShouldContain(node => node.Host == "127.0.0.1" && node.Port == 6380 && node.Role == "slave");
         }
 
         [Fact]
@@ -40,6 +42,24 @@ namespace Roman.RedisManager.Tests.Application.CQRS
             var query = new RedisServerGroupDetailQuery { Id = Guid.Parse("00000000-0000-0000-0000-000000000000") };
 
             await Should.ThrowAsync<KeyNotFoundException>(() => RedisServerGroupDetailQueryHandler.Handle(query, repository));
+        }
+
+        [Fact]
+        public async Task Handle_NullQuery_ThrowsArgumentNullException()
+        {
+            var repository = new InMemoryRedisRepository(new Dictionary<Guid, IReadOnlyCollection<RedisServerNode>>());
+
+            await Should.ThrowAsync<ArgumentNullException>(
+                () => RedisServerGroupDetailQueryHandler.Handle(null!, repository));
+        }
+
+        [Fact]
+        public async Task Handle_NullRepository_ThrowsArgumentNullException()
+        {
+            var query = new RedisServerGroupDetailQuery { Id = Guid.NewGuid() };
+
+            await Should.ThrowAsync<ArgumentNullException>(
+                () => RedisServerGroupDetailQueryHandler.Handle(query, null!));
         }
 
         private sealed class InMemoryRedisRepository : IRedisRepository

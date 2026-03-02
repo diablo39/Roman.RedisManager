@@ -60,10 +60,48 @@ namespace Roman.RedisManager.Tests.Application.CQRS
                 () => PushToListCommandHandler.Handle(command, null!));
         }
 
+        [Fact]
+        public async Task Handle_ValidCommand_ForwardsDirectionAndTtlToRepository()
+        {
+            var capturing = new CapturingListRepository();
+            var command = new PushToListCommand
+            {
+                GroupId = Guid.NewGuid(),
+                Key = "test:list",
+                Values = ["x"],
+                Direction = ListDirection.Left,
+                Ttl = TimeSpan.FromSeconds(30)
+            };
+
+            await PushToListCommandHandler.Handle(command, capturing);
+
+            capturing.ReceivedDirection.ShouldBe(ListDirection.Left);
+            capturing.ReceivedTtl.ShouldBe(TimeSpan.FromSeconds(30));
+        }
+
         private sealed class StubListRepository : IRedisListRepository
         {
             public Task ListPushAsync(Guid groupId, string key, IReadOnlyCollection<string> values, ListDirection direction, TimeSpan? ttl) =>
                 Task.CompletedTask;
+
+            public Task<IReadOnlyCollection<string>> ListRangeAsync(Guid groupId, string key, long start, long stop) =>
+                Task.FromResult<IReadOnlyCollection<string>>(Array.Empty<string>());
+
+            public Task<long> ListRemoveAsync(Guid groupId, string key, string value, long count) =>
+                Task.FromResult(0L);
+        }
+
+        private sealed class CapturingListRepository : IRedisListRepository
+        {
+            public ListDirection ReceivedDirection { get; private set; }
+            public TimeSpan? ReceivedTtl { get; private set; }
+
+            public Task ListPushAsync(Guid groupId, string key, IReadOnlyCollection<string> values, ListDirection direction, TimeSpan? ttl)
+            {
+                ReceivedDirection = direction;
+                ReceivedTtl = ttl;
+                return Task.CompletedTask;
+            }
 
             public Task<IReadOnlyCollection<string>> ListRangeAsync(Guid groupId, string key, long start, long stop) =>
                 Task.FromResult<IReadOnlyCollection<string>>(Array.Empty<string>());

@@ -19,6 +19,9 @@ namespace Roman.RedisManager.Application.CQRS
     {
         public static async Task<RedisInfoQueryResult> Handle(RedisInfoQuery query, IRedisRepository repository)
         {
+            ArgumentNullException.ThrowIfNull(query);
+            ArgumentNullException.ThrowIfNull(repository);
+
             var info = await repository.GetInfoAsync(query.GroupId, query.Host, query.Port);
             return new RedisInfoQueryResult(info.Sections);
         }

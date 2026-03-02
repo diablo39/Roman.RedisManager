@@ -1,10 +1,5 @@
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using Microsoft.Extensions.Options;
 using Roman.RedisManager.Domain.Configuration;
-using Xunit;
-using Shouldly;
 using Roman.RedisManager.Domain.Entities.Server;
 
 namespace Roman.RedisManager.Tests.Domain.Configuration
@@ -33,6 +28,9 @@ namespace Roman.RedisManager.Tests.Domain.Configuration
 
             result.ShouldNotBeNull();
             result.Name.ShouldBe("foo");
+            result.Id.ShouldBe(Guid.Parse("abc00000-0000-0000-0000-000000000000"));
+            result.ConnectionString.ShouldBe("conn");
+            result.GroupType.ShouldBe(GroupType.Standalone);
         }
 
         [Fact]
@@ -52,12 +50,11 @@ namespace Roman.RedisManager.Tests.Domain.Configuration
                 }
             };
 
-            Should.Throw<ArgumentException>(() => config.ResolveServerGroup(Guid.Empty));
+            var ex = Should.Throw<ArgumentException>(() => config.ResolveServerGroup(Guid.Empty));
+            ex.ParamName.ShouldBe("groupId");
         }
 
         [Fact]
-        // invalid GUID string case removed because method now takes Guid
-        // client code should parse before calling ResolveServerGroup
         public void ResolveServerGroup_WithUnknownGuid_ThrowsKeyNotFoundException()
         {
             var config = new RedisConfiguration
@@ -94,6 +91,102 @@ namespace Roman.RedisManager.Tests.Domain.Configuration
 
             Validator.TryValidateObject(config, context, results, validateAllProperties: true).ShouldBeFalse();
             results.ShouldContain(r => r.MemberNames.Contains(nameof(RedisServerGroupConfiguration.Id)));
+        }
+
+        [Fact]
+        public void ResolveServerGroup_WithMultipleGroups_ReturnsCorrectGroup()
+        {
+            var targetId = Guid.Parse("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa");
+
+            var config = new RedisConfiguration
+            {
+                ServerGroups = new[]
+                {
+                    new RedisServerGroupConfiguration
+                    {
+                        Id = Guid.Parse("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb"),
+                        Name = "other",
+                        ConnectionString = "conn-other",
+                        GroupType = GroupType.Standalone
+                    },
+                    new RedisServerGroupConfiguration
+                    {
+                        Id = targetId,
+                        Name = "target",
+                        ConnectionString = "conn-target",
+                        GroupType = GroupType.Cluster
+                    }
+                }
+            };
+
+            var result = config.ResolveServerGroup(targetId);
+
+            result.Name.ShouldBe("target");
+            result.Id.ShouldBe(targetId);
+            result.ConnectionString.ShouldBe("conn-target");
+            result.GroupType.ShouldBe(GroupType.Cluster);
+        }
+
+        [Fact]
+        public void ResolveServerGroup_WhenServerGroupsIsNull_ThrowsInvalidOperationException()
+        {
+            var config = new RedisConfiguration { ServerGroups = null! };
+
+            Should.Throw<InvalidOperationException>(() => config.ResolveServerGroup(Guid.NewGuid()));
+        }
+
+        [Fact]
+        public void ServerGroupConfiguration_MissingName_FailsValidation()
+        {
+            var config = new RedisServerGroupConfiguration
+            {
+                Id = Guid.NewGuid(),
+                Name = string.Empty,
+                ConnectionString = "conn",
+                GroupType = GroupType.Standalone
+            };
+
+            var context = new ValidationContext(config);
+            var results = new List<ValidationResult>();
+
+            Validator.TryValidateObject(config, context, results, validateAllProperties: true).ShouldBeFalse();
+            results.ShouldContain(r => r.MemberNames.Contains(nameof(RedisServerGroupConfiguration.Name)));
+        }
+
+        [Fact]
+        public void ServerGroupConfiguration_MissingConnectionString_FailsValidation()
+        {
+            var config = new RedisServerGroupConfiguration
+            {
+                Id = Guid.NewGuid(),
+                Name = "valid-name",
+                ConnectionString = string.Empty,
+                GroupType = GroupType.Standalone
+            };
+
+            var context = new ValidationContext(config);
+            var results = new List<ValidationResult>();
+
+            Validator.TryValidateObject(config, context, results, validateAllProperties: true).ShouldBeFalse();
+            results.ShouldContain(r => r.MemberNames.Contains(nameof(RedisServerGroupConfiguration.ConnectionString)));
+        }
+
+        [Fact]
+        public void ServerGroupConfiguration_ValidObject_PassesValidation()
+        {
+            var config = new RedisServerGroupConfiguration
+            {
+                Id = Guid.NewGuid(),
+                Name = "valid-name",
+                ConnectionString = "localhost:6379",
+                GroupType = GroupType.Standalone
+            };
+
+            var context = new ValidationContext(config);
+            var results = new List<ValidationResult>();
+
+            Validator.TryValidateObject(config, context, results, validateAllProperties: true).ShouldBeTrue();
+            results.ShouldBeEmpty();
         }
     }
 }

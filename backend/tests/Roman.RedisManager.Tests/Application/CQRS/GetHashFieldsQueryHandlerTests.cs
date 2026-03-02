@@ -30,6 +30,7 @@ namespace Roman.RedisManager.Tests.Application.CQRS
             result.Fields.ShouldNotBeEmpty();
             result.Fields.Count.ShouldBe(2);
             result.Fields.ShouldContain(f => f.Field == "name" && f.Value == "Alice");
+            result.Fields.ShouldContain(f => f.Field == "age" && f.Value == "30");
             result.Cursor.ShouldBe(0L);
             result.HasMoreResults.ShouldBeFalse();
         }
@@ -44,6 +45,8 @@ namespace Roman.RedisManager.Tests.Application.CQRS
 
             result.Cursor.ShouldBe(99L);
             result.HasMoreResults.ShouldBeTrue();
+            result.Fields.Count.ShouldBe(1);
+            result.Fields.ShouldContain(f => f.Field == "f" && f.Value == "v");
         }
 
         [Fact]

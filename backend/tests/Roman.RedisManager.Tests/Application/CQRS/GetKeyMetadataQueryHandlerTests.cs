@@ -30,6 +30,7 @@ namespace Roman.RedisManager.Tests.Application.CQRS
             var result = await GetKeyMetadataQueryHandler.Handle(query, stub);
 
             result.Metadata.TtlMilliseconds.ShouldBe((long)ttl.TotalMilliseconds);
+            result.Metadata.Type.ShouldBe("String");
         }
 
         [Fact]
@@ -41,6 +42,7 @@ namespace Roman.RedisManager.Tests.Application.CQRS
             var result = await GetKeyMetadataQueryHandler.Handle(query, stub);
 
             result.Metadata.Type.ShouldBe("List");
+            result.Metadata.TtlMilliseconds.ShouldBeNull();
         }
 
         [Fact]

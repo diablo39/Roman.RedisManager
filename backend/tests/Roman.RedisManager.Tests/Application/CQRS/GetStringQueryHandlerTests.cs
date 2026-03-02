@@ -26,6 +26,7 @@ namespace Roman.RedisManager.Tests.Application.CQRS
 
             var result = await GetStringQueryHandler.Handle(query, stub);
 
+            result.ShouldNotBeNull();
             result.Value.ShouldBeNull();
         }
 

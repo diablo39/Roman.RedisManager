@@ -45,6 +45,8 @@ namespace Roman.RedisManager.Tests.Application.CQRS
 
             result.Cursor.ShouldBe(42L);
             result.HasMoreResults.ShouldBeTrue();
+            result.Members.Count().ShouldBe(2);
+            result.Members.ShouldBe(new[] { "a", "b" });
         }
 
         [Fact]

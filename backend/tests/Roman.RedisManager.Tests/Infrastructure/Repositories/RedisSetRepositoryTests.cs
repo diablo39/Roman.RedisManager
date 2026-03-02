@@ -71,6 +71,7 @@ namespace Roman.RedisManager.Tests.Infrastructure.Repositories
             result.Items.ShouldContain("x");
             result.Items.ShouldContain("y");
             result.Items.ShouldContain("z");
+            result.HasMoreResults.ShouldBeFalse();
         }
 
         [Fact]
@@ -83,6 +84,7 @@ namespace Roman.RedisManager.Tests.Infrastructure.Repositories
 
             result.ShouldNotBeNull();
             result.Items.ShouldBeEmpty();
+            result.HasMoreResults.ShouldBeFalse();
         }
 
         [Fact]
@@ -117,7 +119,7 @@ namespace Roman.RedisManager.Tests.Infrastructure.Repositories
         public async Task SetAddAsync_EmptyGroupId_ThrowsArgumentException()
         {
             var connectionMultiplexer = ConnectionMultiplexer.Connect(_fixture.ConnectionString + ",allowAdmin=true");
-            await using IRedisConnectionManager connectionManager = new SimpleConnectionManager(connectionMultiplexer);
+            await using IRedisConnectionManager connectionManager = new TestRedisConnectionManager(connectionMultiplexer);
             IRedisSetRepository repo = new RedisSetRepository(connectionManager, CreateOptions());
 
             await Should.ThrowAsync<ArgumentException>(
@@ -128,17 +130,28 @@ namespace Roman.RedisManager.Tests.Infrastructure.Repositories
         public async Task SetScanAsync_EmptyGroupId_ThrowsArgumentException()
         {
             var connectionMultiplexer = ConnectionMultiplexer.Connect(_fixture.ConnectionString + ",allowAdmin=true");
-            await using IRedisConnectionManager connectionManager = new SimpleConnectionManager(connectionMultiplexer);
+            await using IRedisConnectionManager connectionManager = new TestRedisConnectionManager(connectionMultiplexer);
             IRedisSetRepository repo = new RedisSetRepository(connectionManager, CreateOptions());
 
             await Should.ThrowAsync<ArgumentException>(
                 () => repo.SetScanAsync(Guid.Empty, "k", 0, 100));
         }
 
+        [Fact]
+        public async Task SetRemoveAsync_EmptyGroupId_ThrowsArgumentException()
+        {
+            var connectionMultiplexer = ConnectionMultiplexer.Connect(_fixture.ConnectionString + ",allowAdmin=true");
+            await using IRedisConnectionManager connectionManager = new TestRedisConnectionManager(connectionMultiplexer);
+            IRedisSetRepository repo = new RedisSetRepository(connectionManager, CreateOptions());
+
+            await Should.ThrowAsync<ArgumentException>(
+                () => repo.SetRemoveAsync(Guid.Empty, "k", ["m"]));
+        }
+
         private (IRedisSetRepository repo, Guid groupId) CreateRepository(IConnectionMultiplexer connectionMultiplexer)
         {
             var options = CreateOptions();
-            var connectionManager = new SimpleConnectionManager(connectionMultiplexer);
+            var connectionManager = new TestRedisConnectionManager(connectionMultiplexer);
             IRedisSetRepository repo = new RedisSetRepository(connectionManager, options);
             var groupId = options.Value.ServerGroups.First().Id;
             return (repo, groupId);
@@ -160,20 +173,6 @@ namespace Roman.RedisManager.Tests.Infrastructure.Repositories
                 ]
             });
         }
-
-        private sealed class SimpleConnectionManager : IRedisConnectionManager
-        {
-            private readonly IConnectionMultiplexer _multiplexer;
-
-            public SimpleConnectionManager(IConnectionMultiplexer multiplexer) => _multiplexer = multiplexer;
-
-            public Task<IConnectionMultiplexer> GetConnectionAsync(Guid groupId) => Task.FromResult(_multiplexer);
-
-            public ValueTask DisposeAsync()
-            {
-                _multiplexer.Dispose();
-                return ValueTask.CompletedTask;
-            }
-        }
-    }
+    
+}
 }

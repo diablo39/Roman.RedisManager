@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Options;
 using Roman.RedisManager.Domain.Configuration;
+using Roman.RedisManager.Domain.Entities.RedisData;
 using Roman.RedisManager.Domain.Entities.Server;
 using Roman.RedisManager.Domain.Repositories;
 using Roman.RedisManager.Infrastructure.Redis;
@@ -138,7 +139,7 @@ namespace Roman.RedisManager.Tests.Infrastructure.Repositories
         public async Task AddToSortedSetAsync_EmptyGroupId_ThrowsArgumentException()
         {
             var connectionMultiplexer = ConnectionMultiplexer.Connect(_fixture.ConnectionString + ",allowAdmin=true");
-            await using IRedisConnectionManager connectionManager = new SimpleConnectionManager(connectionMultiplexer);
+            await using IRedisConnectionManager connectionManager = new TestRedisConnectionManager(connectionMultiplexer);
             IRedisSortedSetRepository repo = new RedisSortedSetRepository(connectionManager, CreateOptions());
 
             await Should.ThrowAsync<ArgumentException>(
@@ -149,17 +150,28 @@ namespace Roman.RedisManager.Tests.Infrastructure.Repositories
         public async Task GetSortedSetRangeAsync_EmptyGroupId_ThrowsArgumentException()
         {
             var connectionMultiplexer = ConnectionMultiplexer.Connect(_fixture.ConnectionString + ",allowAdmin=true");
-            await using IRedisConnectionManager connectionManager = new SimpleConnectionManager(connectionMultiplexer);
+            await using IRedisConnectionManager connectionManager = new TestRedisConnectionManager(connectionMultiplexer);
             IRedisSortedSetRepository repo = new RedisSortedSetRepository(connectionManager, CreateOptions());
 
             await Should.ThrowAsync<ArgumentException>(
                 () => repo.GetSortedSetRangeAsync(Guid.Empty, "k", 0, -1));
         }
 
+        [Fact]
+        public async Task RemoveFromSortedSetAsync_EmptyGroupId_ThrowsArgumentException()
+        {
+            var connectionMultiplexer = ConnectionMultiplexer.Connect(_fixture.ConnectionString + ",allowAdmin=true");
+            await using IRedisConnectionManager connectionManager = new TestRedisConnectionManager(connectionMultiplexer);
+            IRedisSortedSetRepository repo = new RedisSortedSetRepository(connectionManager, CreateOptions());
+
+            await Should.ThrowAsync<ArgumentException>(
+                () => repo.RemoveFromSortedSetAsync(Guid.Empty, "k", ["m"]));
+        }
+
         private (IRedisSortedSetRepository repo, Guid groupId) CreateRepository(IConnectionMultiplexer connectionMultiplexer)
         {
             var options = CreateOptions();
-            var connectionManager = new SimpleConnectionManager(connectionMultiplexer);
+            var connectionManager = new TestRedisConnectionManager(connectionMultiplexer);
             IRedisSortedSetRepository repo = new RedisSortedSetRepository(connectionManager, options);
             var groupId = options.Value.ServerGroups.First().Id;
             return (repo, groupId);
@@ -181,20 +193,6 @@ namespace Roman.RedisManager.Tests.Infrastructure.Repositories
                 ]
             });
         }
-
-        private sealed class SimpleConnectionManager : IRedisConnectionManager
-        {
-            private readonly IConnectionMultiplexer _multiplexer;
-
-            public SimpleConnectionManager(IConnectionMultiplexer multiplexer) => _multiplexer = multiplexer;
-
-            public Task<IConnectionMultiplexer> GetConnectionAsync(Guid groupId) => Task.FromResult(_multiplexer);
-
-            public ValueTask DisposeAsync()
-            {
-                _multiplexer.Dispose();
-                return ValueTask.CompletedTask;
-            }
-        }
-    }
+    
+}
 }

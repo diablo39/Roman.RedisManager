@@ -20,6 +20,9 @@ namespace Roman.RedisManager.Tests.Application.CQRS
             result.Type.ShouldBe("String");
             result.StringValue.ShouldBe("hello");
             result.ListValues.ShouldBeNull();
+            result.SetMembers.ShouldBeNull();
+            result.HashFields.ShouldBeNull();
+            result.SortedSetEntries.ShouldBeNull();
         }
 
         [Fact]
@@ -35,6 +38,9 @@ namespace Roman.RedisManager.Tests.Application.CQRS
             result.ListValues.ShouldNotBeNull();
             result.ListValues!.Count.ShouldBe(3);
             result.StringValue.ShouldBeNull();
+            result.SetMembers.ShouldBeNull();
+            result.HashFields.ShouldBeNull();
+            result.SortedSetEntries.ShouldBeNull();
         }
 
         [Fact]
@@ -51,6 +57,11 @@ namespace Roman.RedisManager.Tests.Application.CQRS
             result.SortedSetEntries.ShouldNotBeNull();
             result.SortedSetEntries!.Count.ShouldBe(2);
             result.SortedSetEntries.ShouldContain(e => e.Member == "alice" && e.Score == 1.0);
+            result.SortedSetEntries.ShouldContain(e => e.Member == "bob" && e.Score == 2.5);
+            result.StringValue.ShouldBeNull();
+            result.ListValues.ShouldBeNull();
+            result.SetMembers.ShouldBeNull();
+            result.HashFields.ShouldBeNull();
         }
 
         [Fact]
@@ -64,6 +75,54 @@ namespace Roman.RedisManager.Tests.Application.CQRS
 
             result.Type.ShouldBe("None");
             result.StringValue.ShouldBeNull();
+            result.ListValues.ShouldBeNull();
+            result.SetMembers.ShouldBeNull();
+            result.HashFields.ShouldBeNull();
+            result.SortedSetEntries.ShouldBeNull();
+        }
+
+        [Fact]
+        public async Task Handle_SetKey_ReturnsSetMembers()
+        {
+            var keyValue = new RedisKeyValue(RedisDataType.Set, setMembers: new[] { "a", "b", "c" });
+            var stub = new StubKeyRepository(keyValue);
+            var query = new GetKeyValueQuery { GroupId = Guid.NewGuid(), Key = "test:set" };
+
+            var result = await GetKeyValueQueryHandler.Handle(query, stub);
+
+            result.ShouldNotBeNull();
+            result.Type.ShouldBe("Set");
+            result.SetMembers.ShouldNotBeNull();
+            result.SetMembers!.Count.ShouldBe(3);
+            result.SetMembers.ShouldContain("a");
+            result.SetMembers.ShouldContain("b");
+            result.SetMembers.ShouldContain("c");
+            result.StringValue.ShouldBeNull();
+            result.ListValues.ShouldBeNull();
+            result.HashFields.ShouldBeNull();
+            result.SortedSetEntries.ShouldBeNull();
+        }
+
+        [Fact]
+        public async Task Handle_HashKey_ReturnsHashFields()
+        {
+            var hashFields = new Dictionary<string, string> { ["name"] = "Alice", ["age"] = "30" };
+            var keyValue = new RedisKeyValue(RedisDataType.Hash, hashFields: hashFields);
+            var stub = new StubKeyRepository(keyValue);
+            var query = new GetKeyValueQuery { GroupId = Guid.NewGuid(), Key = "test:hash" };
+
+            var result = await GetKeyValueQueryHandler.Handle(query, stub);
+
+            result.ShouldNotBeNull();
+            result.Type.ShouldBe("Hash");
+            result.HashFields.ShouldNotBeNull();
+            result.HashFields!.Count.ShouldBe(2);
+            result.HashFields["name"].ShouldBe("Alice");
+            result.HashFields["age"].ShouldBe("30");
+            result.StringValue.ShouldBeNull();
+            result.ListValues.ShouldBeNull();
+            result.SetMembers.ShouldBeNull();
+            result.SortedSetEntries.ShouldBeNull();
         }
 
         [Fact]

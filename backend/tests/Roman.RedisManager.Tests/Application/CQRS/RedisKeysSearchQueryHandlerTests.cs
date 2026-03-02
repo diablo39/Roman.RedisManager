@@ -53,6 +53,8 @@ namespace Roman.RedisManager.Tests.Application.CQRS
             var result = await RedisKeysSearchQueryHandler.Handle(query, stub);
 
             result.HasMoreResults.ShouldBeFalse();
+            result.Keys.Count.ShouldBe(1);
+            result.Cursor.ShouldBe(0);
         }
 
         [Fact]
@@ -73,6 +75,7 @@ namespace Roman.RedisManager.Tests.Application.CQRS
             var result = await RedisKeysSearchQueryHandler.Handle(query, stub);
 
             result.NodeCursors.ShouldNotBeNull();
+            result.NodeCursors.Count.ShouldBe(1);
             result.NodeCursors["1:6379"].ShouldBe(5);
         }
 
@@ -94,6 +97,15 @@ namespace Roman.RedisManager.Tests.Application.CQRS
 
             await Should.ThrowAsync<ArgumentNullException>(
                 () => RedisKeysSearchQueryHandler.Handle(null!, stub));
+        }
+
+        [Fact]
+        public async Task Handle_NullRepository_ThrowsArgumentNullException()
+        {
+            var query = new RedisKeysSearchQuery { GroupId = Guid.NewGuid() };
+
+            await Should.ThrowAsync<ArgumentNullException>(
+                () => RedisKeysSearchQueryHandler.Handle(query, null!));
         }
 
         private sealed class StubRedisRepository : IRedisRepository

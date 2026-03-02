@@ -30,6 +30,7 @@ namespace Roman.RedisManager.Tests.Application.CQRS
             result.Entries.ShouldNotBeEmpty();
             result.Entries.Count.ShouldBe(3);
             result.Entries.ShouldContain(e => e.Member == "alpha" && e.Score == 1.0);
+            result.Entries.ShouldContain(e => e.Member == "beta" && e.Score == 2.5);
             result.Entries.ShouldContain(e => e.Member == "gamma" && e.Score == 3.0);
         }
 
@@ -41,6 +42,7 @@ namespace Roman.RedisManager.Tests.Application.CQRS
 
             var result = await GetSortedSetRangeQueryHandler.Handle(query, stub);
 
+            result.ShouldNotBeNull();
             result.Entries.ShouldBeEmpty();
         }
 

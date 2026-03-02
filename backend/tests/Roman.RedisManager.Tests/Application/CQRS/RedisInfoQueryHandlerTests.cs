@@ -34,6 +34,8 @@ namespace Roman.RedisManager.Tests.Application.CQRS
             result.Sections.ShouldNotBeNull();
             result.Sections.Count.ShouldBe(2);
             result.Sections["Server"]["redis_version"].ShouldBe("7.2.12");
+            result.Sections["Server"]["tcp_port"].ShouldBe("8000");
+            result.Sections["Clients"]["connected_clients"].ShouldBe("1");
         }
 
         [Fact]
@@ -43,6 +45,38 @@ namespace Roman.RedisManager.Tests.Application.CQRS
             var query = new RedisInfoQuery { GroupId = Guid.NewGuid(), Host = "localhost", Port = 6379 };
 
             await Should.ThrowAsync<KeyNotFoundException>(() => RedisInfoQueryHandler.Handle(query, repository));
+        }
+
+        [Fact]
+        public async Task Handle_EmptySections_ReturnsEmptySections()
+        {
+            var emptyInfo = new RedisInfo(new Dictionary<string, IReadOnlyDictionary<string, string>>());
+            var repository = new StubRedisRepository(emptyInfo);
+            var query = new RedisInfoQuery { GroupId = Guid.NewGuid(), Host = "localhost", Port = 6379 };
+
+            var result = await RedisInfoQueryHandler.Handle(query, repository);
+
+            result.Sections.ShouldNotBeNull();
+            result.Sections.ShouldBeEmpty();
+        }
+
+        [Fact]
+        public async Task Handle_NullQuery_ThrowsArgumentNullException()
+        {
+            var repository = new StubRedisRepository(
+                new RedisInfo(new Dictionary<string, IReadOnlyDictionary<string, string>>()));
+
+            await Should.ThrowAsync<ArgumentNullException>(
+                () => RedisInfoQueryHandler.Handle(null!, repository));
+        }
+
+        [Fact]
+        public async Task Handle_NullRepository_ThrowsArgumentNullException()
+        {
+            var query = new RedisInfoQuery { GroupId = Guid.NewGuid(), Host = "localhost", Port = 6379 };
+
+            await Should.ThrowAsync<ArgumentNullException>(
+                () => RedisInfoQueryHandler.Handle(query, null!));
         }
 
         private sealed class StubRedisRepository : IRedisRepository
