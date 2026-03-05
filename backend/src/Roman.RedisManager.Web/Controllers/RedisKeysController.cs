@@ -46,11 +46,11 @@ namespace Roman.RedisManager.Web.Controllers
             }
             catch (RedisConnectionFailureException ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, new { message = ex.Message });
+                return Problem(statusCode: StatusCodes.Status500InternalServerError, detail: ex.Message);
             }
             catch (ArgumentException ex)
             {
-                return BadRequest(new { message = ex.Message });
+                return Problem(statusCode: StatusCodes.Status400BadRequest, detail: ex.Message);
             }
         }
 
@@ -80,11 +80,11 @@ namespace Roman.RedisManager.Web.Controllers
             }
             catch (RedisConnectionFailureException ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, new { message = ex.Message });
+                return Problem(statusCode: StatusCodes.Status500InternalServerError, detail: ex.Message);
             }
             catch (ArgumentException ex)
             {
-                return BadRequest(new { message = ex.Message });
+                return Problem(statusCode: StatusCodes.Status400BadRequest, detail: ex.Message);
             }
         }
 
@@ -114,11 +114,11 @@ namespace Roman.RedisManager.Web.Controllers
             }
             catch (RedisConnectionFailureException ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, new { message = ex.Message });
+                return Problem(statusCode: StatusCodes.Status500InternalServerError, detail: ex.Message);
             }
             catch (ArgumentException ex)
             {
-                return BadRequest(new { message = ex.Message });
+                return Problem(statusCode: StatusCodes.Status400BadRequest, detail: ex.Message);
             }
         }
 
@@ -148,11 +148,11 @@ namespace Roman.RedisManager.Web.Controllers
             }
             catch (RedisConnectionFailureException ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, new { message = ex.Message });
+                return Problem(statusCode: StatusCodes.Status500InternalServerError, detail: ex.Message);
             }
             catch (ArgumentException ex)
             {
-                return BadRequest(new { message = ex.Message });
+                return Problem(statusCode: StatusCodes.Status400BadRequest, detail: ex.Message);
             }
         }
     }
