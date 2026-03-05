@@ -13,8 +13,19 @@ GET {{Roman.RedisManager.Web_HostAddress}}/api/commands/redis-info?groupId={{Red
 
 ###
 
+### Redis Key Search — bad request (invalid groupId)
+GET {{Roman.RedisManager.Web_HostAddress}}/api/redis-keys?groupId=not-a-guid
+
+###
+
 ### Redis Key Search — all keys (standalone)
 GET {{Roman.RedisManager.Web_HostAddress}}/api/redis-keys?groupId={{RedisServerGroupId}}&pattern=*&cursor=0&pageSize=100
+
+###
+
+### Redis Key Search — unsupported Accept header
+GET {{Roman.RedisManager.Web_HostAddress}}/api/redis-keys?groupId={{RedisServerGroupId}}
+Accept: application/xml
 
 ###
 

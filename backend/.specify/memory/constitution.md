@@ -103,7 +103,7 @@ mocks would hide.
 - Collection properties typed as `IEnumerable<T>`; return types
   as `IReadOnlyCollection<T>`.
 - Controller routes use `[Route("api/{kebab-case-resource}")]`.
-- Controllers return DTOs directly (not `IActionResult`).
+- Controllers return DTOs directly for normal endpoints; **exception**: dedicated error controllers or actions **may** return `ProblemDetails`/`IActionResult` when handling error routes invoked by middleware (e.g. `/error` used by `UseExceptionHandler`). This exception is limited to the error-handling path and does not permit arbitrary controller actions to return generic `IActionResult`.
 - Only PowerShell scripts for automation tasks.
 
 **Rationale:** A single, explicit style eliminates bike-shedding

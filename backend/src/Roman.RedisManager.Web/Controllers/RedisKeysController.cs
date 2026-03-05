@@ -4,6 +4,7 @@ using Roman.RedisManager.Application.CQRS;
 using Roman.RedisManager.Infrastructure.Exceptions;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using Wolverine;
 
@@ -21,7 +22,7 @@ namespace Roman.RedisManager.Web.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<RedisKeysSearchQueryResult>> SearchKeys(
-            [FromQuery] Guid groupId,
+            [FromQuery, Required] Guid groupId,
             [FromQuery] string pattern = "*",
             [FromQuery] string cursor = "0",
             [FromQuery] int pageSize = 100)
@@ -45,11 +46,11 @@ namespace Roman.RedisManager.Web.Controllers
             }
             catch (RedisConnectionFailureException ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, new { message = ex.Message });
+                return Problem(statusCode: StatusCodes.Status500InternalServerError, detail: ex.Message);
             }
             catch (ArgumentException ex)
             {
-                return BadRequest(new { message = ex.Message });
+                return Problem(statusCode: StatusCodes.Status400BadRequest, detail: ex.Message);
             }
         }
 
@@ -79,11 +80,11 @@ namespace Roman.RedisManager.Web.Controllers
             }
             catch (RedisConnectionFailureException ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, new { message = ex.Message });
+                return Problem(statusCode: StatusCodes.Status500InternalServerError, detail: ex.Message);
             }
             catch (ArgumentException ex)
             {
-                return BadRequest(new { message = ex.Message });
+                return Problem(statusCode: StatusCodes.Status400BadRequest, detail: ex.Message);
             }
         }
 
@@ -113,11 +114,11 @@ namespace Roman.RedisManager.Web.Controllers
             }
             catch (RedisConnectionFailureException ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, new { message = ex.Message });
+                return Problem(statusCode: StatusCodes.Status500InternalServerError, detail: ex.Message);
             }
             catch (ArgumentException ex)
             {
-                return BadRequest(new { message = ex.Message });
+                return Problem(statusCode: StatusCodes.Status400BadRequest, detail: ex.Message);
             }
         }
 
@@ -147,11 +148,11 @@ namespace Roman.RedisManager.Web.Controllers
             }
             catch (RedisConnectionFailureException ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, new { message = ex.Message });
+                return Problem(statusCode: StatusCodes.Status500InternalServerError, detail: ex.Message);
             }
             catch (ArgumentException ex)
             {
-                return BadRequest(new { message = ex.Message });
+                return Problem(statusCode: StatusCodes.Status400BadRequest, detail: ex.Message);
             }
         }
     }
