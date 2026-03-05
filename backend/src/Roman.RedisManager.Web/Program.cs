@@ -3,6 +3,8 @@ using Roman.RedisManager.Domain.Repositories;
 using Roman.RedisManager.Infrastructure.Redis;
 using Roman.RedisManager.Infrastructure.Repositories;
 using Wolverine;
+using System.Diagnostics;
+// using Microsoft.AspNetCore.Mvc.Infrastructure; // no longer needed
 
 namespace Roman.RedisManager.Web
 {
@@ -28,6 +30,24 @@ namespace Roman.RedisManager.Web
             builder.Services.AddSingleton<IRedisSortedSetRepository, RedisSortedSetRepository>();
 
             builder.Services.AddControllers();
+            builder.Services.AddProblemDetails(options =>
+            {
+                options.CustomizeProblemDetails = problemContext =>
+                {
+                    var context = problemContext.HttpContext;
+                    var details = problemContext.ProblemDetails;
+
+                    var traceId = Activity.Current?.TraceId.ToString() ?? context.TraceIdentifier;
+                    details.Extensions["traceId"] = traceId;
+
+                    if (context.Request.Headers.TryGetValue("traceparent", out var tp))
+                    {
+                        details.Extensions["traceparent"] = tp.ToString();
+                    }
+
+                    details.Extensions["requestPath"] = context.Request.Path.ToString();
+                };
+            });
             builder.Services.AddOpenApi();
 
             builder.UseWolverine(opts =>
@@ -53,6 +73,10 @@ namespace Roman.RedisManager.Web
                     options.SwaggerEndpoint("/openapi/v1.json", "v1");
                 });
             }
+
+            // Problem details middleware: exception handler and status code pages
+            app.UseExceptionHandler();
+            app.UseStatusCodePages();
 
             app.UseHttpsRedirection();
 

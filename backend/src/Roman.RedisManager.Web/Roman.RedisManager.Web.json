@@ -1719,6 +1719,7 @@
           {
             "name": "groupId",
             "in": "query",
+            "required": true,
             "schema": {
               "type": "string",
               "format": "uuid"
