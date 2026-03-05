@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Roman.RedisManager.Application.CQRS.RedisDataTypes;
+using Roman.RedisManager.Application.CQRS.RedisDataTypes.List;
 using Roman.RedisManager.Domain.Entities.RedisData;
 using Roman.RedisManager.Infrastructure.Exceptions;
 using Wolverine;
