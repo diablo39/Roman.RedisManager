@@ -19,26 +19,36 @@ namespace Roman.RedisManager.Tests.Infrastructure.Repositories.RedisDataTypes
         [Fact]
         public async Task SetAddAsync_NewMembers_AddsMembersToSet()
         {
+
+            // Arrange
             var connectionMultiplexer = ConnectionMultiplexer.Connect(_fixture.ConnectionString + ",allowAdmin=true");
             var (repo, groupId) = CreateRepository(connectionMultiplexer);
             var key = "set:add:" + Guid.NewGuid();
 
+            // Act
             await repo.SetAddAsync(groupId, key, ["x", "y", "z"], null);
 
             var count = await connectionMultiplexer.GetDatabase().SetLengthAsync(key);
+
+            // Assert
             count.ShouldBe(3);
         }
 
         [Fact]
         public async Task SetAddAsync_WithTtl_SetsExpiry()
         {
+
+            // Arrange
             var connectionMultiplexer = ConnectionMultiplexer.Connect(_fixture.ConnectionString + ",allowAdmin=true");
             var (repo, groupId) = CreateRepository(connectionMultiplexer);
             var key = "set:ttl:" + Guid.NewGuid();
 
+            // Act
             await repo.SetAddAsync(groupId, key, ["a"], TimeSpan.FromSeconds(60));
 
             var ttl = await connectionMultiplexer.GetDatabase().KeyTimeToLiveAsync(key);
+
+            // Assert
             ttl.ShouldNotBeNull();
             ttl!.Value.TotalMilliseconds.ShouldBeGreaterThan(0);
         }
@@ -46,27 +56,36 @@ namespace Roman.RedisManager.Tests.Infrastructure.Repositories.RedisDataTypes
         [Fact]
         public async Task SetAddAsync_DuplicateMembers_StoresUnique()
         {
+
+            // Arrange
             var connectionMultiplexer = ConnectionMultiplexer.Connect(_fixture.ConnectionString + ",allowAdmin=true");
             var (repo, groupId) = CreateRepository(connectionMultiplexer);
             var key = "set:unique:" + Guid.NewGuid();
 
+            // Act
             await repo.SetAddAsync(groupId, key, ["a", "a", "b"], null);
 
             var count = await connectionMultiplexer.GetDatabase().SetLengthAsync(key);
+
+            // Assert
             count.ShouldBe(2);
         }
 
         [Fact]
         public async Task SetScanAsync_ExistingSet_ReturnsMembers()
         {
+
+            // Arrange
             var connectionMultiplexer = ConnectionMultiplexer.Connect(_fixture.ConnectionString + ",allowAdmin=true");
             var (repo, groupId) = CreateRepository(connectionMultiplexer);
             var key = "set:scan:" + Guid.NewGuid();
 
+            // Act
             await connectionMultiplexer.GetDatabase().SetAddAsync(key, new RedisValue[] { "x", "y", "z" });
 
             var result = await repo.SetScanAsync(groupId, key, 0, 100);
 
+            // Assert
             result.ShouldNotBeNull();
             result.Items.ShouldNotBeEmpty();
             result.Items.ShouldContain("x");
@@ -78,11 +97,15 @@ namespace Roman.RedisManager.Tests.Infrastructure.Repositories.RedisDataTypes
         [Fact]
         public async Task SetScanAsync_NonExistentKey_ReturnsEmpty()
         {
+
+            // Arrange
             var connectionMultiplexer = ConnectionMultiplexer.Connect(_fixture.ConnectionString + ",allowAdmin=true");
             var (repo, groupId) = CreateRepository(connectionMultiplexer);
 
+            // Act
             var result = await repo.SetScanAsync(groupId, "set:missing:" + Guid.NewGuid(), 0, 100);
 
+            // Assert
             result.ShouldNotBeNull();
             result.Items.ShouldBeEmpty();
             result.HasMoreResults.ShouldBeFalse();
@@ -91,38 +114,51 @@ namespace Roman.RedisManager.Tests.Infrastructure.Repositories.RedisDataTypes
         [Fact]
         public async Task SetRemoveAsync_ExistingMembers_ReturnsRemovedCount()
         {
+
+            // Arrange
             var connectionMultiplexer = ConnectionMultiplexer.Connect(_fixture.ConnectionString + ",allowAdmin=true");
             var (repo, groupId) = CreateRepository(connectionMultiplexer);
             var key = "set:remove:" + Guid.NewGuid();
 
+            // Act
             await connectionMultiplexer.GetDatabase().SetAddAsync(key, new RedisValue[] { "a", "b", "c" });
 
             var removed = await repo.SetRemoveAsync(groupId, key, ["a", "b"]);
 
+            // Assert
             removed.ShouldBe(2L);
         }
 
         [Fact]
         public async Task SetRemoveAsync_NonExistentMember_ReturnsZero()
         {
+
+            // Arrange
             var connectionMultiplexer = ConnectionMultiplexer.Connect(_fixture.ConnectionString + ",allowAdmin=true");
             var (repo, groupId) = CreateRepository(connectionMultiplexer);
             var key = "set:remove:missing:" + Guid.NewGuid();
 
+            // Act
             await connectionMultiplexer.GetDatabase().SetAddAsync(key, new RedisValue[] { "a" });
 
             var removed = await repo.SetRemoveAsync(groupId, key, ["z"]);
 
+            // Assert
             removed.ShouldBe(0L);
         }
 
         [Fact]
         public async Task SetAddAsync_EmptyGroupId_ThrowsArgumentException()
         {
+
+            // Arrange
             var connectionMultiplexer = ConnectionMultiplexer.Connect(_fixture.ConnectionString + ",allowAdmin=true");
+
+            // Act
             await using IRedisConnectionManager connectionManager = new TestRedisConnectionManager(connectionMultiplexer);
             IRedisSetRepository repo = new RedisSetRepository(connectionManager, CreateOptions());
 
+            // Assert
             await Should.ThrowAsync<ArgumentException>(
                 () => repo.SetAddAsync(Guid.Empty, "k", ["m"], null));
         }
@@ -130,10 +166,15 @@ namespace Roman.RedisManager.Tests.Infrastructure.Repositories.RedisDataTypes
         [Fact]
         public async Task SetScanAsync_EmptyGroupId_ThrowsArgumentException()
         {
+
+            // Arrange
             var connectionMultiplexer = ConnectionMultiplexer.Connect(_fixture.ConnectionString + ",allowAdmin=true");
+
+            // Act
             await using IRedisConnectionManager connectionManager = new TestRedisConnectionManager(connectionMultiplexer);
             IRedisSetRepository repo = new RedisSetRepository(connectionManager, CreateOptions());
 
+            // Assert
             await Should.ThrowAsync<ArgumentException>(
                 () => repo.SetScanAsync(Guid.Empty, "k", 0, 100));
         }
@@ -141,10 +182,15 @@ namespace Roman.RedisManager.Tests.Infrastructure.Repositories.RedisDataTypes
         [Fact]
         public async Task SetRemoveAsync_EmptyGroupId_ThrowsArgumentException()
         {
+
+            // Arrange
             var connectionMultiplexer = ConnectionMultiplexer.Connect(_fixture.ConnectionString + ",allowAdmin=true");
+
+            // Act
             await using IRedisConnectionManager connectionManager = new TestRedisConnectionManager(connectionMultiplexer);
             IRedisSetRepository repo = new RedisSetRepository(connectionManager, CreateOptions());
 
+            // Assert
             await Should.ThrowAsync<ArgumentException>(
                 () => repo.SetRemoveAsync(Guid.Empty, "k", ["m"]));
         }

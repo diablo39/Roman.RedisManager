@@ -23,6 +23,7 @@ namespace Roman.RedisManager.Tests.Web.Controllers
         [Fact]
         public async Task SearchKeys_RepositoryThrowsUnhandledException_Returns500ProblemDetails()
         {
+            // Arrange
             var client = _factory.WithWebHostBuilder(builder =>
             {
                 builder.ConfigureServices(services =>
@@ -38,11 +39,14 @@ namespace Roman.RedisManager.Tests.Web.Controllers
                 });
             }).CreateClient();
 
+            // Act
             var validGuid = Guid.NewGuid();
             var response = await client.GetAsync($"/api/redis-keys?groupId={validGuid}");
 
+            // Assert
             response.StatusCode.ShouldBe(HttpStatusCode.InternalServerError);
             var problem = await response.Content.ReadFromJsonAsync<Microsoft.AspNetCore.Mvc.ProblemDetails>();
+            problem.ShouldNotBeNull();
             problem.ShouldBeValidProblemDetails();
         }
 

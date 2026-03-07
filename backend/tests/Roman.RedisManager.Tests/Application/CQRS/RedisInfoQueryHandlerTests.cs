@@ -13,6 +13,8 @@ namespace Roman.RedisManager.Tests.Application.CQRS
         [Fact]
         public async Task Handle_WithValidInfo_ReturnsDto()
         {
+
+            // Arrange
             var sample = new RedisInfo(new Dictionary<string, IReadOnlyDictionary<string, string>>
             {
                 ["Server"] = new Dictionary<string, string>
@@ -29,8 +31,10 @@ namespace Roman.RedisManager.Tests.Application.CQRS
             var repository = new StubRedisRepository(sample);
             var query = new RedisInfoQuery { GroupId = Guid.NewGuid(), Host = "localhost", Port = 6379 };
 
+            // Act
             var result = await RedisInfoQueryHandler.Handle(query, repository);
 
+            // Assert
             result.Sections.ShouldNotBeNull();
             result.Sections.Count.ShouldBe(2);
             result.Sections["Server"]["redis_version"].ShouldBe("7.2.12");
@@ -41,21 +45,30 @@ namespace Roman.RedisManager.Tests.Application.CQRS
         [Fact]
         public async Task Handle_MissingGroup_PropagatesException()
         {
+
+            // Arrange
             var repository = new StubRedisRepository(null);
             var query = new RedisInfoQuery { GroupId = Guid.NewGuid(), Host = "localhost", Port = 6379 };
 
+            // Act
+
+            // Assert
             await Should.ThrowAsync<KeyNotFoundException>(() => RedisInfoQueryHandler.Handle(query, repository));
         }
 
         [Fact]
         public async Task Handle_EmptySections_ReturnsEmptySections()
         {
+
+            // Arrange
             var emptyInfo = new RedisInfo(new Dictionary<string, IReadOnlyDictionary<string, string>>());
             var repository = new StubRedisRepository(emptyInfo);
             var query = new RedisInfoQuery { GroupId = Guid.NewGuid(), Host = "localhost", Port = 6379 };
 
+            // Act
             var result = await RedisInfoQueryHandler.Handle(query, repository);
 
+            // Assert
             result.Sections.ShouldNotBeNull();
             result.Sections.ShouldBeEmpty();
         }
@@ -63,9 +76,14 @@ namespace Roman.RedisManager.Tests.Application.CQRS
         [Fact]
         public async Task Handle_NullQuery_ThrowsArgumentNullException()
         {
+
+            // Arrange
             var repository = new StubRedisRepository(
                 new RedisInfo(new Dictionary<string, IReadOnlyDictionary<string, string>>()));
 
+            // Act
+
+            // Assert
             await Should.ThrowAsync<ArgumentNullException>(
                 () => RedisInfoQueryHandler.Handle(null!, repository));
         }
@@ -73,8 +91,13 @@ namespace Roman.RedisManager.Tests.Application.CQRS
         [Fact]
         public async Task Handle_NullRepository_ThrowsArgumentNullException()
         {
+
+            // Arrange
             var query = new RedisInfoQuery { GroupId = Guid.NewGuid(), Host = "localhost", Port = 6379 };
 
+            // Act
+
+            // Assert
             await Should.ThrowAsync<ArgumentNullException>(
                 () => RedisInfoQueryHandler.Handle(query, null!));
         }

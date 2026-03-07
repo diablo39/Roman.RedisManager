@@ -23,11 +23,13 @@ namespace Roman.RedisManager.Tests.Web.Controllers
         [Fact]
         public async Task SearchKeys_InvalidGroupIdProducesProblemDetails400()
         {
+            // Arrange
             var client = _factory.CreateClient();
 
-            // groupId is a Guid, provide invalid value to trigger model binding failure
+            // Act
             var response = await client.GetAsync("/api/redis-keys?groupId=not-a-guid");
 
+            // Assert
             response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
             var problem = await response.Content.ReadFromJsonAsync<Microsoft.AspNetCore.Mvc.ProblemDetails>();
             problem.ShouldNotBeNull();
@@ -37,6 +39,7 @@ namespace Roman.RedisManager.Tests.Web.Controllers
         [Fact]
         public async Task SearchKeys_InvalidContinuationTokenProducesStableProblemDetailsCode()
         {
+            // Arrange
             var client = _factory.WithWebHostBuilder(builder =>
             {
                 builder.ConfigureServices(services =>
@@ -51,14 +54,17 @@ namespace Roman.RedisManager.Tests.Web.Controllers
                 });
             }).CreateClient();
 
+            // Act
             var response = await client.GetAsync($"/api/redis-keys?groupId={Guid.NewGuid()}&continuationToken=abc");
 
+            // Assert
             response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
             var problem = await response.Content.ReadFromJsonAsync<Microsoft.AspNetCore.Mvc.ProblemDetails>();
             problem.ShouldNotBeNull();
             problem.ShouldBeValidProblemDetails();
             problem.Extensions.ShouldContainKey("code");
-            problem.Extensions["code"].ToString().ShouldBe("invalid_continuation_token");
+            problem.Extensions["code"].ShouldNotBeNull();
+            problem.Extensions["code"]!.ToString().ShouldBe("invalid_continuation_token");
         }
 
         private sealed class InvalidContinuationTokenRepository : IRedisRepository

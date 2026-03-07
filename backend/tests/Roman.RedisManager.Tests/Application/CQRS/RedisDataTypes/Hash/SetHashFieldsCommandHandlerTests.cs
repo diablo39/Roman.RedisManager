@@ -10,6 +10,8 @@ namespace Roman.RedisManager.Tests.Application.CQRS.RedisDataTypes.Hash
         [Fact]
         public async Task Handle_ValidCommand_ReturnsSuccess()
         {
+
+            // Arrange
             var stub = new StubHashRepository();
             var command = new SetHashFieldsCommand
             {
@@ -18,8 +20,10 @@ namespace Roman.RedisManager.Tests.Application.CQRS.RedisDataTypes.Hash
                 Fields = new Dictionary<string, string> { ["name"] = "Alice", ["age"] = "30" }
             };
 
+            // Act
             var result = await SetHashFieldsCommandHandler.Handle(command, stub);
 
+            // Assert
             result.ShouldNotBeNull();
             result.Success.ShouldBeTrue();
         }
@@ -27,6 +31,8 @@ namespace Roman.RedisManager.Tests.Application.CQRS.RedisDataTypes.Hash
         [Fact]
         public async Task Handle_WithTtl_ReturnsSuccess()
         {
+
+            // Arrange
             var stub = new StubHashRepository();
             var command = new SetHashFieldsCommand
             {
@@ -36,16 +42,23 @@ namespace Roman.RedisManager.Tests.Application.CQRS.RedisDataTypes.Hash
                 Ttl = TimeSpan.FromMinutes(5)
             };
 
+            // Act
             var result = await SetHashFieldsCommandHandler.Handle(command, stub);
 
+            // Assert
             result.Success.ShouldBeTrue();
         }
 
         [Fact]
         public async Task Handle_NullCommand_ThrowsArgumentNullException()
         {
+
+            // Arrange
             var stub = new StubHashRepository();
 
+            // Act
+
+            // Assert
             await Should.ThrowAsync<ArgumentNullException>(
                 () => SetHashFieldsCommandHandler.Handle(null!, stub));
         }
@@ -53,6 +66,8 @@ namespace Roman.RedisManager.Tests.Application.CQRS.RedisDataTypes.Hash
         [Fact]
         public async Task Handle_NullRepository_ThrowsArgumentNullException()
         {
+
+            // Arrange
             var command = new SetHashFieldsCommand
             {
                 GroupId = Guid.NewGuid(),
@@ -60,6 +75,9 @@ namespace Roman.RedisManager.Tests.Application.CQRS.RedisDataTypes.Hash
                 Fields = new Dictionary<string, string> { ["f"] = "v" }
             };
 
+            // Act
+
+            // Assert
             await Should.ThrowAsync<ArgumentNullException>(
                 () => SetHashFieldsCommandHandler.Handle(command, null!));
         }

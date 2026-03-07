@@ -13,6 +13,8 @@ namespace Roman.RedisManager.Tests.Infrastructure.Quality
         [Fact]
         public void GovernanceFiles_MutationLoopPolicyPresent_ContainsRequiredPhrases()
         {
+
+            // Arrange
             var backendRoot = ResolveBackendRoot();
             var files = new[]
             {
@@ -27,7 +29,12 @@ namespace Roman.RedisManager.Tests.Infrastructure.Quality
             };
 
             foreach (var file in files)
+
             {
+
+            // Act
+
+            // Assert
                 File.Exists(file).ShouldBeTrue($"Expected governance file not found: {file}");
 
                 var content = File.ReadAllText(file);

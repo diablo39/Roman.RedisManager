@@ -9,6 +9,8 @@ namespace Roman.RedisManager.Tests.Application.CQRS.RedisDataTypes.List
         [Fact]
         public async Task Handle_ValidCommand_ReturnsSuccess()
         {
+
+            // Arrange
             var stub = new StubListRepository();
             var command = new PushToListCommand
             {
@@ -18,8 +20,10 @@ namespace Roman.RedisManager.Tests.Application.CQRS.RedisDataTypes.List
                 Direction = ListDirection.Right
             };
 
+            // Act
             var result = await PushToListCommandHandler.Handle(command, stub);
 
+            // Assert
             result.ShouldNotBeNull();
             result.Success.ShouldBeTrue();
         }
@@ -27,6 +31,8 @@ namespace Roman.RedisManager.Tests.Application.CQRS.RedisDataTypes.List
         [Fact]
         public async Task Handle_LeftDirection_ReturnsSuccess()
         {
+
+            // Arrange
             var stub = new StubListRepository();
             var command = new PushToListCommand
             {
@@ -37,16 +43,23 @@ namespace Roman.RedisManager.Tests.Application.CQRS.RedisDataTypes.List
                 Ttl = TimeSpan.FromMinutes(5)
             };
 
+            // Act
             var result = await PushToListCommandHandler.Handle(command, stub);
 
+            // Assert
             result.Success.ShouldBeTrue();
         }
 
         [Fact]
         public async Task Handle_NullCommand_ThrowsArgumentNullException()
         {
+
+            // Arrange
             var stub = new StubListRepository();
 
+            // Act
+
+            // Assert
             await Should.ThrowAsync<ArgumentNullException>(
                 () => PushToListCommandHandler.Handle(null!, stub));
         }
@@ -54,8 +67,13 @@ namespace Roman.RedisManager.Tests.Application.CQRS.RedisDataTypes.List
         [Fact]
         public async Task Handle_NullRepository_ThrowsArgumentNullException()
         {
+
+            // Arrange
             var command = new PushToListCommand { GroupId = Guid.NewGuid(), Key = "k", Values = ["v"] };
 
+            // Act
+
+            // Assert
             await Should.ThrowAsync<ArgumentNullException>(
                 () => PushToListCommandHandler.Handle(command, null!));
         }
@@ -63,6 +81,8 @@ namespace Roman.RedisManager.Tests.Application.CQRS.RedisDataTypes.List
         [Fact]
         public async Task Handle_ValidCommand_ForwardsDirectionAndTtlToRepository()
         {
+
+            // Arrange
             var capturing = new CapturingListRepository();
             var command = new PushToListCommand
             {
@@ -73,8 +93,10 @@ namespace Roman.RedisManager.Tests.Application.CQRS.RedisDataTypes.List
                 Ttl = TimeSpan.FromSeconds(30)
             };
 
+            // Act
             await PushToListCommandHandler.Handle(command, capturing);
 
+            // Assert
             capturing.ReceivedDirection.ShouldBe(ListDirection.Left);
             capturing.ReceivedTtl.ShouldBe(TimeSpan.FromSeconds(30));
         }

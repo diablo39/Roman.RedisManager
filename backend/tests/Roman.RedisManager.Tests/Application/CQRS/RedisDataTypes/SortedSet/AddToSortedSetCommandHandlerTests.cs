@@ -9,6 +9,8 @@ namespace Roman.RedisManager.Tests.Application.CQRS.RedisDataTypes.SortedSet
         [Fact]
         public async Task Handle_ValidCommand_ReturnsSuccess()
         {
+
+            // Arrange
             var stub = new StubSortedSetRepository();
             var command = new AddToSortedSetCommand
             {
@@ -21,8 +23,10 @@ namespace Roman.RedisManager.Tests.Application.CQRS.RedisDataTypes.SortedSet
                 ]
             };
 
+            // Act
             var result = await AddToSortedSetCommandHandler.Handle(command, stub);
 
+            // Assert
             result.ShouldNotBeNull();
             result.Success.ShouldBeTrue();
         }
@@ -30,6 +34,8 @@ namespace Roman.RedisManager.Tests.Application.CQRS.RedisDataTypes.SortedSet
         [Fact]
         public async Task Handle_WithTtl_ReturnsSuccess()
         {
+
+            // Arrange
             var stub = new StubSortedSetRepository();
             var command = new AddToSortedSetCommand
             {
@@ -39,16 +45,23 @@ namespace Roman.RedisManager.Tests.Application.CQRS.RedisDataTypes.SortedSet
                 Ttl = TimeSpan.FromMinutes(5)
             };
 
+            // Act
             var result = await AddToSortedSetCommandHandler.Handle(command, stub);
 
+            // Assert
             result.Success.ShouldBeTrue();
         }
 
         [Fact]
         public async Task Handle_NullCommand_ThrowsArgumentNullException()
         {
+
+            // Arrange
             var stub = new StubSortedSetRepository();
 
+            // Act
+
+            // Assert
             await Should.ThrowAsync<ArgumentNullException>(
                 () => AddToSortedSetCommandHandler.Handle(null!, stub));
         }
@@ -56,6 +69,8 @@ namespace Roman.RedisManager.Tests.Application.CQRS.RedisDataTypes.SortedSet
         [Fact]
         public async Task Handle_NullRepository_ThrowsArgumentNullException()
         {
+
+            // Arrange
             var command = new AddToSortedSetCommand
             {
                 GroupId = Guid.NewGuid(),
@@ -63,6 +78,9 @@ namespace Roman.RedisManager.Tests.Application.CQRS.RedisDataTypes.SortedSet
                 Entries = [new RedisSortedSetEntry("m", 1.0)]
             };
 
+            // Act
+
+            // Assert
             await Should.ThrowAsync<ArgumentNullException>(
                 () => AddToSortedSetCommandHandler.Handle(command, null!));
         }
@@ -70,6 +88,8 @@ namespace Roman.RedisManager.Tests.Application.CQRS.RedisDataTypes.SortedSet
         [Fact]
         public async Task Handle_ValidCommand_ForwardsEntriesAndTtlToRepository()
         {
+
+            // Arrange
             var capturing = new CapturingSortedSetRepository();
             var entries = new[] { new RedisSortedSetEntry("alpha", 1.0), new RedisSortedSetEntry("beta", 2.5) };
             var ttl = TimeSpan.FromHours(1);
@@ -81,8 +101,10 @@ namespace Roman.RedisManager.Tests.Application.CQRS.RedisDataTypes.SortedSet
                 Ttl = ttl
             };
 
+            // Act
             await AddToSortedSetCommandHandler.Handle(command, capturing);
 
+            // Assert
             capturing.ReceivedEntries.ShouldBe(entries);
             capturing.ReceivedTtl.ShouldBe(ttl);
         }

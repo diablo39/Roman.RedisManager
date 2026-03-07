@@ -7,8 +7,12 @@ namespace Roman.RedisManager.Tests.Domain.Entities
         [Fact]
         public void Constructor_ValidArguments_SetsProperties()
         {
+            // Arrange
             var node = new RedisServerNode("redis-host", 6379, "MASTER");
 
+            // Act
+
+            // Assert
             node.Host.ShouldBe("redis-host");
             node.Port.ShouldBe(6379);
             node.Role.ShouldBe("master"); // normalised to lower
@@ -17,50 +21,90 @@ namespace Roman.RedisManager.Tests.Domain.Entities
         [Fact]
         public void Constructor_NullHost_ThrowsArgumentException()
         {
-            var ex = Should.Throw<ArgumentException>(() => new RedisServerNode(null!, 6379, "master"));
+            // Arrange
+            var action = () => new RedisServerNode(null!, 6379, "master");
+
+            // Act
+            var ex = Should.Throw<ArgumentException>(action);
+
+            // Assert
             ex.ParamName.ShouldBe("host");
         }
 
         [Fact]
         public void Constructor_WhitespaceHost_ThrowsArgumentException()
         {
-            var ex = Should.Throw<ArgumentException>(() => new RedisServerNode("   ", 6379, "master"));
+            // Arrange
+            var action = () => new RedisServerNode("   ", 6379, "master");
+
+            // Act
+            var ex = Should.Throw<ArgumentException>(action);
+
+            // Assert
             ex.ParamName.ShouldBe("host");
         }
 
         [Fact]
         public void Constructor_PortZero_ThrowsArgumentOutOfRangeException()
         {
-            var ex = Should.Throw<ArgumentOutOfRangeException>(() => new RedisServerNode("localhost", 0, "master"));
+            // Arrange
+            var action = () => new RedisServerNode("localhost", 0, "master");
+
+            // Act
+            var ex = Should.Throw<ArgumentOutOfRangeException>(action);
+
+            // Assert
             ex.ParamName.ShouldBe("port");
         }
 
         [Fact]
         public void Constructor_NegativePort_ThrowsArgumentOutOfRangeException()
         {
-            var ex = Should.Throw<ArgumentOutOfRangeException>(() => new RedisServerNode("localhost", -1, "master"));
+            // Arrange
+            var action = () => new RedisServerNode("localhost", -1, "master");
+
+            // Act
+            var ex = Should.Throw<ArgumentOutOfRangeException>(action);
+
+            // Assert
             ex.ParamName.ShouldBe("port");
         }
 
         [Fact]
         public void Constructor_NullRole_ThrowsArgumentException()
         {
-            var ex = Should.Throw<ArgumentException>(() => new RedisServerNode("localhost", 6379, null!));
+            // Arrange
+            var action = () => new RedisServerNode("localhost", 6379, null!);
+
+            // Act
+            var ex = Should.Throw<ArgumentException>(action);
+
+            // Assert
             ex.ParamName.ShouldBe("role");
         }
 
         [Fact]
         public void Constructor_WhitespaceRole_ThrowsArgumentException()
         {
-            var ex = Should.Throw<ArgumentException>(() => new RedisServerNode("localhost", 6379, "  "));
+            // Arrange
+            var action = () => new RedisServerNode("localhost", 6379, "  ");
+
+            // Act
+            var ex = Should.Throw<ArgumentException>(action);
+
+            // Assert
             ex.ParamName.ShouldBe("role");
         }
 
         [Fact]
         public void Constructor_RoleNormalisedToLowercase()
         {
+            // Arrange
             var node = new RedisServerNode("localhost", 6380, "SLAVE");
 
+            // Act
+
+            // Assert
             node.Role.ShouldBe("slave");
         }
     }

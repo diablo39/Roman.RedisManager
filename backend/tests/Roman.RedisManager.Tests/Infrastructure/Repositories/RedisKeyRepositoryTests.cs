@@ -19,35 +19,49 @@ namespace Roman.RedisManager.Tests.Infrastructure.Repositories
         [Fact]
         public async Task DeleteKeyAsync_ExistingKey_ReturnsTrue()
         {
+
+            // Arrange
             var connectionMultiplexer = ConnectionMultiplexer.Connect(_fixture.ConnectionString + ",allowAdmin=true");
+
+            // Act
             await connectionMultiplexer.GetDatabase().StringSetAsync("del:existing", "value");
 
             var (repo, groupId) = CreateRepository(connectionMultiplexer);
 
             var deleted = await repo.DeleteKeyAsync(groupId, "del:existing");
 
+            // Assert
             deleted.ShouldBeTrue();
         }
 
         [Fact]
         public async Task DeleteKeyAsync_NonExistentKey_ReturnsFalse()
         {
+
+            // Arrange
             var connectionMultiplexer = ConnectionMultiplexer.Connect(_fixture.ConnectionString + ",allowAdmin=true");
 
             var (repo, groupId) = CreateRepository(connectionMultiplexer);
 
+            // Act
             var deleted = await repo.DeleteKeyAsync(groupId, "del:nonexistent:" + Guid.NewGuid());
 
+            // Assert
             deleted.ShouldBeFalse();
         }
 
         [Fact]
         public async Task DeleteKeyAsync_EmptyGroupId_ThrowsArgumentException()
         {
+
+            // Arrange
             var connectionMultiplexer = ConnectionMultiplexer.Connect(_fixture.ConnectionString + ",allowAdmin=true");
+
+            // Act
             await using IRedisConnectionManager connectionManager = new TestRedisConnectionManager(connectionMultiplexer);
             IRedisKeyRepository repo = new RedisKeyRepository(connectionManager, CreateOptions());
 
+            // Assert
             await Should.ThrowAsync<ArgumentException>(
                 () => repo.DeleteKeyAsync(Guid.Empty, "some:key"));
         }
@@ -55,13 +69,18 @@ namespace Roman.RedisManager.Tests.Infrastructure.Repositories
         [Fact]
         public async Task GetKeyMetadataAsync_StringKey_ReturnsStringType()
         {
+
+            // Arrange
             var connectionMultiplexer = ConnectionMultiplexer.Connect(_fixture.ConnectionString + ",allowAdmin=true");
+
+            // Act
             await connectionMultiplexer.GetDatabase().StringSetAsync("meta:string", "value");
 
             var (repo, groupId) = CreateRepository(connectionMultiplexer);
 
             var metadata = await repo.GetKeyMetadataAsync(groupId, "meta:string");
 
+            // Assert
             metadata.ShouldNotBeNull();
             metadata.Type.ShouldBe(RedisDataType.String);
             metadata.Ttl.ShouldBeNull();
@@ -70,13 +89,18 @@ namespace Roman.RedisManager.Tests.Infrastructure.Repositories
         [Fact]
         public async Task GetKeyMetadataAsync_WithTtl_ReturnsTtl()
         {
+
+            // Arrange
             var connectionMultiplexer = ConnectionMultiplexer.Connect(_fixture.ConnectionString + ",allowAdmin=true");
+
+            // Act
             await connectionMultiplexer.GetDatabase().StringSetAsync("meta:ttl", "value", TimeSpan.FromSeconds(30));
 
             var (repo, groupId) = CreateRepository(connectionMultiplexer);
 
             var metadata = await repo.GetKeyMetadataAsync(groupId, "meta:ttl");
 
+            // Assert
             metadata.Ttl.ShouldNotBeNull();
             metadata.Ttl!.Value.TotalMilliseconds.ShouldBeGreaterThan(0);
             metadata.Type.ShouldBe(RedisDataType.String);
@@ -85,13 +109,18 @@ namespace Roman.RedisManager.Tests.Infrastructure.Repositories
         [Fact]
         public async Task GetKeyMetadataAsync_WithoutTtl_ReturnsNullTtl()
         {
+
+            // Arrange
             var connectionMultiplexer = ConnectionMultiplexer.Connect(_fixture.ConnectionString + ",allowAdmin=true");
+
+            // Act
             await connectionMultiplexer.GetDatabase().StringSetAsync("meta:nottl", "value");
 
             var (repo, groupId) = CreateRepository(connectionMultiplexer);
 
             var metadata = await repo.GetKeyMetadataAsync(groupId, "meta:nottl");
 
+            // Assert
             metadata.Ttl.ShouldBeNull();
             metadata.Type.ShouldBe(RedisDataType.String);
         }
@@ -99,13 +128,18 @@ namespace Roman.RedisManager.Tests.Infrastructure.Repositories
         [Fact]
         public async Task GetKeyValueAsync_StringKey_ReturnsStringValue()
         {
+
+            // Arrange
             var connectionMultiplexer = ConnectionMultiplexer.Connect(_fixture.ConnectionString + ",allowAdmin=true");
+
+            // Act
             await connectionMultiplexer.GetDatabase().StringSetAsync("val:string", "hello world");
 
             var (repo, groupId) = CreateRepository(connectionMultiplexer);
 
             var keyValue = await repo.GetKeyValueAsync(groupId, "val:string");
 
+            // Assert
             keyValue.ShouldNotBeNull();
             keyValue.Type.ShouldBe(RedisDataType.String);
             keyValue.StringValue.ShouldBe("hello world");
@@ -114,8 +148,12 @@ namespace Roman.RedisManager.Tests.Infrastructure.Repositories
         [Fact]
         public async Task GetKeyValueAsync_ListKey_ReturnsListValues()
         {
+
+            // Arrange
             var connectionMultiplexer = ConnectionMultiplexer.Connect(_fixture.ConnectionString + ",allowAdmin=true");
             var db = connectionMultiplexer.GetDatabase();
+
+            // Act
             await db.KeyDeleteAsync("val:list");
             await db.ListRightPushAsync("val:list", new RedisValue[] { "a", "b", "c" });
 
@@ -123,6 +161,7 @@ namespace Roman.RedisManager.Tests.Infrastructure.Repositories
 
             var keyValue = await repo.GetKeyValueAsync(groupId, "val:list");
 
+            // Assert
             keyValue.Type.ShouldBe(RedisDataType.List);
             keyValue.ListValues.ShouldNotBeNull();
             keyValue.ListValues!.Count().ShouldBe(3);
@@ -134,12 +173,16 @@ namespace Roman.RedisManager.Tests.Infrastructure.Repositories
         [Fact]
         public async Task GetKeyValueAsync_NonExistentKey_ReturnsNoneType()
         {
+
+            // Arrange
             var connectionMultiplexer = ConnectionMultiplexer.Connect(_fixture.ConnectionString + ",allowAdmin=true");
 
             var (repo, groupId) = CreateRepository(connectionMultiplexer);
 
+            // Act
             var keyValue = await repo.GetKeyValueAsync(groupId, "val:nonexistent:" + Guid.NewGuid());
 
+            // Assert
             keyValue.Type.ShouldBe(RedisDataType.None);
             keyValue.StringValue.ShouldBeNull();
             keyValue.ListValues.ShouldBeNull();
@@ -151,9 +194,13 @@ namespace Roman.RedisManager.Tests.Infrastructure.Repositories
         [Fact]
         public async Task GetKeyValueAsync_HashKey_ReturnsHashFields()
         {
+
+            // Arrange
             var connectionMultiplexer = ConnectionMultiplexer.Connect(_fixture.ConnectionString + ",allowAdmin=true");
             var db = connectionMultiplexer.GetDatabase();
             var key = "val:hash:" + Guid.NewGuid();
+
+            // Act
             await db.KeyDeleteAsync(key);
             await db.HashSetAsync(key, new StackExchange.Redis.HashEntry[]
             {
@@ -165,6 +212,7 @@ namespace Roman.RedisManager.Tests.Infrastructure.Repositories
 
             var keyValue = await repo.GetKeyValueAsync(groupId, key);
 
+            // Assert
             keyValue.Type.ShouldBe(RedisDataType.Hash);
             keyValue.HashFields.ShouldNotBeNull();
             keyValue.HashFields!["field1"].ShouldBe("value1");
@@ -174,9 +222,13 @@ namespace Roman.RedisManager.Tests.Infrastructure.Repositories
         [Fact]
         public async Task GetKeyValueAsync_SetKey_ReturnsSetMembers()
         {
+
+            // Arrange
             var connectionMultiplexer = ConnectionMultiplexer.Connect(_fixture.ConnectionString + ",allowAdmin=true");
             var db = connectionMultiplexer.GetDatabase();
             var key = "val:set:" + Guid.NewGuid();
+
+            // Act
             await db.KeyDeleteAsync(key);
             await db.SetAddAsync(key, new StackExchange.Redis.RedisValue[] { "member1", "member2" });
 
@@ -184,6 +236,7 @@ namespace Roman.RedisManager.Tests.Infrastructure.Repositories
 
             var keyValue = await repo.GetKeyValueAsync(groupId, key);
 
+            // Assert
             keyValue.Type.ShouldBe(RedisDataType.Set);
             keyValue.SetMembers.ShouldNotBeNull();
             keyValue.SetMembers!.ShouldContain("member1");
@@ -193,9 +246,13 @@ namespace Roman.RedisManager.Tests.Infrastructure.Repositories
         [Fact]
         public async Task GetKeyValueAsync_SortedSetKey_ReturnsSortedSetEntries()
         {
+
+            // Arrange
             var connectionMultiplexer = ConnectionMultiplexer.Connect(_fixture.ConnectionString + ",allowAdmin=true");
             var db = connectionMultiplexer.GetDatabase();
             var key = "val:zset:" + Guid.NewGuid();
+
+            // Act
             await db.KeyDeleteAsync(key);
             await db.SortedSetAddAsync(key, new StackExchange.Redis.SortedSetEntry[]
             {
@@ -207,6 +264,7 @@ namespace Roman.RedisManager.Tests.Infrastructure.Repositories
 
             var keyValue = await repo.GetKeyValueAsync(groupId, key);
 
+            // Assert
             keyValue.Type.ShouldBe(RedisDataType.SortedSet);
             keyValue.SortedSetEntries.ShouldNotBeNull();
             keyValue.SortedSetEntries!.ShouldContain(e => e.Member == "alpha" && e.Score == 1.0);
@@ -216,10 +274,15 @@ namespace Roman.RedisManager.Tests.Infrastructure.Repositories
         [Fact]
         public async Task GetKeyMetadataAsync_EmptyGroupId_ThrowsArgumentException()
         {
+
+            // Arrange
             var connectionMultiplexer = ConnectionMultiplexer.Connect(_fixture.ConnectionString + ",allowAdmin=true");
+
+            // Act
             await using IRedisConnectionManager connectionManager = new TestRedisConnectionManager(connectionMultiplexer);
             IRedisKeyRepository repo = new RedisKeyRepository(connectionManager, CreateOptions());
 
+            // Assert
             await Should.ThrowAsync<ArgumentException>(
                 () => repo.GetKeyMetadataAsync(Guid.Empty, "some:key"));
         }
@@ -227,10 +290,15 @@ namespace Roman.RedisManager.Tests.Infrastructure.Repositories
         [Fact]
         public async Task GetKeyValueAsync_EmptyGroupId_ThrowsArgumentException()
         {
+
+            // Arrange
             var connectionMultiplexer = ConnectionMultiplexer.Connect(_fixture.ConnectionString + ",allowAdmin=true");
+
+            // Act
             await using IRedisConnectionManager connectionManager = new TestRedisConnectionManager(connectionMultiplexer);
             IRedisKeyRepository repo = new RedisKeyRepository(connectionManager, CreateOptions());
 
+            // Assert
             await Should.ThrowAsync<ArgumentException>(
                 () => repo.GetKeyValueAsync(Guid.Empty, "some:key"));
         }

@@ -12,14 +12,18 @@ namespace Roman.RedisManager.Tests.Infrastructure.Quality
         [Fact]
         public void Validate_RequiredReportsExist_ReturnsValid()
         {
+
+            // Arrange
             var outputDirectory = CreateTempOutputDirectory();
             Directory.CreateDirectory(Path.Combine(outputDirectory, "reports"));
             File.WriteAllText(Path.Combine(outputDirectory, "reports", "mutation-report.json"), "{}");
             File.WriteAllText(Path.Combine(outputDirectory, "reports", "mutation-report.html"), "<html></html>");
             File.WriteAllText(Path.Combine(outputDirectory, "mutation-comparison.md"), "# comparison");
 
+            // Act
             var result = MutationReportSetValidator.Validate(outputDirectory, requireComparisonReport: true);
 
+            // Assert
             result.IsValid.ShouldBeTrue();
             result.Errors.ShouldBeEmpty();
             result.JsonReportPath.ShouldNotBeNullOrWhiteSpace();
@@ -30,12 +34,16 @@ namespace Roman.RedisManager.Tests.Infrastructure.Quality
         [Fact]
         public void Validate_MissingComparisonWhenRequired_ReturnsInvalid()
         {
+
+            // Arrange
             var outputDirectory = CreateTempOutputDirectory();
             File.WriteAllText(Path.Combine(outputDirectory, "mutation-report.json"), "{}");
             File.WriteAllText(Path.Combine(outputDirectory, "mutation-report.html"), "<html></html>");
 
+            // Act
             var result = MutationReportSetValidator.Validate(outputDirectory, requireComparisonReport: true);
 
+            // Assert
             result.IsValid.ShouldBeFalse();
             result.Errors.ShouldContain("Mutation comparison report was not found.");
         }

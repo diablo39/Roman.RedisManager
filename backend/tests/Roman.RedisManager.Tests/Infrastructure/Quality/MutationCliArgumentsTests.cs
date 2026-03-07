@@ -16,10 +16,15 @@ namespace Roman.RedisManager.Tests.Infrastructure.Quality
         [Fact]
         public void Build_DefaultSettings_ContainsRequiredStrykerArguments()
         {
+
+            // Arrange
             var settings = new MutationRunSettings();
 
             var args = MutationCliArguments.Build(settings);
 
+            // Act
+
+            // Assert
             args.ShouldContain("dotnet-stryker");
             args.ShouldContain("--solution");
             args.ShouldContain(settings.SolutionPath);
@@ -37,6 +42,8 @@ namespace Roman.RedisManager.Tests.Infrastructure.Quality
         [Fact]
         public void Build_WithBaselineEnabled_IncludesBaselineArguments()
         {
+
+            // Arrange
             var settings = new MutationRunSettings
             {
                 WithBaseline = true,
@@ -45,6 +52,9 @@ namespace Roman.RedisManager.Tests.Infrastructure.Quality
 
             var args = MutationCliArguments.Build(settings);
 
+            // Act
+
+            // Assert
             args.ShouldContain("--with-baseline");
         }
     }

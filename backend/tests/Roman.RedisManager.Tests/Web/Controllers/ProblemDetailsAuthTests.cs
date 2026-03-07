@@ -18,36 +18,48 @@ namespace Roman.RedisManager.Tests.Web.Controllers
         [Fact]
         public async Task UnauthorizedEndpoint_Returns401WithProblemDetails()
         {
+            // Arrange
             var client = _factory.CreateClient();
 
+            // Act
             var response = await client.GetAsync("/api/test/unauth");
 
+            // Assert
             response.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
             var problem = await response.Content.ReadFromJsonAsync<Microsoft.AspNetCore.Mvc.ProblemDetails>();
+            problem.ShouldNotBeNull();
             problem.ShouldBeValidProblemDetails();
         }
 
         [Fact]
         public async Task ForbiddenEndpoint_Returns403WithProblemDetails()
         {
+            // Arrange
             var client = _factory.CreateClient();
 
+            // Act
             var response = await client.GetAsync("/api/test/forbidden");
 
+            // Assert
             response.StatusCode.ShouldBe(HttpStatusCode.Forbidden);
             var problem = await response.Content.ReadFromJsonAsync<Microsoft.AspNetCore.Mvc.ProblemDetails>();
+            problem.ShouldNotBeNull();
             problem.ShouldBeValidProblemDetails();
         }
 
         [Fact]
         public async Task ServerErrorEndpoint_Returns500WithProblemDetails()
         {
+            // Arrange
             var client = _factory.CreateClient();
 
+            // Act
             var response = await client.GetAsync("/api/test/server-error");
 
+            // Assert
             response.StatusCode.ShouldBe(HttpStatusCode.InternalServerError);
             var problem = await response.Content.ReadFromJsonAsync<Microsoft.AspNetCore.Mvc.ProblemDetails>();
+            problem.ShouldNotBeNull();
             problem.ShouldBeValidProblemDetails();
         }
     }

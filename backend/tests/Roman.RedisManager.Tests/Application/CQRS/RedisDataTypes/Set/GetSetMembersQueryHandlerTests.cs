@@ -9,6 +9,8 @@ namespace Roman.RedisManager.Tests.Application.CQRS.RedisDataTypes.Set
         [Fact]
         public async Task Handle_ValidQuery_ReturnsMembers()
         {
+
+            // Arrange
             var expectedMembers = new[] { "x", "y", "z" };
             var scanResult = new RedisScanResult<string>(0, expectedMembers);
             var stub = new StubSetRepository(scanResult);
@@ -20,8 +22,10 @@ namespace Roman.RedisManager.Tests.Application.CQRS.RedisDataTypes.Set
                 PageSize = 100
             };
 
+            // Act
             var result = await GetSetMembersQueryHandler.Handle(query, stub);
 
+            // Assert
             result.ShouldNotBeNull();
             result.Members.ShouldNotBeEmpty();
             result.Members.ShouldBe(expectedMembers);
@@ -32,6 +36,8 @@ namespace Roman.RedisManager.Tests.Application.CQRS.RedisDataTypes.Set
         [Fact]
         public async Task Handle_WithMoreResults_ReturnsNonZeroCursor()
         {
+
+            // Arrange
             var scanResult = new RedisScanResult<string>(42, new[] { "a", "b" });
             var stub = new StubSetRepository(scanResult);
             var query = new GetSetMembersQuery
@@ -41,8 +47,10 @@ namespace Roman.RedisManager.Tests.Application.CQRS.RedisDataTypes.Set
                 PageSize = 2
             };
 
+            // Act
             var result = await GetSetMembersQueryHandler.Handle(query, stub);
 
+            // Assert
             result.Cursor.ShouldBe(42L);
             result.HasMoreResults.ShouldBeTrue();
             result.Members.Count().ShouldBe(2);
@@ -52,8 +60,13 @@ namespace Roman.RedisManager.Tests.Application.CQRS.RedisDataTypes.Set
         [Fact]
         public async Task Handle_NullQuery_ThrowsArgumentNullException()
         {
+
+            // Arrange
             var stub = new StubSetRepository(new RedisScanResult<string>(0, Array.Empty<string>()));
 
+            // Act
+
+            // Assert
             await Should.ThrowAsync<ArgumentNullException>(
                 () => GetSetMembersQueryHandler.Handle(null!, stub));
         }
@@ -61,8 +74,13 @@ namespace Roman.RedisManager.Tests.Application.CQRS.RedisDataTypes.Set
         [Fact]
         public async Task Handle_NullRepository_ThrowsArgumentNullException()
         {
+
+            // Arrange
             var query = new GetSetMembersQuery { GroupId = Guid.NewGuid(), Key = "k" };
 
+            // Act
+
+            // Assert
             await Should.ThrowAsync<ArgumentNullException>(
                 () => GetSetMembersQueryHandler.Handle(query, null!));
         }

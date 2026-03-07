@@ -19,10 +19,16 @@ namespace Roman.RedisManager.Tests.Web.Controllers
         [Fact]
         public async Task GetServerGroups_WithConfiguredGroups_Returns200WithGroups()
         {
+
+
+            // Arrange
+
+            // Act
             var client = _factory.CreateClient();
 
             var response = await client.GetAsync("/api/redis-server-groups");
 
+            // Assert
             response.StatusCode.ShouldBe(HttpStatusCode.OK);
             var body = await response.Content.ReadAsStringAsync();
             body.ShouldNotBeNullOrEmpty();
@@ -31,17 +37,25 @@ namespace Roman.RedisManager.Tests.Web.Controllers
         [Fact]
         public async Task GetServerGroupDetail_UnknownGroupId_Returns404()
         {
+
+
+            // Arrange
+
+            // Act
             var client = _factory.CreateClient();
             var unknownId = Guid.NewGuid();
 
             var response = await client.GetAsync($"/api/redis-server-groups/{unknownId}");
 
+            // Assert
             response.StatusCode.ShouldBe(HttpStatusCode.NotFound);
         }
 
         [Fact]
         public async Task GetServerGroupDetail_RedisConnectionFailure_Returns500()
         {
+
+            // Arrange
             // Override IRedisRepository with a stub that throws RedisConnectionFailureException
             // to simulate a Redis connectivity problem without needing a real broken server.
             var client = _factory.WithWebHostBuilder(builder =>
@@ -51,7 +65,12 @@ namespace Roman.RedisManager.Tests.Web.Controllers
                     // Remove the real IRedisRepository and replace with one that always
                     // throws RedisConnectionFailureException on GetServerNodesAsync.
                     var descriptor = services.SingleOrDefault(
+
                         d => d.ServiceType == typeof(IRedisRepository));
+
+            // Act
+
+            // Assert
                     if (descriptor is not null)
                     {
                         services.Remove(descriptor);

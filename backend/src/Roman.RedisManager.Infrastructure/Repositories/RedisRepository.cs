@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Options;
 using Roman.RedisManager.Domain.Entities;
+using Roman.RedisManager.Domain.Entities.RedisData;
 using Roman.RedisManager.Domain.Repositories;
 using Roman.RedisManager.Domain.Configuration;
 using Roman.RedisManager.Infrastructure.Exceptions;
@@ -79,7 +80,7 @@ namespace Roman.RedisManager.Infrastructure.Repositories
                     var nodeIndex = envelope?.ClusterState?.NodeIndex ?? 0;
                     var innerCursor = envelope?.ClusterState?.NodeCursor ?? 0;
 
-                    var collected = new List<RedisKey>();
+                    var collected = new List<string>();
                     var nextNodeIndex = nodeIndex;
                     long nextInner = innerCursor;
 
@@ -100,7 +101,7 @@ namespace Roman.RedisManager.Infrastructure.Repositories
 
                         foreach (var k in rawKeys)
                         {
-                            collected.Add(new RedisKey((string)k!));
+                            collected.Add((string)k!);
                             if (collected.Count >= pageSize)
                                 break;
                         }
@@ -115,6 +116,8 @@ namespace Roman.RedisManager.Infrastructure.Repositories
                             break;
                         }
                     }
+
+                    var enrichedKeys = await EnrichKeysWithMetadataAsync(connection.GetDatabase(), collected).ConfigureAwait(false);
 
                     var hasMore = nextNodeIndex < masters.Count;
                     string? nextContinuationToken = null;
@@ -132,7 +135,7 @@ namespace Roman.RedisManager.Infrastructure.Repositories
                         nextContinuationToken = _continuationTokenCodec.Encode(nextEnvelope);
                     }
 
-                    var result = new RedisSearchResult(collected, hasMore)
+                    var result = new RedisSearchResult(enrichedKeys, hasMore)
                     {
                         ContinuationToken = nextContinuationToken
                     };
@@ -143,7 +146,7 @@ namespace Roman.RedisManager.Infrastructure.Repositories
                     var numericCursor = envelope?.StandaloneState?.Cursor ?? 0;
 
                     var server = GetServer(connection);
-                    var keys = new List<RedisKey>();
+                    var keys = new List<string>();
                     var nextCursor = numericCursor;
 
                     // Avoid empty first-page responses that still require continuation when there are no matches.
@@ -163,7 +166,7 @@ namespace Roman.RedisManager.Infrastructure.Repositories
 
                         foreach (var key in rawKeys)
                         {
-                            keys.Add(new RedisKey((string)key!));
+                            keys.Add((string)key!);
                             if (keys.Count >= pageSize)
                             {
                                 break;
@@ -171,6 +174,8 @@ namespace Roman.RedisManager.Infrastructure.Repositories
                         }
                     }
                     while (keys.Count == 0 && nextCursor != 0);
+
+                    var enrichedKeys = await EnrichKeysWithMetadataAsync(connection.GetDatabase(), keys).ConfigureAwait(false);
 
                     var hasMore = nextCursor != 0;
                     string? nextContinuationToken = null;
@@ -188,7 +193,7 @@ namespace Roman.RedisManager.Infrastructure.Repositories
                         nextContinuationToken = _continuationTokenCodec.Encode(nextEnvelope);
                     }
 
-                    return new RedisSearchResult(keys, hasMore)
+                    return new RedisSearchResult(enrichedKeys, hasMore)
                     {
                         ContinuationToken = nextContinuationToken
                     };
@@ -206,6 +211,61 @@ namespace Roman.RedisManager.Infrastructure.Repositories
             {
                 throw new RedisConnectionFailureException("Redis server returned an error while searching keys for the requested group.", ex);
             }
+        }
+
+        private static async Task<IReadOnlyCollection<RedisKey>> EnrichKeysWithMetadataAsync(
+            IDatabase database,
+            IReadOnlyList<string> keys)
+        {
+            if (keys.Count == 0)
+            {
+                return Array.Empty<RedisKey>();
+            }
+
+            var typeTasks = keys
+                .Select(key => database.KeyTypeAsync(key))
+                .ToArray();
+            var ttlTasks = keys
+                .Select(key => database.KeyTimeToLiveAsync(key))
+                .ToArray();
+
+            await Task.WhenAll(typeTasks.Cast<Task>().Concat(ttlTasks)).ConfigureAwait(false);
+
+            var enriched = new List<RedisKey>(keys.Count);
+            for (int i = 0; i < keys.Count; i++)
+            {
+                var normalizedType = NormalizeMetadataType(typeTasks[i].Result);
+                var ttl = ttlTasks[i].Result;
+                var hasExpiration = ttl.HasValue;
+
+                if (normalizedType == RedisDataType.Unknown)
+                {
+                    ttl = null;
+                    hasExpiration = false;
+                }
+
+                enriched.Add(new RedisKey(keys[i], normalizedType, ttl, hasExpiration));
+            }
+
+            return enriched;
+        }
+
+        private static RedisDataType NormalizeMetadataType(StackExchange.Redis.RedisType type)
+        {
+            var mappedType = type switch
+            {
+                StackExchange.Redis.RedisType.String => RedisDataType.String,
+                StackExchange.Redis.RedisType.List => RedisDataType.List,
+                StackExchange.Redis.RedisType.Set => RedisDataType.Set,
+                StackExchange.Redis.RedisType.Hash => RedisDataType.Hash,
+                StackExchange.Redis.RedisType.SortedSet => RedisDataType.SortedSet,
+                StackExchange.Redis.RedisType.Stream => RedisDataType.Stream,
+                _ => RedisDataType.Unknown
+            };
+
+            return mappedType == RedisDataType.None
+                ? RedisDataType.Unknown
+                : mappedType;
         }
 
         private void ValidateEnvelope(ContinuationTokenEnvelope envelope, string contextHash, GroupType groupType)

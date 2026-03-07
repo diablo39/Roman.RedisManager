@@ -11,6 +11,8 @@ namespace Roman.RedisManager.Tests.Infrastructure.Redis
         [Fact]
         public void EncodeDecode_ValidEnvelope_RoundTrips()
         {
+
+            // Arrange
             var codec = CreateCodec();
             var envelope = new ContinuationTokenEnvelope
             {
@@ -20,9 +22,11 @@ namespace Roman.RedisManager.Tests.Infrastructure.Redis
                 StandaloneState = new StandaloneCursorState(42)
             };
 
+            // Act
             var token = codec.Encode(envelope);
             var decoded = codec.Decode(token);
 
+            // Assert
             decoded.Version.ShouldBe((byte)1);
             decoded.ContextHash.ShouldBe("ctx-hash");
             decoded.Mode.ShouldBe(ContinuationTokenMode.Standalone);
@@ -33,6 +37,8 @@ namespace Roman.RedisManager.Tests.Infrastructure.Redis
         [Fact]
         public void Decode_TamperedToken_ThrowsInvalidContinuationTokenException()
         {
+
+            // Arrange
             var codec = CreateCodec();
             var envelope = new ContinuationTokenEnvelope
             {
@@ -42,10 +48,12 @@ namespace Roman.RedisManager.Tests.Infrastructure.Redis
                 StandaloneState = new StandaloneCursorState(15)
             };
 
+            // Act
             var token = codec.Encode(envelope);
             var tamperIndex = token.Length / 2;
             var tampered = token[..tamperIndex] + (token[tamperIndex] == 'A' ? 'B' : 'A') + token[(tamperIndex + 1)..];
 
+            // Assert
             var ex = Should.Throw<InvalidContinuationTokenException>(() => codec.Decode(tampered));
             ex.ErrorCode.ShouldBe(ContinuationTokenError.InvalidContinuationToken);
         }
@@ -53,6 +61,8 @@ namespace Roman.RedisManager.Tests.Infrastructure.Redis
         [Fact]
         public void Decode_UnsupportedVersion_ThrowsInvalidContinuationTokenException()
         {
+
+            // Arrange
             var codec = CreateCodec();
             var envelope = new ContinuationTokenEnvelope
             {
@@ -62,8 +72,10 @@ namespace Roman.RedisManager.Tests.Infrastructure.Redis
                 StandaloneState = new StandaloneCursorState(15)
             };
 
+            // Act
             var token = codec.Encode(envelope);
 
+            // Assert
             var ex = Should.Throw<InvalidContinuationTokenException>(() => codec.Decode(token));
             ex.ErrorCode.ShouldBe(ContinuationTokenError.InvalidContinuationToken);
         }

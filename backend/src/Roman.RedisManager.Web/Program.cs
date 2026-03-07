@@ -25,6 +25,12 @@ namespace Roman.RedisManager.Web
                 .ValidateOnStart();
 
             builder.Services
+                .AddOptions<RedisSearchLimitsConfiguration>()
+                .Bind(builder.Configuration.GetSection(RedisConfiguration.SectionName).GetSection(RedisSearchLimitsConfiguration.SectionName))
+                .ValidateDataAnnotations()
+                .ValidateOnStart();
+
+            builder.Services
                 .AddOptions<ContinuationTokenConfiguration>()
                 .Bind(builder.Configuration.GetSection(ContinuationTokenConfiguration.SectionName))
                 .ValidateDataAnnotations()
