@@ -72,7 +72,7 @@ namespace Roman.RedisManager.Tests.Application.CQRS
             }
 
             public Task<RedisSearchResult> SearchForKeysAsync(
-                Guid groupId, string pattern, string cursor, int pageSize)
+                Guid groupId, string pattern, string? continuationToken, int pageSize)
             {
                 return Task.FromResult(new RedisSearchResult(Array.Empty<RedisKey>(), 0));
             }

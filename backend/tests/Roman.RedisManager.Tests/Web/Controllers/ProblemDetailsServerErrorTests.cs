@@ -49,7 +49,7 @@ namespace Roman.RedisManager.Tests.Web.Controllers
         private sealed class ExceptionThrowingRepository : IRedisRepository
         {
             public Task<RedisSearchResult> SearchForKeysAsync(
-                Guid groupId, string pattern, string cursor, int pageSize) =>
+                Guid groupId, string pattern, string? continuationToken, int pageSize) =>
                 throw new Exception("simulated failure");
 
             public Task<IReadOnlyCollection<RedisServerNode>> GetServerNodesAsync(Guid groupId) =>

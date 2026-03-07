@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Roman.RedisManager.Application.CQRS;
 using Roman.RedisManager.Infrastructure.Exceptions;
+using Roman.RedisManager.Web.ProblemDetails;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -24,7 +25,7 @@ namespace Roman.RedisManager.Web.Controllers
         public async Task<ActionResult<RedisKeysSearchQueryResult>> SearchKeys(
             [FromQuery, Required] Guid groupId,
             [FromQuery] string pattern = "*",
-            [FromQuery] string cursor = "0",
+            [FromQuery] string? continuationToken = null,
             [FromQuery] int pageSize = 100)
         {
             try
@@ -34,7 +35,7 @@ namespace Roman.RedisManager.Web.Controllers
                     {
                         GroupId = groupId,
                         Pattern = pattern,
-                        Cursor = cursor,
+                        ContinuationToken = continuationToken,
                         PageSize = pageSize
                     });
 
@@ -48,9 +49,31 @@ namespace Roman.RedisManager.Web.Controllers
             {
                 return Problem(statusCode: StatusCodes.Status500InternalServerError, detail: ex.Message);
             }
-            catch (ArgumentException ex)
+            catch (InvalidContinuationTokenException ex)
             {
-                return Problem(statusCode: StatusCodes.Status400BadRequest, detail: ex.Message);
+                var logger = HttpContext.RequestServices.GetRequiredService<ILogger<RedisKeysController>>();
+                var errorCode = ContinuationTokenProblemDetailsMapper.ToCode(ex.ErrorCode);
+                logger.LogWarning(
+                    "Rejected continuation token with error code {ErrorCode} on {RequestPath}",
+                    errorCode,
+                    HttpContext.Request.Path.ToString());
+
+                var details = new Microsoft.AspNetCore.Mvc.ProblemDetails
+                {
+                    Status = StatusCodes.Status400BadRequest,
+                    Title = "Invalid continuation token",
+                    Detail = ex.Message,
+                    Type = ContinuationTokenProblemDetailsMapper.ToType(ex.ErrorCode)
+                };
+
+                details.Extensions["code"] = errorCode;
+                details.Extensions["traceId"] = HttpContext.TraceIdentifier;
+                details.Extensions["requestPath"] = HttpContext.Request.Path.ToString();
+
+                return new ObjectResult(details)
+                {
+                    StatusCode = StatusCodes.Status400BadRequest
+                };
             }
         }
 

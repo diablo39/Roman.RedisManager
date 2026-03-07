@@ -1,6 +1,7 @@
 @Roman.RedisManager.Web_HostAddress = https://localhost:7244
 # GUID value for the server group identifier
 @RedisServerGroupId = 11111111-1111-1111-1111-111111111111
+@ContinuationToken = replace-with-token-from-previous-response
 
 GET {{Roman.RedisManager.Web_HostAddress}}/api/redis-server-groups
 
@@ -19,7 +20,7 @@ GET {{Roman.RedisManager.Web_HostAddress}}/api/redis-keys?groupId=not-a-guid
 ###
 
 ### Redis Key Search — all keys (standalone)
-GET {{Roman.RedisManager.Web_HostAddress}}/api/redis-keys?groupId={{RedisServerGroupId}}&pattern=*&cursor=0&pageSize=100
+GET {{Roman.RedisManager.Web_HostAddress}}/api/redis-keys?groupId={{RedisServerGroupId}}&pattern=*&pageSize=100
 
 ###
 
@@ -30,19 +31,19 @@ Accept: application/xml
 ###
 
 ### Redis Key Search — pattern filter (standalone)
-GET {{Roman.RedisManager.Web_HostAddress}}/api/redis-keys?groupId={{RedisServerGroupId}}&pattern=session:*&cursor=0&pageSize=50
+GET {{Roman.RedisManager.Web_HostAddress}}/api/redis-keys?groupId={{RedisServerGroupId}}&pattern=session:*&pageSize=50
 
 ###
 
 ### Redis Key Search — cluster across masters (no host/port needed)
-GET {{Roman.RedisManager.Web_HostAddress}}/api/redis-keys?groupId={{RedisServerGroupId}}&pattern=*&cursor=0&pageSize=100
+GET {{Roman.RedisManager.Web_HostAddress}}/api/redis-keys?groupId={{RedisServerGroupId}}&pattern=*&pageSize=100
 
 ###
 
 ###
 
-### Redis Key Search — continuation with cursor from a previous response (string-valued cursor)
-GET {{Roman.RedisManager.Web_HostAddress}}/api/redis-keys?groupId={{RedisServerGroupId}}&pattern=*&cursor=12345&pageSize=100
+### Redis Key Search — continuation with continuationToken from a previous response
+GET {{Roman.RedisManager.Web_HostAddress}}/api/redis-keys?groupId={{RedisServerGroupId}}&pattern=*&continuationToken={{ContinuationToken}}&pageSize=100
 
 ###
 

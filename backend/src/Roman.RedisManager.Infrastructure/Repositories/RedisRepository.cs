@@ -7,6 +7,8 @@ using Roman.RedisManager.Infrastructure.Redis;
 using StackExchange.Redis;
 using System.Net;
 using System.Net.Sockets;
+using System.Security.Cryptography;
+using System.Text;
 using RedisKey = Roman.RedisManager.Domain.Entities.RedisKey;
 using Roman.RedisManager.Domain.Entities.Server;
 
@@ -16,17 +18,25 @@ namespace Roman.RedisManager.Infrastructure.Repositories
     {
         private readonly IRedisConnectionManager _connectionManager;
         private readonly IOptions<RedisConfiguration> _redisConfiguration;
+        private readonly IContinuationTokenCodec _continuationTokenCodec;
+        private readonly IOptions<ContinuationTokenConfiguration> _continuationTokenConfiguration;
 
-        public RedisRepository(IRedisConnectionManager connectionManager, IOptions<RedisConfiguration> redisConfiguration)
+        public RedisRepository(
+            IRedisConnectionManager connectionManager,
+            IOptions<RedisConfiguration> redisConfiguration,
+            IContinuationTokenCodec continuationTokenCodec,
+            IOptions<ContinuationTokenConfiguration> continuationTokenConfiguration)
         {
             _connectionManager = connectionManager ?? throw new ArgumentNullException(nameof(connectionManager));
             _redisConfiguration = redisConfiguration ?? throw new ArgumentNullException(nameof(redisConfiguration));
+            _continuationTokenCodec = continuationTokenCodec ?? throw new ArgumentNullException(nameof(continuationTokenCodec));
+            _continuationTokenConfiguration = continuationTokenConfiguration ?? throw new ArgumentNullException(nameof(continuationTokenConfiguration));
         }
 
         public async Task<RedisSearchResult> SearchForKeysAsync(
             Guid groupId,
             string pattern,
-            string cursor,
+            string? continuationToken,
             int pageSize)
         {
             if (groupId == Guid.Empty)
@@ -51,35 +61,27 @@ namespace Roman.RedisManager.Infrastructure.Repositories
                 var connection = await _connectionManager.GetConnectionAsync(groupId).ConfigureAwait(false);
 
                 var effectivePattern = string.IsNullOrEmpty(pattern) ? "*" : pattern;
+                var contextHash = ComputeContextHash(groupId, effectivePattern, pageSize);
 
-                // determine behaviour based on group type
+                ContinuationTokenEnvelope? envelope = null;
+                if (!string.IsNullOrWhiteSpace(continuationToken))
+                {
+                    envelope = _continuationTokenCodec.Decode(continuationToken);
+                    ValidateEnvelope(envelope, contextHash, group.GroupType);
+                }
+
                 if (group.GroupType == GroupType.Cluster)
                 {
-                    // perform scan across all master nodes in sequence, using a composite cursor string
                     var masters = connection.GetServers()
                         .Where(s => s != null && s.EndPoint != null && !s.IsReplica)
                         .ToList();
 
-                    // parse incoming cursor of form "nodeIndex:innerCursor" or just number
-                    int nodeIndex = 0;
-                    long innerCursor = 0;
-                    if (!string.IsNullOrEmpty(cursor))
-                    {
-                        var parts = cursor.Split(':');
-                        if (parts.Length >= 1 && int.TryParse(parts[0], out var ni))
-                        {
-                            nodeIndex = ni;
-                        }
-                        if (parts.Length == 2 && long.TryParse(parts[1], out var ic))
-                        {
-                            innerCursor = ic;
-                        }
-                    }
+                    var nodeIndex = envelope?.ClusterState?.NodeIndex ?? 0;
+                    var innerCursor = envelope?.ClusterState?.NodeCursor ?? 0;
 
                     var collected = new List<RedisKey>();
                     var nextNodeIndex = nodeIndex;
                     long nextInner = innerCursor;
-                    var nodeCursors = new Dictionary<string, long>(StringComparer.Ordinal);
 
                     while (collected.Count < pageSize && nextNodeIndex < masters.Count)
                     {
@@ -103,64 +105,93 @@ namespace Roman.RedisManager.Infrastructure.Repositories
                                 break;
                         }
 
-                        // register the cursor for this node
-                        var endpoint = server.EndPoint;
-                        var (host, port) = ResolveEndpoint(endpoint);
-                        var key = host + ":" + port;
-                        nodeCursors[key] = nextInner;
-
                         if (nextInner == 0)
                         {
-                            // finished this node, move to next
                             nextNodeIndex++;
                             nextInner = 0;
                         }
                         else
                         {
-                            // still working on this node; stop scanning further
                             break;
                         }
                     }
 
-                    // build the composite cursor string for the caller
-                    string compositeCursor;
-                    if (nextNodeIndex < masters.Count)
+                    var hasMore = nextNodeIndex < masters.Count;
+                    string? nextContinuationToken = null;
+                    if (hasMore)
                     {
-                        compositeCursor = nextNodeIndex + ":" + nextInner;
-                    }
-                    else
-                    {
-                        compositeCursor = "0";
+                        var nextEnvelope = new ContinuationTokenEnvelope
+                        {
+                            Version = 1,
+                            ContextHash = contextHash,
+                            Mode = ContinuationTokenMode.Cluster,
+                            IssuedAtUtc = DateTimeOffset.UtcNow,
+                            ClusterState = new ClusterCursorState(nextNodeIndex, nextInner, BuildTopologyFingerprint(masters))
+                        };
+
+                        nextContinuationToken = _continuationTokenCodec.Encode(nextEnvelope);
                     }
 
-                    var result = new RedisSearchResult(collected, 0)
+                    var result = new RedisSearchResult(collected, hasMore)
                     {
-                        NodeCursors = nodeCursors
+                        ContinuationToken = nextContinuationToken
                     };
                     return result;
                 }
                 else
                 {
-                    // standalone or single-instance behaviour stays the same; cursor must be numeric
-                    if (!long.TryParse(cursor, out var numericCursor))
-                    {
-                        numericCursor = 0;
-                    }
+                    var numericCursor = envelope?.StandaloneState?.Cursor ?? 0;
 
                     var server = GetServer(connection);
-                    var scanResult = await server.ExecuteAsync(
-                        "SCAN",
-                        numericCursor.ToString(),
-                        "MATCH",
-                        effectivePattern,
-                        "COUNT",
-                        pageSize.ToString()).ConfigureAwait(false);
+                    var keys = new List<RedisKey>();
+                    var nextCursor = numericCursor;
 
-                    var inner = (RedisResult[])scanResult!;
-                    var nextCursor = long.Parse((string)inner[0]!);
-                    var rawKeys = (RedisResult[])inner[1]!;
-                    var keys = rawKeys.Select(k => new RedisKey((string)k!)).ToList();
-                    return new RedisSearchResult(keys, nextCursor);
+                    // Avoid empty first-page responses that still require continuation when there are no matches.
+                    do
+                    {
+                        var scanResult = await server.ExecuteAsync(
+                            "SCAN",
+                            nextCursor.ToString(),
+                            "MATCH",
+                            effectivePattern,
+                            "COUNT",
+                            pageSize.ToString()).ConfigureAwait(false);
+
+                        var inner = (RedisResult[])scanResult!;
+                        nextCursor = long.Parse((string)inner[0]!);
+                        var rawKeys = (RedisResult[])inner[1]!;
+
+                        foreach (var key in rawKeys)
+                        {
+                            keys.Add(new RedisKey((string)key!));
+                            if (keys.Count >= pageSize)
+                            {
+                                break;
+                            }
+                        }
+                    }
+                    while (keys.Count == 0 && nextCursor != 0);
+
+                    var hasMore = nextCursor != 0;
+                    string? nextContinuationToken = null;
+                    if (hasMore)
+                    {
+                        var nextEnvelope = new ContinuationTokenEnvelope
+                        {
+                            Version = 1,
+                            ContextHash = contextHash,
+                            Mode = ContinuationTokenMode.Standalone,
+                            IssuedAtUtc = DateTimeOffset.UtcNow,
+                            StandaloneState = new StandaloneCursorState(nextCursor)
+                        };
+
+                        nextContinuationToken = _continuationTokenCodec.Encode(nextEnvelope);
+                    }
+
+                    return new RedisSearchResult(keys, hasMore)
+                    {
+                        ContinuationToken = nextContinuationToken
+                    };
                 }
             }
             catch (RedisConnectionException ex)
@@ -175,6 +206,71 @@ namespace Roman.RedisManager.Infrastructure.Repositories
             {
                 throw new RedisConnectionFailureException("Redis server returned an error while searching keys for the requested group.", ex);
             }
+        }
+
+        private void ValidateEnvelope(ContinuationTokenEnvelope envelope, string contextHash, GroupType groupType)
+        {
+            if (!string.Equals(envelope.ContextHash, contextHash, StringComparison.Ordinal))
+            {
+                throw new InvalidContinuationTokenException(
+                    ContinuationTokenError.ContinuationContextMismatch,
+                    "Continuation token does not match the current search parameters. Start a new search.");
+            }
+
+            if (groupType == GroupType.Cluster && envelope.Mode != ContinuationTokenMode.Cluster)
+            {
+                throw new InvalidContinuationTokenException(
+                    ContinuationTokenError.ContinuationContextMismatch,
+                    "Continuation token does not match the current search parameters. Start a new search.");
+            }
+
+            if (groupType == GroupType.Standalone && envelope.Mode != ContinuationTokenMode.Standalone)
+            {
+                throw new InvalidContinuationTokenException(
+                    ContinuationTokenError.ContinuationContextMismatch,
+                    "Continuation token does not match the current search parameters. Start a new search.");
+            }
+
+            if (groupType == GroupType.Cluster && envelope.ClusterState is null)
+            {
+                throw new InvalidContinuationTokenException(
+                    ContinuationTokenError.InvalidContinuationToken,
+                    "Continuation token is invalid. Start a new search.");
+            }
+
+            if (groupType == GroupType.Standalone && envelope.StandaloneState is null)
+            {
+                throw new InvalidContinuationTokenException(
+                    ContinuationTokenError.InvalidContinuationToken,
+                    "Continuation token is invalid. Start a new search.");
+            }
+
+            var tokenTtlMinutes = _continuationTokenConfiguration.Value.TokenTtlMinutes;
+            if (tokenTtlMinutes.HasValue && envelope.IssuedAtUtc.AddMinutes(tokenTtlMinutes.Value) < DateTimeOffset.UtcNow)
+            {
+                throw new InvalidContinuationTokenException(
+                    ContinuationTokenError.ContinuationNotResumable,
+                    "Continuation token can no longer be resumed. Start a new search.");
+            }
+        }
+
+        private static string BuildTopologyFingerprint(IReadOnlyCollection<IServer> masters)
+        {
+            var orderedEndpoints = masters
+                .Select(server => ResolveEndpoint(server.EndPoint))
+                .OrderBy(endpoint => endpoint.Host, StringComparer.Ordinal)
+                .ThenBy(endpoint => endpoint.Port)
+                .Select(endpoint => $"{endpoint.Host}:{endpoint.Port}");
+
+            return string.Join("|", orderedEndpoints);
+        }
+
+        private static string ComputeContextHash(Guid groupId, string pattern, int pageSize)
+        {
+            var raw = $"{groupId:N}|{pattern}|{pageSize}";
+            var bytes = Encoding.UTF8.GetBytes(raw);
+            var hash = SHA256.HashData(bytes);
+            return Convert.ToHexString(hash);
         }
 
         public async Task<IReadOnlyCollection<RedisServerNode>> GetServerNodesAsync(Guid groupId)

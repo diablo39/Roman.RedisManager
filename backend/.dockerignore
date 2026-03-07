@@ -1,0 +1,20 @@
+# Source control
+.git/
+
+# Build and test artifacts
+bin/
+obj/
+TestResults/
+
+# Local tooling and editor files
+.vs/
+.vscode/
+.idea/
+
+# Environment and logs
+.env*
+*.log*
+
+# Docker metadata
+Dockerfile*
+.dockerignore

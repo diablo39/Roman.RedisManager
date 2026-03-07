@@ -1734,11 +1734,10 @@
             }
           },
           {
-            "name": "cursor",
+            "name": "continuationToken",
             "in": "query",
             "schema": {
-              "type": "string",
-              "default": "0"
+              "type": "string"
             }
           },
           {
@@ -2632,8 +2631,8 @@
       "RedisKeysSearchQueryResult": {
         "required": [
           "keys",
-          "cursor",
-          "hasMoreResults"
+          "hasMoreResults",
+          "continuationToken"
         ],
         "type": "object",
         "properties": {
@@ -2643,30 +2642,14 @@
               "$ref": "#/components/schemas/RedisKeyDto"
             }
           },
-          "cursor": {
-            "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": [
-              "integer",
-              "string"
-            ],
-            "format": "int64"
-          },
           "hasMoreResults": {
             "type": "boolean"
           },
-          "nodeCursors": {
+          "continuationToken": {
             "type": [
               "null",
-              "object"
-            ],
-            "additionalProperties": {
-              "pattern": "^-?(?:0|[1-9]\\d*)$",
-              "type": [
-                "integer",
-                "string"
-              ],
-              "format": "int64"
-            }
+              "string"
+            ]
           }
         }
       },

@@ -10,12 +10,7 @@ namespace Roman.RedisManager.Application.CQRS
     {
         public Guid GroupId { get; set; }
         public string Pattern { get; set; } = "*";
-        /// <summary>
-        /// Composite cursor value. Clients should treat this as an opaque string;
-        /// when scanning a cluster the repository will return values like
-        /// "0:34" meaning page 34 of the first master node.
-        /// </summary>
-        public string Cursor { get; set; } = "0";
+        public string? ContinuationToken { get; set; }
         public int PageSize { get; set; } = 100;
     }
 
@@ -23,11 +18,8 @@ namespace Roman.RedisManager.Application.CQRS
 
     public record RedisKeysSearchQueryResult(
         IReadOnlyCollection<RedisKeyDto> Keys,
-        long Cursor,
-        bool HasMoreResults)
-    {
-        public Dictionary<string,long>? NodeCursors { get; init; }
-    };
+        bool HasMoreResults,
+        string? ContinuationToken);
 
     public static class RedisKeysSearchQueryHandler
     {
@@ -41,17 +33,16 @@ namespace Roman.RedisManager.Application.CQRS
             var result = await repository.SearchForKeysAsync(
                 query.GroupId,
                 query.Pattern,
-                query.Cursor,
+                query.ContinuationToken,
                 query.PageSize).ConfigureAwait(false);
 
             var dtos = result.Keys
                 .Select(k => new RedisKeyDto(k.Key))
                 .ToList();
 
-            return new RedisKeysSearchQueryResult(dtos, result.Cursor, result.HasMoreResults)
-            {
-                NodeCursors = result.NodeCursors
-            };
+            var nextToken = result.HasMoreResults ? result.ContinuationToken : null;
+
+            return new RedisKeysSearchQueryResult(dtos, result.HasMoreResults, nextToken);
         }
     }
 }

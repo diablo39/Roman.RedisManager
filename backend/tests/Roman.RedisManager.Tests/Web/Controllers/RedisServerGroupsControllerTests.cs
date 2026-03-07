@@ -70,7 +70,7 @@ namespace Roman.RedisManager.Tests.Web.Controllers
         private sealed class AlwaysFailingRedisRepository : IRedisRepository
         {
             public Task<RedisSearchResult> SearchForKeysAsync(
-                Guid groupId, string pattern, string cursor, int pageSize) =>
+                Guid groupId, string pattern, string? continuationToken, int pageSize) =>
                 throw new RedisConnectionFailureException(
                     "Simulated connection failure.", new Exception());
 
