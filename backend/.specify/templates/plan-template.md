@@ -27,6 +27,8 @@
 **Constraints**: [domain-specific, e.g., <200ms p95, <100MB memory, offline-capable or NEEDS CLARIFICATION]  
 **Scale/Scope**: [domain-specific, e.g., 10k users, 1M LOC, 50 screens or NEEDS CLARIFICATION]
 
+**Mutation Quality Loop**: If tests are in scope, plan MUST include `run -> analyze -> improve -> rerun`, output artifact paths (HTML/JSON/comparison), and exception handling for non-actionable mutants.
+
 ## Constitution Check
 
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*

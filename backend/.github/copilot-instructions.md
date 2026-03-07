@@ -6,6 +6,19 @@ All questions should be printed as a numbered list of options.
 
 Try to re-use existing code and if it is not possible, follow the conventions and patterns documented in this file to ensure consistency with the existing codebase.
 
+## Mutation Testing Quality Gate
+
+When creating or modifying tests (including AI-authored tests), contributors MUST execute the mutation loop `run -> analyze -> improve -> rerun` before considering the work complete.
+
+Required evidence:
+
+1. Mutation execution output (HTML and JSON reports).
+2. Surviving/no-coverage mutant analysis.
+3. Assertion updates that target actionable findings.
+4. Follow-up mutation run showing delta or an approved non-actionable exception.
+
+If actionable survivors remain, the loop MUST continue until threshold or approved exception is reached.
+
 ## 1. Overview
 
 This file enables AI coding assistants (GitHub Copilot, etc.) to generate features that are **consistent with the existing architecture, conventions, and patterns** of the Roman.RedisManager codebase.

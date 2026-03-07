@@ -1,0 +1,16 @@
+{
+  "stryker-config": {
+    "project": "Roman.RedisManager.Tests.csproj",
+    "reporters": [
+      "html",
+      "json"
+    ],
+    "thresholds": {
+      "high": 75,
+      "low": 60,
+      "break": 50
+    },
+    "concurrency": 2,
+    "verbosity": "info"
+  }
+}

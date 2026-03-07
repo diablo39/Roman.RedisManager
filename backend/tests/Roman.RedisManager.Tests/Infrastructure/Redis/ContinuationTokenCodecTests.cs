@@ -43,7 +43,8 @@ namespace Roman.RedisManager.Tests.Infrastructure.Redis
             };
 
             var token = codec.Encode(envelope);
-            var tampered = token[..^1] + (token[^1] == 'A' ? 'B' : 'A');
+            var tamperIndex = token.Length / 2;
+            var tampered = token[..tamperIndex] + (token[tamperIndex] == 'A' ? 'B' : 'A') + token[(tamperIndex + 1)..];
 
             var ex = Should.Throw<InvalidContinuationTokenException>(() => codec.Decode(tampered));
             ex.ErrorCode.ShouldBe(ContinuationTokenError.InvalidContinuationToken);

@@ -20,6 +20,39 @@
       },
       "problemMatcher": [],
       "label": "dotnet: test"
+    },
+    {
+      "type": "shell",
+      "label": "mutation: run",
+      "command": "pwsh",
+      "args": [
+        "-NoProfile",
+        "-File",
+        ".specify/scripts/powershell/run-mutation-tests.ps1"
+      ],
+      "problemMatcher": []
+    },
+    {
+      "type": "shell",
+      "label": "mutation: compare",
+      "command": "pwsh",
+      "args": [
+        "-NoProfile",
+        "-File",
+        ".specify/scripts/powershell/compare-mutation-reports.ps1"
+      ],
+      "problemMatcher": []
+    },
+    {
+      "type": "shell",
+      "label": "mutation: analyze",
+      "command": "pwsh",
+      "args": [
+        "-NoProfile",
+        "-File",
+        ".specify/scripts/powershell/analyze-surviving-mutants.ps1"
+      ],
+      "problemMatcher": []
     }
   ]
 }

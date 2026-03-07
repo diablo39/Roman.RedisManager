@@ -151,6 +151,14 @@ Additional constraints:
    `Roman.RedisManager.Web.http`.
 7. **Build Gate** — the solution MUST compile with zero warnings
    before a feature is considered complete.
+8. **Mutation Test Gate** — when tests are added or changed, the workflow MUST execute `run -> analyze -> improve -> rerun`.
+
+Mutation Test Gate enforcement:
+
+- Mutation reports MUST include HTML and JSON artifacts.
+- Surviving/no-coverage mutants MUST be triaged into actionable findings.
+- Actionable findings MUST trigger assertion updates followed by another mutation run.
+- If work ends with remaining survivors, an approved non-actionable exception record is REQUIRED.
 
 ## Governance
 

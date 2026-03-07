@@ -7,6 +7,11 @@
 
 ## User Scenarios & Testing *(mandatory)*
 
+### Mutation Quality Requirement *(mandatory when tests change)*
+
+- If this feature adds or modifies tests, the implementation MUST follow `run -> analyze -> improve -> rerun` for mutation quality.
+- The spec MUST identify where mutation reports (HTML/JSON), finding analysis, and iteration evidence are recorded.
+
 <!--
   IMPORTANT: User stories should be PRIORITIZED as user journeys ordered by importance.
   Each user story/journey must be INDEPENDENTLY TESTABLE - meaning if you implement just ONE of them,

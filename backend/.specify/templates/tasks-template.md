@@ -10,6 +10,8 @@ description: "Task list template for feature implementation"
 
 **Tests**: The examples below include test tasks. Tests are OPTIONAL - only include them if explicitly requested in the feature specification.
 
+When tests are added or modified, tasks MUST include explicit mutation loop steps: `run -> analyze -> improve -> rerun`, with artifacts and exception logging tasks.
+
 **Organization**: Tasks are grouped by user story to enable independent implementation and testing of each story.
 
 ## Format: `[ID] [P?] [Story] Description`
