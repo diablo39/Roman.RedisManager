@@ -5,7 +5,6 @@ using Roman.RedisManager.Infrastructure.Redis;
 using Roman.RedisManager.Infrastructure.Exceptions;
 using Roman.RedisManager.Infrastructure.Repositories;
 using Roman.RedisManager.Infrastructure.Repositories.RedisDataTypes;
-using Roman.RedisManager.Web.ProblemDetails;
 using Wolverine;
 using System.Diagnostics;
 using Microsoft.AspNetCore.Diagnostics;
@@ -48,24 +47,8 @@ namespace Roman.RedisManager.Web
                 {
                     var context = problemContext.HttpContext;
                     var details = problemContext.ProblemDetails;
-                    var exception = context.Features.Get<IExceptionHandlerFeature>()?.Error;
 
-                    if (exception is InvalidContinuationTokenException continuationException)
-                    {
-                        details.Status = StatusCodes.Status400BadRequest;
-                        details.Title = "Invalid continuation token";
-                        details.Detail = continuationException.Message;
-                        details.Type = ContinuationTokenProblemDetailsMapper.ToType(continuationException.ErrorCode);
-                        details.Extensions["code"] = ContinuationTokenProblemDetailsMapper.ToCode(continuationException.ErrorCode);
-
-                        var loggerFactory = context.RequestServices.GetRequiredService<ILoggerFactory>();
-                        var logger = loggerFactory.CreateLogger("ContinuationTokenProblemDetails");
-                        logger.LogWarning(
-                            "Rejected continuation token with error code {ErrorCode} on {RequestPath}",
-                            ContinuationTokenProblemDetailsMapper.ToCode(continuationException.ErrorCode),
-                            context.Request.Path.ToString());
-                    }
-
+                    // continuation-token specific handling moved to controller; keep only generic extensions here
                     var traceId = Activity.Current?.TraceId.ToString() ?? context.TraceIdentifier;
                     details.Extensions["traceId"] = traceId;
 
