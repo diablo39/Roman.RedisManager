@@ -1,7 +1,9 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using Roman.RedisManager.Application.CQRS;
 using Roman.RedisManager.Infrastructure.Exceptions;
+using Roman.RedisManager.Web.Authorization;
 using Roman.RedisManager.Web.ProblemDetails;
 using System;
 using System.Collections.Generic;
@@ -18,6 +20,7 @@ namespace Roman.RedisManager.Web.Controllers
         private readonly IMessageBus _bus = bus;
 
         [HttpGet]
+        [Authorize(Policy = AuthorizationPolicies.ReadKeys)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -78,6 +81,7 @@ namespace Roman.RedisManager.Web.Controllers
         }
 
         [HttpDelete("{key}")]
+        [Authorize(Policy = AuthorizationPolicies.DeleteKeysByGroup)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -112,6 +116,7 @@ namespace Roman.RedisManager.Web.Controllers
         }
 
         [HttpGet("{key}/metadata")]
+        [Authorize(Policy = AuthorizationPolicies.ReadKeys)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -146,6 +151,7 @@ namespace Roman.RedisManager.Web.Controllers
         }
 
         [HttpGet("{key}/value")]
+        [Authorize(Policy = AuthorizationPolicies.ReadKeys)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]

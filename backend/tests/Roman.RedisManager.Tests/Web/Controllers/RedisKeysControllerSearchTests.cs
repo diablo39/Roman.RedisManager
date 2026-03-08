@@ -11,6 +11,7 @@ using Roman.RedisManager.Domain.Entities.Server;
 using Roman.RedisManager.Domain.Repositories;
 using Roman.RedisManager.Web;
 using Xunit.Abstractions;
+using Roman.RedisManager.Tests.Web.Helpers;
 
 namespace Roman.RedisManager.Tests.Web.Controllers
 {
@@ -36,6 +37,7 @@ namespace Roman.RedisManager.Tests.Web.Controllers
             });
 
             var client = CreateClientWithRepository(repository, null);
+            TestAuthTokenFactory.ApplyBearer(client, "redis-reader", "editor", "admin");
 
             // Act
             var response = await client.GetAsync("/api/redis-keys?groupId=11111111-1111-1111-1111-111111111111&pattern=*&pageSize=10");
@@ -61,6 +63,7 @@ namespace Roman.RedisManager.Tests.Web.Controllers
                 .ToArray());
 
             var client = CreateClientWithRepository(repository, configuredMaxPageSize);
+            TestAuthTokenFactory.ApplyBearer(client, "redis-reader", "editor", "admin");
 
             // Act
             var response = await client.GetAsync("/api/redis-keys?groupId=11111111-1111-1111-1111-111111111111&pattern=cap:*&pageSize=999");
@@ -85,6 +88,7 @@ namespace Roman.RedisManager.Tests.Web.Controllers
                 .ToArray());
 
             var client = CreateClientWithRepository(repository, configuredMaxPageSize);
+            TestAuthTokenFactory.ApplyBearer(client, "redis-reader", "editor", "admin");
             var samples = new List<long>(100);
 
             // Act
@@ -127,6 +131,7 @@ namespace Roman.RedisManager.Tests.Web.Controllers
             var expected = sampleKeys.ToDictionary(key => key.Key, key => key.HasExpiration);
             var repository = new TrackingRedisRepository(sampleKeys);
             var client = CreateClientWithRepository(repository, null);
+            TestAuthTokenFactory.ApplyBearer(client, "redis-reader", "editor", "admin");
 
             // Act
             var response = await client.GetAsync("/api/redis-keys?groupId=11111111-1111-1111-1111-111111111111&pattern=sample:*&pageSize=20");

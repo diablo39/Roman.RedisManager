@@ -25,6 +25,7 @@ namespace Roman.RedisManager.Tests.Web.Controllers
         {
             // Arrange
             var client = _factory.CreateClient();
+            TestAuthTokenFactory.ApplyBearer(client, "redis-reader", "editor", "admin");
 
             // Act
             var response = await client.GetAsync("/api/redis-keys?groupId=not-a-guid");
@@ -53,6 +54,7 @@ namespace Roman.RedisManager.Tests.Web.Controllers
                     services.AddSingleton<IRedisRepository, InvalidContinuationTokenRepository>();
                 });
             }).CreateClient();
+            TestAuthTokenFactory.ApplyBearer(client, "redis-reader", "editor", "admin");
 
             // Act
             var response = await client.GetAsync($"/api/redis-keys?groupId={Guid.NewGuid()}&continuationToken=abc");

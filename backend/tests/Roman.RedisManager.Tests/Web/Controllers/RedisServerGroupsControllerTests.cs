@@ -7,6 +7,7 @@ using Roman.RedisManager.Domain.Entities.Server;
 using Roman.RedisManager.Domain.Repositories;
 using Roman.RedisManager.Infrastructure.Exceptions;
 using Roman.RedisManager.Web;
+using Roman.RedisManager.Tests.Web.Helpers;
 
 namespace Roman.RedisManager.Tests.Web.Controllers
 {
@@ -25,6 +26,7 @@ namespace Roman.RedisManager.Tests.Web.Controllers
 
             // Act
             var client = _factory.CreateClient();
+            TestAuthTokenFactory.ApplyBearer(client, "redis-reader", "editor", "admin");
 
             var response = await client.GetAsync("/api/redis-server-groups");
 
@@ -37,14 +39,12 @@ namespace Roman.RedisManager.Tests.Web.Controllers
         [Fact]
         public async Task GetServerGroupDetail_UnknownGroupId_Returns404()
         {
-
-
             // Arrange
-
-            // Act
             var client = _factory.CreateClient();
+            TestAuthTokenFactory.ApplyBearer(client, "redis-reader", "editor", "admin");
             var unknownId = Guid.NewGuid();
 
+            // Act
             var response = await client.GetAsync($"/api/redis-server-groups/{unknownId}");
 
             // Assert
@@ -54,7 +54,6 @@ namespace Roman.RedisManager.Tests.Web.Controllers
         [Fact]
         public async Task GetServerGroupDetail_RedisConnectionFailure_Returns500()
         {
-
             // Arrange
             // Override IRedisRepository with a stub that throws RedisConnectionFailureException
             // to simulate a Redis connectivity problem without needing a real broken server.
@@ -68,9 +67,7 @@ namespace Roman.RedisManager.Tests.Web.Controllers
 
                         d => d.ServiceType == typeof(IRedisRepository));
 
-            // Act
 
-            // Assert
                     if (descriptor is not null)
                     {
                         services.Remove(descriptor);
@@ -79,10 +76,13 @@ namespace Roman.RedisManager.Tests.Web.Controllers
                     services.AddSingleton<IRedisRepository, AlwaysFailingRedisRepository>();
                 });
             }).CreateClient();
+            TestAuthTokenFactory.ApplyBearer(client, "redis-reader", "editor", "admin");
 
+            // Act
             // Use a known group ID from appsettings.json ("11111111-1111-1111-1111-111111111111")
             var response = await client.GetAsync("/api/redis-server-groups/11111111-1111-1111-1111-111111111111");
 
+            // Assert
             response.StatusCode.ShouldBe(HttpStatusCode.InternalServerError);
         }
 

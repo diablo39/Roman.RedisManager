@@ -38,6 +38,7 @@ namespace Roman.RedisManager.Tests.Web.Controllers
                     services.AddSingleton<IRedisRepository, ExceptionThrowingRepository>();
                 });
             }).CreateClient();
+            TestAuthTokenFactory.ApplyBearer(client, "redis-reader", "editor", "admin");
 
             // Act
             var validGuid = Guid.NewGuid();
