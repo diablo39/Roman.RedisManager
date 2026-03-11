@@ -1,7 +1,9 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using Roman.RedisManager.Application.CQRS;
 using Roman.RedisManager.Infrastructure.Exceptions;
+using Roman.RedisManager.Web.Authorization;
 using System.Collections.Generic;
 using Wolverine;
 
@@ -17,6 +19,7 @@ namespace Roman.RedisManager.Web.Controllers
         public RedisServerGroupsController(IMessageBus bus) => _bus = bus;
 
         [HttpGet]
+        [Authorize(Policy = AuthorizationPolicies.ReadKeys)]
         public async Task<RedisServerGroupsQueryResult> GetServerGroups([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
         {
             return await _bus.InvokeAsync<RedisServerGroupsQueryResult>(
@@ -24,6 +27,7 @@ namespace Roman.RedisManager.Web.Controllers
         }
 
         [HttpGet("{id}")]
+        [Authorize(Policy = AuthorizationPolicies.ReadKeys)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]

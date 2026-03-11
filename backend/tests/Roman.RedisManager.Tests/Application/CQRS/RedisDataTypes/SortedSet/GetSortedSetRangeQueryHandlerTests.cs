@@ -9,6 +9,8 @@ namespace Roman.RedisManager.Tests.Application.CQRS.RedisDataTypes.SortedSet
         [Fact]
         public async Task Handle_ValidQuery_ReturnsEntries()
         {
+
+            // Arrange
             var expectedEntries = new[]
             {
                 new RedisSortedSetEntry("alpha", 1.0),
@@ -24,8 +26,10 @@ namespace Roman.RedisManager.Tests.Application.CQRS.RedisDataTypes.SortedSet
                 Stop = -1
             };
 
+            // Act
             var result = await GetSortedSetRangeQueryHandler.Handle(query, stub);
 
+            // Assert
             result.ShouldNotBeNull();
             result.Entries.ShouldNotBeEmpty();
             result.Entries.Count.ShouldBe(3);
@@ -37,11 +41,15 @@ namespace Roman.RedisManager.Tests.Application.CQRS.RedisDataTypes.SortedSet
         [Fact]
         public async Task Handle_EmptySortedSet_ReturnsEmptyCollection()
         {
+
+            // Arrange
             var stub = new StubSortedSetRepository(Array.Empty<RedisSortedSetEntry>());
             var query = new GetSortedSetRangeQuery { GroupId = Guid.NewGuid(), Key = "test:empty" };
 
+            // Act
             var result = await GetSortedSetRangeQueryHandler.Handle(query, stub);
 
+            // Assert
             result.ShouldNotBeNull();
             result.Entries.ShouldBeEmpty();
         }
@@ -49,8 +57,13 @@ namespace Roman.RedisManager.Tests.Application.CQRS.RedisDataTypes.SortedSet
         [Fact]
         public async Task Handle_NullQuery_ThrowsArgumentNullException()
         {
+
+            // Arrange
             var stub = new StubSortedSetRepository(Array.Empty<RedisSortedSetEntry>());
 
+            // Act
+
+            // Assert
             await Should.ThrowAsync<ArgumentNullException>(
                 () => GetSortedSetRangeQueryHandler.Handle(null!, stub));
         }
@@ -58,8 +71,13 @@ namespace Roman.RedisManager.Tests.Application.CQRS.RedisDataTypes.SortedSet
         [Fact]
         public async Task Handle_NullRepository_ThrowsArgumentNullException()
         {
+
+            // Arrange
             var query = new GetSortedSetRangeQuery { GroupId = Guid.NewGuid(), Key = "k" };
 
+            // Act
+
+            // Assert
             await Should.ThrowAsync<ArgumentNullException>(
                 () => GetSortedSetRangeQueryHandler.Handle(query, null!));
         }

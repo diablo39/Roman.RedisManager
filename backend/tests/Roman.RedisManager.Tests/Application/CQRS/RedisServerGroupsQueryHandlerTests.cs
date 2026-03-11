@@ -10,11 +10,15 @@ namespace Roman.RedisManager.Tests.Application.CQRS
         [Fact]
         public void Handle_WithMultipleGroups_FirstPage_ReturnsCorrectSlice()
         {
+
+            // Arrange
             var options = CreateOptions(CreateGroups(5));
             var query = new RedisServerGroupsQuery { PageNumber = 1, PageSize = 2 };
 
+            // Act
             var result = RedisServerGroupsQueryHandler.Handle(query, options);
 
+            // Assert
             result.ServerGroups.Count.ShouldBe(2);
             result.ServerGroups[0].Name.ShouldBe("Group-0");
             result.ServerGroups[1].Name.ShouldBe("Group-1");
@@ -26,11 +30,15 @@ namespace Roman.RedisManager.Tests.Application.CQRS
         [Fact]
         public void Handle_WithMultipleGroups_SecondPage_ReturnsCorrectSlice()
         {
+
+            // Arrange
             var options = CreateOptions(CreateGroups(5));
             var query = new RedisServerGroupsQuery { PageNumber = 2, PageSize = 2 };
 
+            // Act
             var result = RedisServerGroupsQueryHandler.Handle(query, options);
 
+            // Assert
             result.ServerGroups.Count.ShouldBe(2);
             result.ServerGroups[0].Name.ShouldBe("Group-2");
             result.ServerGroups[1].Name.ShouldBe("Group-3");
@@ -42,11 +50,15 @@ namespace Roman.RedisManager.Tests.Application.CQRS
         [Fact]
         public void Handle_PageBeyondEnd_ReturnsEmptyPage()
         {
+
+            // Arrange
             var options = CreateOptions(CreateGroups(3));
             var query = new RedisServerGroupsQuery { PageNumber = 99, PageSize = 10 };
 
+            // Act
             var result = RedisServerGroupsQueryHandler.Handle(query, options);
 
+            // Assert
             result.ServerGroups.ShouldBeEmpty();
             result.TotalCount.ShouldBe(3);
             result.PageNumber.ShouldBe(99);
@@ -56,11 +68,15 @@ namespace Roman.RedisManager.Tests.Application.CQRS
         [Fact]
         public void Handle_TotalCount_AlwaysReflectsFullListLength()
         {
+
+            // Arrange
             var options = CreateOptions(CreateGroups(7));
             var query = new RedisServerGroupsQuery { PageNumber = 1, PageSize = 3 };
 
+            // Act
             var result = RedisServerGroupsQueryHandler.Handle(query, options);
 
+            // Assert
             result.TotalCount.ShouldBe(7);
             result.ServerGroups.Count.ShouldBe(3);
             result.PageNumber.ShouldBe(1);
@@ -70,11 +86,15 @@ namespace Roman.RedisManager.Tests.Application.CQRS
         [Fact]
         public void Handle_WithEmptyServerGroups_ReturnsEmptyResult()
         {
+
+            // Arrange
             var options = CreateOptions(Array.Empty<RedisServerGroupConfiguration>());
             var query = new RedisServerGroupsQuery { PageNumber = 1, PageSize = 10 };
 
+            // Act
             var result = RedisServerGroupsQueryHandler.Handle(query, options);
 
+            // Assert
             result.ServerGroups.ShouldBeEmpty();
             result.TotalCount.ShouldBe(0);
             result.PageNumber.ShouldBe(1);
@@ -84,6 +104,8 @@ namespace Roman.RedisManager.Tests.Application.CQRS
         [Fact]
         public void Handle_Mapping_GroupTypeAndIdForwardedCorrectly()
         {
+
+            // Arrange
             var id = Guid.Parse("12345678-1234-1234-1234-123456789abc");
             var options = Options.Create(new RedisConfiguration
             {
@@ -100,8 +122,10 @@ namespace Roman.RedisManager.Tests.Application.CQRS
             });
             var query = new RedisServerGroupsQuery { PageNumber = 1, PageSize = 10 };
 
+            // Act
             var result = RedisServerGroupsQueryHandler.Handle(query, options);
 
+            // Assert
             result.ServerGroups.Count.ShouldBe(1);
             result.ServerGroups[0].Id.ShouldBe(id);
             result.ServerGroups[0].Name.ShouldBe("mapped-group");

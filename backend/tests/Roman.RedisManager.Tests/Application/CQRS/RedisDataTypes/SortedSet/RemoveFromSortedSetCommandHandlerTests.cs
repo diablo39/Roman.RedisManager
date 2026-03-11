@@ -9,6 +9,8 @@ namespace Roman.RedisManager.Tests.Application.CQRS.RedisDataTypes.SortedSet
         [Fact]
         public async Task Handle_ValidCommand_ReturnsRemovedCount()
         {
+
+            // Arrange
             var stub = new StubSortedSetRepository(removedCount: 2);
             var command = new RemoveFromSortedSetCommand
             {
@@ -17,8 +19,10 @@ namespace Roman.RedisManager.Tests.Application.CQRS.RedisDataTypes.SortedSet
                 Members = ["alpha", "beta"]
             };
 
+            // Act
             var result = await RemoveFromSortedSetCommandHandler.Handle(command, stub);
 
+            // Assert
             result.ShouldNotBeNull();
             result.RemovedCount.ShouldBe(2L);
         }
@@ -26,6 +30,8 @@ namespace Roman.RedisManager.Tests.Application.CQRS.RedisDataTypes.SortedSet
         [Fact]
         public async Task Handle_MembersNotFound_ReturnsZero()
         {
+
+            // Arrange
             var stub = new StubSortedSetRepository(removedCount: 0);
             var command = new RemoveFromSortedSetCommand
             {
@@ -34,16 +40,23 @@ namespace Roman.RedisManager.Tests.Application.CQRS.RedisDataTypes.SortedSet
                 Members = ["missing"]
             };
 
+            // Act
             var result = await RemoveFromSortedSetCommandHandler.Handle(command, stub);
 
+            // Assert
             result.RemovedCount.ShouldBe(0L);
         }
 
         [Fact]
         public async Task Handle_NullCommand_ThrowsArgumentNullException()
         {
+
+            // Arrange
             var stub = new StubSortedSetRepository(0);
 
+            // Act
+
+            // Assert
             await Should.ThrowAsync<ArgumentNullException>(
                 () => RemoveFromSortedSetCommandHandler.Handle(null!, stub));
         }
@@ -51,8 +64,13 @@ namespace Roman.RedisManager.Tests.Application.CQRS.RedisDataTypes.SortedSet
         [Fact]
         public async Task Handle_NullRepository_ThrowsArgumentNullException()
         {
+
+            // Arrange
             var command = new RemoveFromSortedSetCommand { GroupId = Guid.NewGuid(), Key = "k", Members = ["m"] };
 
+            // Act
+
+            // Assert
             await Should.ThrowAsync<ArgumentNullException>(
                 () => RemoveFromSortedSetCommandHandler.Handle(command, null!));
         }

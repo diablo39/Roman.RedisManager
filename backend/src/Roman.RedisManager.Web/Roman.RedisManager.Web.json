@@ -2598,12 +2598,30 @@
       },
       "RedisKeyDto": {
         "required": [
-          "key"
+          "key",
+          "type",
+          "ttlMilliseconds",
+          "hasExpiration"
         ],
         "type": "object",
         "properties": {
           "key": {
             "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "ttlMilliseconds": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "null",
+              "integer",
+              "string"
+            ],
+            "format": "int64"
+          },
+          "hasExpiration": {
+            "type": "boolean"
           }
         }
       },

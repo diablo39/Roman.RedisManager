@@ -20,9 +20,14 @@ namespace Roman.RedisManager.Tests.Web.Controllers
         [Fact]
         public async Task InvalidInput_ReturnsValidationProblemDetails()
         {
+            // Arrange
             var client = _factory.CreateClient();
+            TestAuthTokenFactory.ApplyBearer(client, "redis-reader", "editor", "admin");
 
+            // Act
             var response = await client.GetAsync("/api/redis-keys?groupId=not-a-guid");
+
+            // Assert
             response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
 
             var validation = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>();
@@ -34,12 +39,17 @@ namespace Roman.RedisManager.Tests.Web.Controllers
         [Fact]
         public async Task UnknownRoute_ReturnsProblemDetails404()
         {
+            // Arrange
             var client = _factory.CreateClient();
 
+            // Act
             var response = await client.GetAsync("/api/this-route-does-not-exist");
+
+            // Assert
             response.StatusCode.ShouldBe(HttpStatusCode.NotFound);
 
             var problem = await response.Content.ReadFromJsonAsync<Microsoft.AspNetCore.Mvc.ProblemDetails>();
+            problem.ShouldNotBeNull();
             problem.ShouldBeValidProblemDetails();
         }
     }

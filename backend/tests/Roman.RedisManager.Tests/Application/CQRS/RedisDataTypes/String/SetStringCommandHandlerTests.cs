@@ -9,6 +9,8 @@ namespace Roman.RedisManager.Tests.Application.CQRS.RedisDataTypes.String
         [Fact]
         public async Task Handle_ConditionNone_ReturnsSuccess()
         {
+
+            // Arrange
             var stub = new StubStringRepository(setResult: true);
             var command = new SetStringCommand
             {
@@ -18,8 +20,10 @@ namespace Roman.RedisManager.Tests.Application.CQRS.RedisDataTypes.String
                 Condition = SetCondition.None
             };
 
+            // Act
             var result = await SetStringCommandHandler.Handle(command, stub);
 
+            // Assert
             result.ShouldNotBeNull();
             result.Success.ShouldBeTrue();
         }
@@ -27,6 +31,8 @@ namespace Roman.RedisManager.Tests.Application.CQRS.RedisDataTypes.String
         [Fact]
         public async Task Handle_NotExistsConditionOnExistingKey_ReturnsFailure()
         {
+
+            // Arrange
             var stub = new StubStringRepository(setResult: false);
             var command = new SetStringCommand
             {
@@ -36,8 +42,10 @@ namespace Roman.RedisManager.Tests.Application.CQRS.RedisDataTypes.String
                 Condition = SetCondition.NotExists
             };
 
+            // Act
             var result = await SetStringCommandHandler.Handle(command, stub);
 
+            // Assert
             result.ShouldNotBeNull();
             result.Success.ShouldBeFalse();
         }
@@ -45,8 +53,13 @@ namespace Roman.RedisManager.Tests.Application.CQRS.RedisDataTypes.String
         [Fact]
         public async Task Handle_NullCommand_ThrowsArgumentNullException()
         {
+
+            // Arrange
             var stub = new StubStringRepository(setResult: true);
 
+            // Act
+
+            // Assert
             await Should.ThrowAsync<ArgumentNullException>(
                 () => SetStringCommandHandler.Handle(null!, stub));
         }
@@ -54,8 +67,13 @@ namespace Roman.RedisManager.Tests.Application.CQRS.RedisDataTypes.String
         [Fact]
         public async Task Handle_NullRepository_ThrowsArgumentNullException()
         {
+
+            // Arrange
             var command = new SetStringCommand { GroupId = Guid.NewGuid(), Key = "k", Value = "v" };
 
+            // Act
+
+            // Assert
             await Should.ThrowAsync<ArgumentNullException>(
                 () => SetStringCommandHandler.Handle(command, null!));
         }
@@ -63,6 +81,8 @@ namespace Roman.RedisManager.Tests.Application.CQRS.RedisDataTypes.String
         [Fact]
         public async Task Handle_ValidCommand_ForwardsConditionAndTtlToRepository()
         {
+
+            // Arrange
             var capturing = new CapturingStringRepository();
             var command = new SetStringCommand
             {
@@ -73,8 +93,10 @@ namespace Roman.RedisManager.Tests.Application.CQRS.RedisDataTypes.String
                 Condition = SetCondition.NotExists
             };
 
+            // Act
             await SetStringCommandHandler.Handle(command, capturing);
 
+            // Assert
             capturing.ReceivedCondition.ShouldBe(SetCondition.NotExists);
             capturing.ReceivedTtl.ShouldBe(TimeSpan.FromMinutes(10));
         }

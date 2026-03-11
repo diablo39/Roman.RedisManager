@@ -14,6 +14,8 @@ namespace Roman.RedisManager.Tests.Application.CQRS
         [Fact]
         public async Task Handle_ExistingGroup_ReturnsNodes()
         {
+
+            // Arrange
             var repository = new InMemoryRedisRepository(new Dictionary<Guid, IReadOnlyCollection<RedisServerNode>>
             {
                 [Guid.Parse("11111111-1111-1111-1111-111111111111")] = new List<RedisServerNode>
@@ -25,8 +27,10 @@ namespace Roman.RedisManager.Tests.Application.CQRS
 
             var query = new RedisServerGroupDetailQuery { Id = Guid.Parse("11111111-1111-1111-1111-111111111111") };
 
+            // Act
             var result = await RedisServerGroupDetailQueryHandler.Handle(query, repository);
 
+            // Assert
             result.Nodes.ShouldNotBeNull();
             result.Nodes.Count.ShouldBe(2);
             result.Nodes.ShouldContain(node => node.Role == "master");
@@ -38,17 +42,27 @@ namespace Roman.RedisManager.Tests.Application.CQRS
         [Fact]
         public async Task Handle_MissingGroup_ThrowsKeyNotFoundException()
         {
+
+            // Arrange
             var repository = new InMemoryRedisRepository(new Dictionary<Guid, IReadOnlyCollection<RedisServerNode>>());
             var query = new RedisServerGroupDetailQuery { Id = Guid.Parse("00000000-0000-0000-0000-000000000000") };
 
+            // Act
+
+            // Assert
             await Should.ThrowAsync<KeyNotFoundException>(() => RedisServerGroupDetailQueryHandler.Handle(query, repository));
         }
 
         [Fact]
         public async Task Handle_NullQuery_ThrowsArgumentNullException()
         {
+
+            // Arrange
             var repository = new InMemoryRedisRepository(new Dictionary<Guid, IReadOnlyCollection<RedisServerNode>>());
 
+            // Act
+
+            // Assert
             await Should.ThrowAsync<ArgumentNullException>(
                 () => RedisServerGroupDetailQueryHandler.Handle(null!, repository));
         }
@@ -56,8 +70,13 @@ namespace Roman.RedisManager.Tests.Application.CQRS
         [Fact]
         public async Task Handle_NullRepository_ThrowsArgumentNullException()
         {
+
+            // Arrange
             var query = new RedisServerGroupDetailQuery { Id = Guid.NewGuid() };
 
+            // Act
+
+            // Assert
             await Should.ThrowAsync<ArgumentNullException>(
                 () => RedisServerGroupDetailQueryHandler.Handle(query, null!));
         }

@@ -9,6 +9,8 @@ namespace Roman.RedisManager.Tests.Application.CQRS.RedisDataTypes.List
         [Fact]
         public async Task Handle_ValidQuery_ReturnsValues()
         {
+
+            // Arrange
             var expectedValues = new[] { "a", "b", "c" };
             var stub = new StubListRepository(expectedValues);
             var query = new GetListRangeQuery
@@ -19,8 +21,10 @@ namespace Roman.RedisManager.Tests.Application.CQRS.RedisDataTypes.List
                 Stop = -1
             };
 
+            // Act
             var result = await GetListRangeQueryHandler.Handle(query, stub);
 
+            // Assert
             result.ShouldNotBeNull();
             result.Values.ShouldNotBeEmpty();
             result.Values.ShouldBe(expectedValues);
@@ -29,6 +33,8 @@ namespace Roman.RedisManager.Tests.Application.CQRS.RedisDataTypes.List
         [Fact]
         public async Task Handle_EmptyList_ReturnsEmptyCollection()
         {
+
+            // Arrange
             var stub = new StubListRepository(Array.Empty<string>());
             var query = new GetListRangeQuery
             {
@@ -36,8 +42,10 @@ namespace Roman.RedisManager.Tests.Application.CQRS.RedisDataTypes.List
                 Key = "test:empty"
             };
 
+            // Act
             var result = await GetListRangeQueryHandler.Handle(query, stub);
 
+            // Assert
             result.ShouldNotBeNull();
             result.Values.ShouldBeEmpty();
         }
@@ -45,8 +53,13 @@ namespace Roman.RedisManager.Tests.Application.CQRS.RedisDataTypes.List
         [Fact]
         public async Task Handle_NullQuery_ThrowsArgumentNullException()
         {
+
+            // Arrange
             var stub = new StubListRepository(Array.Empty<string>());
 
+            // Act
+
+            // Assert
             await Should.ThrowAsync<ArgumentNullException>(
                 () => GetListRangeQueryHandler.Handle(null!, stub));
         }
@@ -54,8 +67,13 @@ namespace Roman.RedisManager.Tests.Application.CQRS.RedisDataTypes.List
         [Fact]
         public async Task Handle_NullRepository_ThrowsArgumentNullException()
         {
+
+            // Arrange
             var query = new GetListRangeQuery { GroupId = Guid.NewGuid(), Key = "k" };
 
+            // Act
+
+            // Assert
             await Should.ThrowAsync<ArgumentNullException>(
                 () => GetListRangeQueryHandler.Handle(query, null!));
         }

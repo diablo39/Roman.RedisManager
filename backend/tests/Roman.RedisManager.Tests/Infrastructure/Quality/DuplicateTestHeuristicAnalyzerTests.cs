@@ -12,6 +12,8 @@ namespace Roman.RedisManager.Tests.Infrastructure.Quality
         [Fact]
         public void Analyze_HighOverlapWithoutUniqueAssertionIntent_ReturnsPotentialDuplicate()
         {
+
+            // Arrange
             var analyzer = new DuplicateTestHeuristicAnalyzer();
             var footprints = new[]
             {
@@ -21,6 +23,9 @@ namespace Roman.RedisManager.Tests.Infrastructure.Quality
 
             var findings = analyzer.Analyze(footprints);
 
+            // Act
+
+            // Assert
             findings.Count.ShouldBe(1);
             findings.Single().Category.ShouldBe(MutationFindingCategory.PotentialDuplicateTest);
         }
@@ -28,6 +33,8 @@ namespace Roman.RedisManager.Tests.Infrastructure.Quality
         [Fact]
         public void Analyze_UniqueAssertionIntentPresent_ReturnsNoDuplicateFinding()
         {
+
+            // Arrange
             var analyzer = new DuplicateTestHeuristicAnalyzer();
             var footprints = new[]
             {
@@ -37,6 +44,9 @@ namespace Roman.RedisManager.Tests.Infrastructure.Quality
 
             var findings = analyzer.Analyze(footprints);
 
+            // Act
+
+            // Assert
             findings.ShouldBeEmpty();
         }
     }

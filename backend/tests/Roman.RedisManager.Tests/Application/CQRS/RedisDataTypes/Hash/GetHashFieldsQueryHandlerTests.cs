@@ -10,6 +10,8 @@ namespace Roman.RedisManager.Tests.Application.CQRS.RedisDataTypes.Hash
         [Fact]
         public async Task Handle_ValidQuery_ReturnsFields()
         {
+
+            // Arrange
             var hashEntries = new[]
             {
                 new RedisHashEntry("name", "Alice"),
@@ -24,8 +26,10 @@ namespace Roman.RedisManager.Tests.Application.CQRS.RedisDataTypes.Hash
                 PageSize = 100
             };
 
+            // Act
             var result = await GetHashFieldsQueryHandler.Handle(query, stub);
 
+            // Assert
             result.ShouldNotBeNull();
             result.Fields.ShouldNotBeEmpty();
             result.Fields.Count.ShouldBe(2);
@@ -38,11 +42,15 @@ namespace Roman.RedisManager.Tests.Application.CQRS.RedisDataTypes.Hash
         [Fact]
         public async Task Handle_WithMoreResults_ReturnsNonZeroCursor()
         {
+
+            // Arrange
             var stub = new StubHashRepository(new RedisScanResult<RedisHashEntry>(99, new[] { new RedisHashEntry("f", "v") }));
             var query = new GetHashFieldsQuery { GroupId = Guid.NewGuid(), Key = "test:hash", PageSize = 1 };
 
+            // Act
             var result = await GetHashFieldsQueryHandler.Handle(query, stub);
 
+            // Assert
             result.Cursor.ShouldBe(99L);
             result.HasMoreResults.ShouldBeTrue();
             result.Fields.Count.ShouldBe(1);
@@ -52,8 +60,13 @@ namespace Roman.RedisManager.Tests.Application.CQRS.RedisDataTypes.Hash
         [Fact]
         public async Task Handle_NullQuery_ThrowsArgumentNullException()
         {
+
+            // Arrange
             var stub = new StubHashRepository(new RedisScanResult<RedisHashEntry>(0, Array.Empty<RedisHashEntry>()));
 
+            // Act
+
+            // Assert
             await Should.ThrowAsync<ArgumentNullException>(
                 () => GetHashFieldsQueryHandler.Handle(null!, stub));
         }
@@ -61,8 +74,13 @@ namespace Roman.RedisManager.Tests.Application.CQRS.RedisDataTypes.Hash
         [Fact]
         public async Task Handle_NullRepository_ThrowsArgumentNullException()
         {
+
+            // Arrange
             var query = new GetHashFieldsQuery { GroupId = Guid.NewGuid(), Key = "k" };
 
+            // Act
+
+            // Assert
             await Should.ThrowAsync<ArgumentNullException>(
                 () => GetHashFieldsQueryHandler.Handle(query, null!));
         }

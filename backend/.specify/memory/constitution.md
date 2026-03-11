@@ -1,13 +1,10 @@
 <!--
   Sync Impact Report
   ==================
-  Version change: 0.0.0 → 1.0.0 (MAJOR: initial ratification)
-  Modified principles: N/A (initial version)
-  Added sections:
-    - Core Principles (5 principles)
-    - Technology Stack & Constraints
-    - Development Workflow & Quality Gates
-    - Governance
+  Version change: 1.0.0 → 1.1.0 (MINOR: expanded mandatory test discipline)
+  Modified principles:
+    - IV. Test Discipline (AAA section comments now mandatory)
+  Added sections: N/A
   Removed sections: N/A
   Templates requiring updates:
     - .specify/templates/plan-template.md           ✅ no changes needed
@@ -79,6 +76,7 @@ infrastructure details out of upper layers.
 
 - Use **xUnit** `[Fact]` tests with **Shouldly** assertions.
 - Method naming: `MethodName_Condition_ExpectedBehavior`.
+- Every test method MUST contain explicit section comments in this order: `// Arrange`, `// Act`, `// Assert`.
 - Instantiate **real implementations** — no Moq, NSubstitute, or
   other mocking frameworks.
 - Use `Options.Create(...)` with private helper methods for
@@ -146,7 +144,8 @@ Additional constraints:
    following the existing registration order: Options →
    Singletons → Controllers → OpenApi → Wolverine.
 5. **Tests** — add xUnit/Shouldly facts exercising the new
-   repository or handler against a real Redis instance.
+  repository or handler against a real Redis instance, and include
+  `// Arrange`, `// Act`, `// Assert` section markers in each test.
 6. **HTTP File** — append a sample request to
    `Roman.RedisManager.Web.http`.
 7. **Build Gate** — the solution MUST compile with zero warnings
@@ -183,4 +182,4 @@ conflicting guidance found elsewhere in the repository.
   `.github/copilot-instructions.md` and the instruction files
   under `.github/instructions/`.
 
-**Version**: 1.0.0 | **Ratified**: 2026-03-02 | **Last Amended**: 2026-03-02
+**Version**: 1.1.0 | **Ratified**: 2026-03-02 | **Last Amended**: 2026-03-07

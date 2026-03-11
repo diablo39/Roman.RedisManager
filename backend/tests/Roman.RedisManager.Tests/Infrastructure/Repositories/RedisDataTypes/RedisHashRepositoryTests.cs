@@ -19,26 +19,36 @@ namespace Roman.RedisManager.Tests.Infrastructure.Repositories.RedisDataTypes
         [Fact]
         public async Task SetHashFieldsAsync_NewFields_SetsFields()
         {
+
+            // Arrange
             var connectionMultiplexer = ConnectionMultiplexer.Connect(_fixture.ConnectionString + ",allowAdmin=true");
             var (repo, groupId) = CreateRepository(connectionMultiplexer);
             var key = "hash:set:" + Guid.NewGuid();
 
+            // Act
             await repo.SetHashFieldsAsync(groupId, key, new Dictionary<string, string> { ["name"] = "Alice", ["age"] = "30" }, null);
 
             var count = await connectionMultiplexer.GetDatabase().HashLengthAsync(key);
+
+            // Assert
             count.ShouldBe(2);
         }
 
         [Fact]
         public async Task SetHashFieldsAsync_WithTtl_SetsExpiry()
         {
+
+            // Arrange
             var connectionMultiplexer = ConnectionMultiplexer.Connect(_fixture.ConnectionString + ",allowAdmin=true");
             var (repo, groupId) = CreateRepository(connectionMultiplexer);
             var key = "hash:ttl:" + Guid.NewGuid();
 
+            // Act
             await repo.SetHashFieldsAsync(groupId, key, new Dictionary<string, string> { ["f"] = "v" }, TimeSpan.FromSeconds(60));
 
             var ttl = await connectionMultiplexer.GetDatabase().KeyTimeToLiveAsync(key);
+
+            // Assert
             ttl.ShouldNotBeNull();
             ttl!.Value.TotalMilliseconds.ShouldBeGreaterThan(0);
         }
@@ -46,10 +56,13 @@ namespace Roman.RedisManager.Tests.Infrastructure.Repositories.RedisDataTypes
         [Fact]
         public async Task HashScanAsync_ExistingHash_ReturnsFields()
         {
+
+            // Arrange
             var connectionMultiplexer = ConnectionMultiplexer.Connect(_fixture.ConnectionString + ",allowAdmin=true");
             var (repo, groupId) = CreateRepository(connectionMultiplexer);
             var key = "hash:scan:" + Guid.NewGuid();
 
+            // Act
             await connectionMultiplexer.GetDatabase().HashSetAsync(key, new HashEntry[]
             {
                 new("name", "Bob"),
@@ -58,6 +71,7 @@ namespace Roman.RedisManager.Tests.Infrastructure.Repositories.RedisDataTypes
 
             var result = await repo.HashScanAsync(groupId, key, 0, 100);
 
+            // Assert
             result.ShouldNotBeNull();
             result.Items.ShouldNotBeEmpty();
             result.Items.ShouldContain(e => e.Field == "name" && e.Value == "Bob");
@@ -68,11 +82,15 @@ namespace Roman.RedisManager.Tests.Infrastructure.Repositories.RedisDataTypes
         [Fact]
         public async Task HashScanAsync_NonExistentKey_ReturnsEmpty()
         {
+
+            // Arrange
             var connectionMultiplexer = ConnectionMultiplexer.Connect(_fixture.ConnectionString + ",allowAdmin=true");
             var (repo, groupId) = CreateRepository(connectionMultiplexer);
 
+            // Act
             var result = await repo.HashScanAsync(groupId, "hash:missing:" + Guid.NewGuid(), 0, 100);
 
+            // Assert
             result.ShouldNotBeNull();
             result.Items.ShouldBeEmpty();
             result.HasMoreResults.ShouldBeFalse();
@@ -81,10 +99,13 @@ namespace Roman.RedisManager.Tests.Infrastructure.Repositories.RedisDataTypes
         [Fact]
         public async Task RemoveHashFieldsAsync_ExistingFields_ReturnsRemovedCount()
         {
+
+            // Arrange
             var connectionMultiplexer = ConnectionMultiplexer.Connect(_fixture.ConnectionString + ",allowAdmin=true");
             var (repo, groupId) = CreateRepository(connectionMultiplexer);
             var key = "hash:remove:" + Guid.NewGuid();
 
+            // Act
             await connectionMultiplexer.GetDatabase().HashSetAsync(key, new HashEntry[]
             {
                 new("name", "Alice"),
@@ -94,30 +115,40 @@ namespace Roman.RedisManager.Tests.Infrastructure.Repositories.RedisDataTypes
 
             var removed = await repo.RemoveHashFieldsAsync(groupId, key, ["name", "age"]);
 
+            // Assert
             removed.ShouldBe(2L);
         }
 
         [Fact]
         public async Task RemoveHashFieldsAsync_NonExistentField_ReturnsZero()
         {
+
+            // Arrange
             var connectionMultiplexer = ConnectionMultiplexer.Connect(_fixture.ConnectionString + ",allowAdmin=true");
             var (repo, groupId) = CreateRepository(connectionMultiplexer);
             var key = "hash:remove:missing:" + Guid.NewGuid();
 
+            // Act
             await connectionMultiplexer.GetDatabase().HashSetAsync(key, new HashEntry[] { new("f", "v") });
 
             var removed = await repo.RemoveHashFieldsAsync(groupId, key, ["nonexistent"]);
 
+            // Assert
             removed.ShouldBe(0L);
         }
 
         [Fact]
         public async Task SetHashFieldsAsync_EmptyGroupId_ThrowsArgumentException()
         {
+
+            // Arrange
             var connectionMultiplexer = ConnectionMultiplexer.Connect(_fixture.ConnectionString + ",allowAdmin=true");
+
+            // Act
             await using IRedisConnectionManager connectionManager = new TestRedisConnectionManager(connectionMultiplexer);
             IRedisHashRepository repo = new RedisHashRepository(connectionManager, CreateOptions());
 
+            // Assert
             await Should.ThrowAsync<ArgumentException>(
                 () => repo.SetHashFieldsAsync(Guid.Empty, "k", new Dictionary<string, string> { ["f"] = "v" }, null));
         }
@@ -125,10 +156,15 @@ namespace Roman.RedisManager.Tests.Infrastructure.Repositories.RedisDataTypes
         [Fact]
         public async Task HashScanAsync_EmptyGroupId_ThrowsArgumentException()
         {
+
+            // Arrange
             var connectionMultiplexer = ConnectionMultiplexer.Connect(_fixture.ConnectionString + ",allowAdmin=true");
+
+            // Act
             await using IRedisConnectionManager connectionManager = new TestRedisConnectionManager(connectionMultiplexer);
             IRedisHashRepository repo = new RedisHashRepository(connectionManager, CreateOptions());
 
+            // Assert
             await Should.ThrowAsync<ArgumentException>(
                 () => repo.HashScanAsync(Guid.Empty, "k", 0, 100));
         }
@@ -136,10 +172,15 @@ namespace Roman.RedisManager.Tests.Infrastructure.Repositories.RedisDataTypes
         [Fact]
         public async Task RemoveHashFieldsAsync_EmptyGroupId_ThrowsArgumentException()
         {
+
+            // Arrange
             var connectionMultiplexer = ConnectionMultiplexer.Connect(_fixture.ConnectionString + ",allowAdmin=true");
+
+            // Act
             await using IRedisConnectionManager connectionManager = new TestRedisConnectionManager(connectionMultiplexer);
             IRedisHashRepository repo = new RedisHashRepository(connectionManager, CreateOptions());
 
+            // Assert
             await Should.ThrowAsync<ArgumentException>(
                 () => repo.RemoveHashFieldsAsync(Guid.Empty, "k", ["f"]));
         }

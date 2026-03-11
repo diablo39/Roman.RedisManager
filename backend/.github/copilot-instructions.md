@@ -109,6 +109,7 @@ Everything documented here is derived from **actual observed patterns** in the c
 **Key conventions:**
 - Method naming: `MethodName_Condition_ExpectedBehavior`.
 - `[Fact]` only — no `[Theory]`.
+- Every `[Fact]` test method MUST include explicit section comments in order: `// Arrange`, `// Act`, `// Assert`.
 - Shouldly assertions: `.ShouldNotBeNull()`, `.ShouldNotBeEmpty()`, `.ShouldAllBe()`, `.ShouldContain()`.
 - **No mocking framework** — instantiate real implementations.
 - Config via `Options.Create(...)` with private helper methods.
@@ -218,6 +219,7 @@ These constraints **must** be followed when generating code. Violating them will
 
 ### Testing
 - ✅ Use xUnit `[Fact]` + Shouldly assertions.
+- ✅ Every test method must contain `// Arrange`, `// Act`, `// Assert` sections in that exact order.
 - ✅ Instantiate real implementations — no mocks.
 - ✅ Use `Options.Create(...)` for configuration in tests.
 - ❌ Do not introduce Moq, NSubstitute, or other mocking frameworks.

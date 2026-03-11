@@ -11,6 +11,10 @@ namespace Roman.RedisManager.Domain.Configuration
         public const string SectionName = "Redis";
 
         [Required]
+        [ConfigurationKeyName("Search")]
+        public RedisSearchLimitsConfiguration Search { get; set; } = new();
+
+        [Required]
         [MinLength(1)]
         [ConfigurationKeyName("ServerGroups")]
         public required IEnumerable<RedisServerGroupConfiguration> ServerGroups { get; set; }

@@ -10,12 +10,16 @@ namespace Roman.RedisManager.Tests.Application.CQRS
         [Fact]
         public async Task Handle_StringKey_ReturnsStringValue()
         {
+
+            // Arrange
             var keyValue = new RedisKeyValue(RedisDataType.String, stringValue: "hello");
             var stub = new StubKeyRepository(keyValue);
             var query = new GetKeyValueQuery { GroupId = Guid.NewGuid(), Key = "test:string" };
 
+            // Act
             var result = await GetKeyValueQueryHandler.Handle(query, stub);
 
+            // Assert
             result.ShouldNotBeNull();
             result.Type.ShouldBe("String");
             result.StringValue.ShouldBe("hello");
@@ -28,12 +32,16 @@ namespace Roman.RedisManager.Tests.Application.CQRS
         [Fact]
         public async Task Handle_ListKey_ReturnsListValues()
         {
+
+            // Arrange
             var keyValue = new RedisKeyValue(RedisDataType.List, listValues: new[] { "a", "b", "c" });
             var stub = new StubKeyRepository(keyValue);
             var query = new GetKeyValueQuery { GroupId = Guid.NewGuid(), Key = "test:list" };
 
+            // Act
             var result = await GetKeyValueQueryHandler.Handle(query, stub);
 
+            // Assert
             result.Type.ShouldBe("List");
             result.ListValues.ShouldNotBeNull();
             result.ListValues!.Count.ShouldBe(3);
@@ -46,13 +54,17 @@ namespace Roman.RedisManager.Tests.Application.CQRS
         [Fact]
         public async Task Handle_SortedSetKey_ReturnsSortedSetEntries()
         {
+
+            // Arrange
             var entries = new[] { new RedisSortedSetEntry("alice", 1.0), new RedisSortedSetEntry("bob", 2.5) };
             var keyValue = new RedisKeyValue(RedisDataType.SortedSet, sortedSetEntries: entries);
             var stub = new StubKeyRepository(keyValue);
             var query = new GetKeyValueQuery { GroupId = Guid.NewGuid(), Key = "test:zset" };
 
+            // Act
             var result = await GetKeyValueQueryHandler.Handle(query, stub);
 
+            // Assert
             result.Type.ShouldBe("SortedSet");
             result.SortedSetEntries.ShouldNotBeNull();
             result.SortedSetEntries!.Count.ShouldBe(2);
@@ -67,12 +79,16 @@ namespace Roman.RedisManager.Tests.Application.CQRS
         [Fact]
         public async Task Handle_NonExistentKey_ReturnsNoneType()
         {
+
+            // Arrange
             var keyValue = new RedisKeyValue(RedisDataType.None);
             var stub = new StubKeyRepository(keyValue);
             var query = new GetKeyValueQuery { GroupId = Guid.NewGuid(), Key = "missing:key" };
 
+            // Act
             var result = await GetKeyValueQueryHandler.Handle(query, stub);
 
+            // Assert
             result.Type.ShouldBe("None");
             result.StringValue.ShouldBeNull();
             result.ListValues.ShouldBeNull();
@@ -84,12 +100,16 @@ namespace Roman.RedisManager.Tests.Application.CQRS
         [Fact]
         public async Task Handle_SetKey_ReturnsSetMembers()
         {
+
+            // Arrange
             var keyValue = new RedisKeyValue(RedisDataType.Set, setMembers: new[] { "a", "b", "c" });
             var stub = new StubKeyRepository(keyValue);
             var query = new GetKeyValueQuery { GroupId = Guid.NewGuid(), Key = "test:set" };
 
+            // Act
             var result = await GetKeyValueQueryHandler.Handle(query, stub);
 
+            // Assert
             result.ShouldNotBeNull();
             result.Type.ShouldBe("Set");
             result.SetMembers.ShouldNotBeNull();
@@ -106,13 +126,17 @@ namespace Roman.RedisManager.Tests.Application.CQRS
         [Fact]
         public async Task Handle_HashKey_ReturnsHashFields()
         {
+
+            // Arrange
             var hashFields = new Dictionary<string, string> { ["name"] = "Alice", ["age"] = "30" };
             var keyValue = new RedisKeyValue(RedisDataType.Hash, hashFields: hashFields);
             var stub = new StubKeyRepository(keyValue);
             var query = new GetKeyValueQuery { GroupId = Guid.NewGuid(), Key = "test:hash" };
 
+            // Act
             var result = await GetKeyValueQueryHandler.Handle(query, stub);
 
+            // Assert
             result.ShouldNotBeNull();
             result.Type.ShouldBe("Hash");
             result.HashFields.ShouldNotBeNull();
@@ -128,8 +152,13 @@ namespace Roman.RedisManager.Tests.Application.CQRS
         [Fact]
         public async Task Handle_NullQuery_ThrowsArgumentNullException()
         {
+
+            // Arrange
             var stub = new StubKeyRepository(new RedisKeyValue(RedisDataType.None));
 
+            // Act
+
+            // Assert
             await Should.ThrowAsync<ArgumentNullException>(
                 () => GetKeyValueQueryHandler.Handle(null!, stub));
         }
@@ -137,8 +166,13 @@ namespace Roman.RedisManager.Tests.Application.CQRS
         [Fact]
         public async Task Handle_NullRepository_ThrowsArgumentNullException()
         {
+
+            // Arrange
             var query = new GetKeyValueQuery { GroupId = Guid.NewGuid(), Key = "k" };
 
+            // Act
+
+            // Assert
             await Should.ThrowAsync<ArgumentNullException>(
                 () => GetKeyValueQueryHandler.Handle(query, null!));
         }

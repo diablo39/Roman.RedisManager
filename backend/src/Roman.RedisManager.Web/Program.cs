@@ -1,13 +1,20 @@
 using Roman.RedisManager.Domain.Configuration;
+using Roman.RedisManager.Domain.Entities;
 using Roman.RedisManager.Domain.Repositories;
 using Roman.RedisManager.Domain.Repositories.RedisDataTypes;
 using Roman.RedisManager.Infrastructure.Redis;
 using Roman.RedisManager.Infrastructure.Exceptions;
 using Roman.RedisManager.Infrastructure.Repositories;
 using Roman.RedisManager.Infrastructure.Repositories.RedisDataTypes;
+using Roman.RedisManager.Web.Authentication;
+using Roman.RedisManager.Web.Authorization;
+using Roman.RedisManager.Web.Authorization.Handlers;
+using Roman.RedisManager.Web.Authorization.Requirements;
 using Wolverine;
 using System.Diagnostics;
 using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authentication;
 // using Microsoft.AspNetCore.Mvc.Infrastructure; // no longer needed
 
 namespace Roman.RedisManager.Web
@@ -25,8 +32,32 @@ namespace Roman.RedisManager.Web
                 .ValidateOnStart();
 
             builder.Services
+                .AddOptions<RedisSearchLimitsConfiguration>()
+                .Bind(builder.Configuration.GetSection(RedisConfiguration.SectionName).GetSection(RedisSearchLimitsConfiguration.SectionName))
+                .ValidateDataAnnotations()
+                .ValidateOnStart();
+
+            builder.Services
                 .AddOptions<ContinuationTokenConfiguration>()
                 .Bind(builder.Configuration.GetSection(ContinuationTokenConfiguration.SectionName))
+                .ValidateDataAnnotations()
+                .ValidateOnStart();
+
+            builder.Services
+                .AddOptions<OidcAuthenticationConfiguration>()
+                .Bind(builder.Configuration.GetSection(OidcAuthenticationConfiguration.SectionName))
+                .ValidateDataAnnotations()
+                .ValidateOnStart();
+
+            builder.Services
+                .AddOptions<AuthorizationRoleMappingConfiguration>()
+                .Bind(builder.Configuration.GetSection(AuthorizationRoleMappingConfiguration.SectionName))
+                .ValidateDataAnnotations()
+                .ValidateOnStart();
+
+            builder.Services
+                .AddOptions<AuthorizationPermissionConfiguration>()
+                .Bind(builder.Configuration.GetSection(AuthorizationRoleMappingConfiguration.SectionName).GetSection("Permissions"))
                 .ValidateDataAnnotations()
                 .ValidateOnStart();
 
@@ -39,6 +70,25 @@ namespace Roman.RedisManager.Web
             builder.Services.AddSingleton<IRedisSetRepository, RedisSetRepository>();
             builder.Services.AddSingleton<IRedisHashRepository, RedisHashRepository>();
             builder.Services.AddSingleton<IRedisSortedSetRepository, RedisSortedSetRepository>();
+            builder.Services.AddSingleton<IGroupContextAccessor, RouteGroupContextAccessor>();
+            builder.Services.AddSingleton<AuthorizationDecisionLogger>();
+            builder.Services.AddSingleton<RoleClaimMappingEvaluator>();
+            builder.Services.AddSingleton<IAuthorizationHandler, GroupPermissionAuthorizationHandler>();
+
+            builder.Services.AddConfiguredIdentity();
+
+            builder.Services.AddAuthorization(options =>
+            {
+                options.AddPolicy(AuthorizationPolicies.ReadKeys, policy => policy
+                    .RequireAuthenticatedUser()
+                    .RequireRole("redis-reader", "editor", "admin"));
+
+                options.AddPolicy(AuthorizationPolicies.DeleteKeysByGroup, policy => policy
+                    .RequireAuthenticatedUser()
+                    .AddRequirements(new GroupPermissionRequirement(PermissionAction.DeleteKey)));
+            });
+
+            builder.Services.AddTransient<IClaimsTransformation, NormalizedRoleClaimsTransformation>();
 
             builder.Services.AddControllers();
             builder.Services.AddProblemDetails(options =>
@@ -92,6 +142,7 @@ namespace Roman.RedisManager.Web
 
             app.UseHttpsRedirection();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseDefaultFiles();

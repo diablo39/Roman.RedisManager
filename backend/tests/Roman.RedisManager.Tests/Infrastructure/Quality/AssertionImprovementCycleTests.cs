@@ -62,12 +62,17 @@ namespace Roman.RedisManager.Tests.Infrastructure.Quality
         [Fact]
         public void Start_ThenComplete_TransitionsToCompletedState()
         {
+
+            // Arrange
             var cycle = new AssertionImprovementCycleState();
 
             cycle.Start("run-1");
             cycle.RecordRerun("run-2");
             cycle.Complete("ThresholdMet");
 
+            // Act
+
+            // Assert
             cycle.Status.ShouldBe(AssertionImprovementCycleStatus.Completed);
             cycle.RunIdBefore.ShouldBe("run-1");
             cycle.RunIdAfter.ShouldBe("run-2");
@@ -77,8 +82,13 @@ namespace Roman.RedisManager.Tests.Infrastructure.Quality
         [Fact]
         public void Complete_BeforeStart_ThrowsInvalidOperationException()
         {
+
+            // Arrange
             var cycle = new AssertionImprovementCycleState();
 
+            // Act
+
+            // Assert
             Should.Throw<InvalidOperationException>(() => cycle.Complete("ThresholdMet"));
         }
     }

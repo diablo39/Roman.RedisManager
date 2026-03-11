@@ -9,6 +9,8 @@ namespace Roman.RedisManager.Tests.Application.CQRS.RedisDataTypes.Set
         [Fact]
         public async Task Handle_ValidCommand_ReturnsSuccess()
         {
+
+            // Arrange
             var stub = new StubSetRepository();
             var command = new AddToSetCommand
             {
@@ -17,8 +19,10 @@ namespace Roman.RedisManager.Tests.Application.CQRS.RedisDataTypes.Set
                 Members = ["x", "y", "z"]
             };
 
+            // Act
             var result = await AddToSetCommandHandler.Handle(command, stub);
 
+            // Assert
             result.ShouldNotBeNull();
             result.Success.ShouldBeTrue();
         }
@@ -26,6 +30,8 @@ namespace Roman.RedisManager.Tests.Application.CQRS.RedisDataTypes.Set
         [Fact]
         public async Task Handle_WithTtl_ReturnsSuccess()
         {
+
+            // Arrange
             var stub = new StubSetRepository();
             var command = new AddToSetCommand
             {
@@ -35,16 +41,23 @@ namespace Roman.RedisManager.Tests.Application.CQRS.RedisDataTypes.Set
                 Ttl = TimeSpan.FromMinutes(10)
             };
 
+            // Act
             var result = await AddToSetCommandHandler.Handle(command, stub);
 
+            // Assert
             result.Success.ShouldBeTrue();
         }
 
         [Fact]
         public async Task Handle_NullCommand_ThrowsArgumentNullException()
         {
+
+            // Arrange
             var stub = new StubSetRepository();
 
+            // Act
+
+            // Assert
             await Should.ThrowAsync<ArgumentNullException>(
                 () => AddToSetCommandHandler.Handle(null!, stub));
         }
@@ -52,8 +65,13 @@ namespace Roman.RedisManager.Tests.Application.CQRS.RedisDataTypes.Set
         [Fact]
         public async Task Handle_NullRepository_ThrowsArgumentNullException()
         {
+
+            // Arrange
             var command = new AddToSetCommand { GroupId = Guid.NewGuid(), Key = "k", Members = ["m"] };
 
+            // Act
+
+            // Assert
             await Should.ThrowAsync<ArgumentNullException>(
                 () => AddToSetCommandHandler.Handle(command, null!));
         }

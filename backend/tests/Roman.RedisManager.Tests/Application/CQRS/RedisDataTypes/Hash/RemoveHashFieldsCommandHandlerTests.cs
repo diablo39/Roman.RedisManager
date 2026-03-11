@@ -10,6 +10,8 @@ namespace Roman.RedisManager.Tests.Application.CQRS.RedisDataTypes.Hash
         [Fact]
         public async Task Handle_ValidCommand_ReturnsRemovedCount()
         {
+
+            // Arrange
             var stub = new StubHashRepository(removedCount: 2);
             var command = new RemoveHashFieldsCommand
             {
@@ -18,8 +20,10 @@ namespace Roman.RedisManager.Tests.Application.CQRS.RedisDataTypes.Hash
                 Fields = ["name", "age"]
             };
 
+            // Act
             var result = await RemoveHashFieldsCommandHandler.Handle(command, stub);
 
+            // Assert
             result.ShouldNotBeNull();
             result.RemovedCount.ShouldBe(2L);
         }
@@ -27,6 +31,8 @@ namespace Roman.RedisManager.Tests.Application.CQRS.RedisDataTypes.Hash
         [Fact]
         public async Task Handle_FieldsNotFound_ReturnsZero()
         {
+
+            // Arrange
             var stub = new StubHashRepository(removedCount: 0);
             var command = new RemoveHashFieldsCommand
             {
@@ -35,16 +41,23 @@ namespace Roman.RedisManager.Tests.Application.CQRS.RedisDataTypes.Hash
                 Fields = ["missing"]
             };
 
+            // Act
             var result = await RemoveHashFieldsCommandHandler.Handle(command, stub);
 
+            // Assert
             result.RemovedCount.ShouldBe(0L);
         }
 
         [Fact]
         public async Task Handle_NullCommand_ThrowsArgumentNullException()
         {
+
+            // Arrange
             var stub = new StubHashRepository(0);
 
+            // Act
+
+            // Assert
             await Should.ThrowAsync<ArgumentNullException>(
                 () => RemoveHashFieldsCommandHandler.Handle(null!, stub));
         }
@@ -52,8 +65,13 @@ namespace Roman.RedisManager.Tests.Application.CQRS.RedisDataTypes.Hash
         [Fact]
         public async Task Handle_NullRepository_ThrowsArgumentNullException()
         {
+
+            // Arrange
             var command = new RemoveHashFieldsCommand { GroupId = Guid.NewGuid(), Key = "k", Fields = ["f"] };
 
+            // Act
+
+            // Assert
             await Should.ThrowAsync<ArgumentNullException>(
                 () => RemoveHashFieldsCommandHandler.Handle(command, null!));
         }

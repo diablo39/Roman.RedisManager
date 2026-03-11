@@ -2,8 +2,21 @@
 # GUID value for the server group identifier
 @RedisServerGroupId = 11111111-1111-1111-1111-111111111111
 @ContinuationToken = replace-with-token-from-previous-response
+@BearerToken = replace-with-valid-bearer-token
 
 GET {{Roman.RedisManager.Web_HostAddress}}/api/redis-server-groups
+
+###
+
+### Authenticated read call (bearer)
+GET {{Roman.RedisManager.Web_HostAddress}}/api/redis-server-groups
+Authorization: Bearer {{BearerToken}}
+
+###
+
+### Authenticated delete call (bearer + group-scoped policy)
+DELETE {{Roman.RedisManager.Web_HostAddress}}/api/redis-keys/test:string?groupId={{RedisServerGroupId}}
+Authorization: Bearer {{BearerToken}}
 
 ###
 
@@ -32,6 +45,16 @@ Accept: application/xml
 
 ### Redis Key Search — pattern filter (standalone)
 GET {{Roman.RedisManager.Web_HostAddress}}/api/redis-keys?groupId={{RedisServerGroupId}}&pattern=session:*&pageSize=50
+
+###
+
+### Redis Key Search — oversized page size (server applies max page cap)
+GET {{Roman.RedisManager.Web_HostAddress}}/api/redis-keys?groupId={{RedisServerGroupId}}&pattern=*&pageSize=5000
+
+###
+
+### Redis Key Search — verify enriched item attributes (type, ttlMilliseconds, hasExpiration)
+GET {{Roman.RedisManager.Web_HostAddress}}/api/redis-keys?groupId={{RedisServerGroupId}}&pattern=test:*&pageSize=25
 
 ###
 

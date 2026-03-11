@@ -12,6 +12,8 @@ namespace Roman.RedisManager.Tests.Infrastructure.Quality
         [Fact]
         public void Classify_SurvivedAndNoCoverageMutants_ReturnsActionableFindings()
         {
+
+            // Arrange
             var classifier = new MutationFindingClassifier();
             var mutants = new[]
             {
@@ -21,6 +23,9 @@ namespace Roman.RedisManager.Tests.Infrastructure.Quality
 
             var findings = classifier.Classify(mutants);
 
+            // Act
+
+            // Assert
             findings.Count.ShouldBe(2);
             findings.ShouldContain(f => f.Category == MutationFindingCategory.SurvivedMutant && f.Severity == MutationFindingSeverity.High);
             findings.ShouldContain(f => f.Category == MutationFindingCategory.NoCoverage && f.Severity == MutationFindingSeverity.Medium);
@@ -29,6 +34,8 @@ namespace Roman.RedisManager.Tests.Infrastructure.Quality
         [Fact]
         public void Classify_TimeoutMutant_ReturnsFlakyOutcomeFinding()
         {
+
+            // Arrange
             var classifier = new MutationFindingClassifier();
             var mutants = new[]
             {
@@ -37,6 +44,9 @@ namespace Roman.RedisManager.Tests.Infrastructure.Quality
 
             var findings = classifier.Classify(mutants);
 
+            // Act
+
+            // Assert
             findings.Count.ShouldBe(1);
             findings.Single().Category.ShouldBe(MutationFindingCategory.FlakyOutcome);
             findings.Single().Recommendation.ShouldNotBeNullOrWhiteSpace();

@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Options;
 using Roman.RedisManager.Domain.Configuration;
 using Roman.RedisManager.Domain.Entities;
+using Roman.RedisManager.Domain.Entities.RedisData;
 using Roman.RedisManager.Domain.Entities.Server;
 using Roman.RedisManager.Domain.Repositories;
 using Roman.RedisManager.Infrastructure.Exceptions;
@@ -22,7 +23,11 @@ namespace Roman.RedisManager.Tests.Infrastructure.Repositories
         [Fact]
         public async Task SearchForKeysAsync_WithSeededKey_ReturnsNonEmptyResult()
         {
+
+            // Arrange
             using var connectionMultiplexer = ConnectionMultiplexer.Connect(_fixture.ConnectionString + ",allowAdmin=true");
+
+            // Act
             await connectionMultiplexer.GetDatabase().StringSetAsync("seed", "value");
 
             var options = CreateRedisOptions(GroupType.Standalone, Guid.Parse("33333333-3333-3333-3333-333333333333"));
@@ -31,15 +36,96 @@ namespace Roman.RedisManager.Tests.Infrastructure.Repositories
 
             var result = await repository.SearchForKeysAsync(options.Value.ServerGroups.First().Id, "*", null, 50);
 
+            // Assert
             result.ShouldNotBeNull();
             result.Keys.ShouldNotBeEmpty();
         }
 
         [Fact]
-        public async Task SearchForKeysAsync_WithContinuationToken_ReplaysNextPage()
+        public async Task SearchForKeysAsync_WithMixedMetadata_MapsTypeTtlAndHasExpiration()
         {
+
+            // Arrange
             using var connectionMultiplexer = ConnectionMultiplexer.Connect(_fixture.ConnectionString + ",allowAdmin=true");
             var db = connectionMultiplexer.GetDatabase();
+            var prefix = $"meta:{Guid.NewGuid():N}";
+
+            // Act
+            await db.StringSetAsync($"{prefix}:string:persistent", "value");
+            await db.StringSetAsync($"{prefix}:string:expiring", "value", TimeSpan.FromMinutes(2));
+            await db.HashSetAsync($"{prefix}:hash:persistent", new[] { new HashEntry("f", "v") });
+
+            var options = CreateRedisOptions(GroupType.Standalone, Guid.Parse("41414141-4141-4141-4141-414141414141"));
+            await using IRedisConnectionManager connectionManager = new TestRedisConnectionManager(connectionMultiplexer);
+            IRedisRepository repository = CreateRepository(connectionManager, options);
+            var groupId = options.Value.ServerGroups.First().Id;
+
+            var collected = new List<Roman.RedisManager.Domain.Entities.RedisKey>();
+            string? continuationToken = null;
+            for (int i = 0; i < 20; i++)
+            {
+                var page = await repository.SearchForKeysAsync(groupId, $"{prefix}:*", continuationToken, 20);
+                collected.AddRange(page.Keys);
+                if (!page.HasMoreResults)
+                {
+                    break;
+                }
+
+                continuationToken = page.ContinuationToken;
+            }
+
+            // Assert
+            collected.ShouldContain(key => key.Key == $"{prefix}:string:persistent" && key.Type == RedisDataType.String && key.Ttl == null && !key.HasExpiration);
+            collected.ShouldContain(key =>
+                key.Key == $"{prefix}:string:expiring" &&
+                key.Type == RedisDataType.String &&
+                key.Ttl.HasValue &&
+                key.Ttl.Value > TimeSpan.Zero &&
+                key.HasExpiration);
+            collected.ShouldContain(key => key.Key == $"{prefix}:hash:persistent" && key.Type == RedisDataType.Hash && key.Ttl == null && !key.HasExpiration);
+        }
+
+        [Fact]
+        public async Task SearchForKeysAsync_WithSmallPageSize_ReturnsBoundedPageAndContinuation()
+        {
+
+            // Arrange
+            using var connectionMultiplexer = ConnectionMultiplexer.Connect(_fixture.ConnectionString + ",allowAdmin=true");
+            var db = connectionMultiplexer.GetDatabase();
+
+            // Act
+            for (int i = 0; i < 60; i++)
+            {
+                await db.StringSetAsync($"cap-continuation:{i}", "v");
+            }
+
+            var options = CreateRedisOptions(GroupType.Standalone, Guid.Parse("48484848-4848-4848-4848-484848484848"));
+            await using IRedisConnectionManager connectionManager = new TestRedisConnectionManager(connectionMultiplexer);
+            IRedisRepository repository = CreateRepository(connectionManager, options);
+            var groupId = options.Value.ServerGroups.First().Id;
+
+            var page1 = await repository.SearchForKeysAsync(groupId, "cap-continuation:*", null, 3);
+
+            // Assert
+            page1.Keys.Count().ShouldBeLessThanOrEqualTo(3);
+            if (page1.HasMoreResults)
+            {
+                page1.ContinuationToken.ShouldNotBeNullOrWhiteSpace();
+                var page2 = await repository.SearchForKeysAsync(groupId, "cap-continuation:*", page1.ContinuationToken, 3);
+                page2.Keys.Count().ShouldBeLessThanOrEqualTo(3);
+                page2.Keys.ShouldAllBe(key => key.Type == RedisDataType.String && key.Ttl == null && !key.HasExpiration);
+            }
+        }
+
+        [Fact]
+        public async Task SearchForKeysAsync_WithContinuationToken_ReplaysNextPage()
+        {
+
+            // Arrange
+            using var connectionMultiplexer = ConnectionMultiplexer.Connect(_fixture.ConnectionString + ",allowAdmin=true");
+            var db = connectionMultiplexer.GetDatabase();
+
+            // Act
             for (int i = 0; i < 120; i++)
             {
                 await db.StringSetAsync($"cursor-chain:{i}", "v");
@@ -52,6 +138,7 @@ namespace Roman.RedisManager.Tests.Infrastructure.Repositories
 
             var page1 = await repository.SearchForKeysAsync(groupId, "cursor-chain:*", null, 5);
 
+            // Assert
             page1.HasMoreResults.ShouldBeTrue();
             page1.ContinuationToken.ShouldNotBeNullOrWhiteSpace();
 
@@ -63,8 +150,12 @@ namespace Roman.RedisManager.Tests.Infrastructure.Repositories
         [Fact]
         public async Task SearchForKeysAsync_StandaloneContinuation_ReplaysThreeConsecutivePages()
         {
+
+            // Arrange
             using var connectionMultiplexer = ConnectionMultiplexer.Connect(_fixture.ConnectionString + ",allowAdmin=true");
             var db = connectionMultiplexer.GetDatabase();
+
+            // Act
             for (int i = 0; i < 180; i++)
             {
                 await db.StringSetAsync($"standalone-3pages:{i}", "v");
@@ -76,6 +167,8 @@ namespace Roman.RedisManager.Tests.Infrastructure.Repositories
             var groupId = options.Value.ServerGroups.First().Id;
 
             var page1 = await repository.SearchForKeysAsync(groupId, "standalone-3pages:*", null, 5);
+
+            // Assert
             page1.Keys.Count().ShouldBeLessThanOrEqualTo(5);
             page1.HasMoreResults.ShouldBeTrue();
 
@@ -90,8 +183,12 @@ namespace Roman.RedisManager.Tests.Infrastructure.Repositories
         [Fact]
         public async Task SearchForKeysAsync_ClusterContinuation_ReplaysThreeConsecutivePages()
         {
+
+            // Arrange
             using var connectionMultiplexer = ConnectionMultiplexer.Connect(_fixture.ConnectionString + ",allowAdmin=true");
             var db = connectionMultiplexer.GetDatabase();
+
+            // Act
             for (int i = 0; i < 180; i++)
             {
                 await db.StringSetAsync($"cluster-3pages:{i}", "v");
@@ -103,6 +200,8 @@ namespace Roman.RedisManager.Tests.Infrastructure.Repositories
             var groupId = options.Value.ServerGroups.First().Id;
 
             var page1 = await repository.SearchForKeysAsync(groupId, "cluster-3pages:*", null, 5);
+
+            // Assert
             page1.Keys.Count().ShouldBeLessThanOrEqualTo(5);
             page1.HasMoreResults.ShouldBeTrue();
             page1.ContinuationToken.ShouldNotBeNullOrWhiteSpace();
@@ -119,12 +218,17 @@ namespace Roman.RedisManager.Tests.Infrastructure.Repositories
         [Fact]
         public async Task SearchForKeysAsync_WithMalformedContinuationToken_ThrowsInvalidContinuationToken()
         {
+
+            // Arrange
             using var connectionMultiplexer = ConnectionMultiplexer.Connect(_fixture.ConnectionString + ",allowAdmin=true");
             var options = CreateRedisOptions(GroupType.Standalone, Guid.Parse("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"));
+
+            // Act
             await using IRedisConnectionManager connectionManager = new TestRedisConnectionManager(connectionMultiplexer);
             IRedisRepository repository = CreateRepository(connectionManager, options);
             var groupId = options.Value.ServerGroups.First().Id;
 
+            // Assert
             var ex = await Should.ThrowAsync<InvalidContinuationTokenException>(() =>
                 repository.SearchForKeysAsync(groupId, "*", "invalid-token", 50));
 
@@ -134,8 +238,12 @@ namespace Roman.RedisManager.Tests.Infrastructure.Repositories
         [Fact]
         public async Task SearchForKeysAsync_WithMismatchedPattern_ThrowsContextMismatch()
         {
+
+            // Arrange
             using var connectionMultiplexer = ConnectionMultiplexer.Connect(_fixture.ConnectionString + ",allowAdmin=true");
             var db = connectionMultiplexer.GetDatabase();
+
+            // Act
             await db.StringSetAsync("mismatch:1", "v");
 
             var options = CreateRedisOptions(GroupType.Standalone, Guid.Parse("12121212-1212-1212-1212-121212121212"));
@@ -144,6 +252,8 @@ namespace Roman.RedisManager.Tests.Infrastructure.Repositories
             var groupId = options.Value.ServerGroups.First().Id;
 
             var page1 = await repository.SearchForKeysAsync(groupId, "mismatch:*", null, 2);
+
+            // Assert
             page1.ContinuationToken.ShouldNotBeNullOrWhiteSpace();
 
             var ex = await Should.ThrowAsync<InvalidContinuationTokenException>(() =>
@@ -155,8 +265,12 @@ namespace Roman.RedisManager.Tests.Infrastructure.Repositories
         [Fact]
         public async Task SearchForKeysAsync_WithExpiredToken_ThrowsNotResumable()
         {
+
+            // Arrange
             using var connectionMultiplexer = ConnectionMultiplexer.Connect(_fixture.ConnectionString + ",allowAdmin=true");
             var options = CreateRedisOptions(GroupType.Standalone, Guid.Parse("56565656-5656-5656-5656-565656565656"));
+
+            // Act
             await using IRedisConnectionManager connectionManager = new TestRedisConnectionManager(connectionMultiplexer);
             IRedisRepository repository = CreateRepository(connectionManager, options);
             var groupId = options.Value.ServerGroups.First().Id;
@@ -172,6 +286,7 @@ namespace Roman.RedisManager.Tests.Infrastructure.Repositories
             };
             var token = codec.Encode(expiredEnvelope);
 
+            // Assert
             var ex = await Should.ThrowAsync<InvalidContinuationTokenException>(() =>
                 repository.SearchForKeysAsync(groupId, "*", token, 50));
 
@@ -181,8 +296,12 @@ namespace Roman.RedisManager.Tests.Infrastructure.Repositories
         [Fact]
         public async Task SearchForKeysAsync_WithSmallPageSize_ReturnsBoundedPage()
         {
+
+            // Arrange
             using var connectionMultiplexer = ConnectionMultiplexer.Connect(_fixture.ConnectionString + ",allowAdmin=true");
             var db = connectionMultiplexer.GetDatabase();
+
+            // Act
             for (int i = 0; i < 20; i++)
             {
                 await db.StringSetAsync($"paging-test:{i}", "v");
@@ -195,20 +314,26 @@ namespace Roman.RedisManager.Tests.Infrastructure.Repositories
 
             var result = await repository.SearchForKeysAsync(groupId, "paging-test:*", null, 5);
 
+            // Assert
             result.Keys.Count().ShouldBeLessThanOrEqualTo(5);
         }
 
         [Fact]
         public async Task SearchForKeysAsync_FinalPage_HasNoContinuationToken()
         {
+
+            // Arrange
             using var connectionMultiplexer = ConnectionMultiplexer.Connect(_fixture.ConnectionString + ",allowAdmin=true");
             var options = CreateRedisOptions(GroupType.Standalone, Guid.Parse("98989898-9898-9898-9898-989898989898"));
+
+            // Act
             await using IRedisConnectionManager connectionManager = new TestRedisConnectionManager(connectionMultiplexer);
             IRedisRepository repository = CreateRepository(connectionManager, options);
             var groupId = options.Value.ServerGroups.First().Id;
 
             var result = await repository.SearchForKeysAsync(groupId, "no-match:pattern:*", null, 50);
 
+            // Assert
             result.HasMoreResults.ShouldBeFalse();
             result.ContinuationToken.ShouldBeNull();
         }
@@ -216,8 +341,12 @@ namespace Roman.RedisManager.Tests.Infrastructure.Repositories
         [Fact]
         public async Task SearchForKeysAsync_ClusterGroup_UsesUnifiedContinuationTokenContract()
         {
+
+            // Arrange
             using var connectionMultiplexer = ConnectionMultiplexer.Connect(_fixture.ConnectionString + ",allowAdmin=true");
             var db = connectionMultiplexer.GetDatabase();
+
+            // Act
             for (int i = 0; i < 120; i++)
             {
                 await db.StringSetAsync($"cluster-token:{i}", "v");
@@ -230,6 +359,7 @@ namespace Roman.RedisManager.Tests.Infrastructure.Repositories
 
             var page1 = await repository.SearchForKeysAsync(groupId, "cluster-token:*", null, 5);
 
+            // Assert
             page1.ShouldNotBeNull();
             if (page1.HasMoreResults)
             {
@@ -242,14 +372,19 @@ namespace Roman.RedisManager.Tests.Infrastructure.Repositories
         [Fact]
         public async Task GetServerNodesAsync_WithValidGroupId_ReturnsAtLeastOneNode()
         {
+
+            // Arrange
             using var connectionMultiplexer = ConnectionMultiplexer.Connect(_fixture.ConnectionString + ",allowAdmin=true");
             var options = CreateRedisOptions(GroupType.Standalone, Guid.Parse("66666666-6666-6666-6666-666666666666"));
+
+            // Act
             await using IRedisConnectionManager connectionManager = new TestRedisConnectionManager(connectionMultiplexer);
             IRedisRepository repository = CreateRepository(connectionManager, options);
             var groupId = options.Value.ServerGroups.First().Id;
 
             var nodes = await repository.GetServerNodesAsync(groupId);
 
+            // Assert
             nodes.ShouldNotBeNull();
             nodes.ShouldNotBeEmpty();
             nodes.All(n => n.Role == "master" || n.Role == "slave").ShouldBeTrue();
@@ -258,19 +393,28 @@ namespace Roman.RedisManager.Tests.Infrastructure.Repositories
         [Fact]
         public async Task GetServerNodesAsync_InvalidGroupId_ThrowsKeyNotFoundException()
         {
+
+            // Arrange
             using var connectionMultiplexer = ConnectionMultiplexer.Connect(_fixture.ConnectionString + ",allowAdmin=true");
             var options = CreateRedisOptions(GroupType.Standalone, Guid.Parse("78787878-7878-7878-7878-787878787878"));
+
+            // Act
             await using IRedisConnectionManager connectionManager = new TestRedisConnectionManager(connectionMultiplexer);
             IRedisRepository repository = CreateRepository(connectionManager, options);
 
+            // Assert
             await Should.ThrowAsync<KeyNotFoundException>(() => repository.GetServerNodesAsync(Guid.NewGuid()));
         }
 
         [Fact]
         public async Task GetInfoAsync_WithValidGroupId_ReturnsStructuredSections()
         {
+
+            // Arrange
             using var connectionMultiplexer = ConnectionMultiplexer.Connect(_fixture.ConnectionString + ",allowAdmin=true");
             var options = CreateRedisOptions(GroupType.Standalone, Guid.Parse("44444444-4444-4444-4444-444444444444"));
+
+            // Act
             await using IRedisConnectionManager connectionManager = new TestRedisConnectionManager(connectionMultiplexer);
             IRedisRepository repository = CreateRepository(connectionManager, options);
             var groupId = options.Value.ServerGroups.First().Id;
@@ -278,6 +422,7 @@ namespace Roman.RedisManager.Tests.Infrastructure.Repositories
             var endpointParts = _fixture.Container.GetConnectionString().Split(':');
             var info = await repository.GetInfoAsync(groupId, endpointParts[0], int.Parse(endpointParts[1]));
 
+            // Assert
             info.ShouldNotBeNull();
             info.Sections.ShouldNotBeEmpty();
         }
@@ -308,6 +453,10 @@ namespace Roman.RedisManager.Tests.Infrastructure.Repositories
         {
             return Options.Create(new RedisConfiguration
             {
+                Search = new RedisSearchLimitsConfiguration
+                {
+                    MaxPageSize = 100
+                },
                 ServerGroups =
                 [
                     new RedisServerGroupConfiguration

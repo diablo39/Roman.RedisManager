@@ -9,6 +9,8 @@ namespace Roman.RedisManager.Tests.Application.CQRS.RedisDataTypes.List
         [Fact]
         public async Task Handle_ValidCommand_ReturnsRemovedCount()
         {
+
+            // Arrange
             var stub = new StubListRepository(removedCount: 2);
             var command = new RemoveFromListCommand
             {
@@ -18,8 +20,10 @@ namespace Roman.RedisManager.Tests.Application.CQRS.RedisDataTypes.List
                 Count = 2
             };
 
+            // Act
             var result = await RemoveFromListCommandHandler.Handle(command, stub);
 
+            // Assert
             result.ShouldNotBeNull();
             result.RemovedCount.ShouldBe(2L);
         }
@@ -27,6 +31,8 @@ namespace Roman.RedisManager.Tests.Application.CQRS.RedisDataTypes.List
         [Fact]
         public async Task Handle_ValueNotFound_ReturnsZero()
         {
+
+            // Arrange
             var stub = new StubListRepository(removedCount: 0);
             var command = new RemoveFromListCommand
             {
@@ -35,16 +41,23 @@ namespace Roman.RedisManager.Tests.Application.CQRS.RedisDataTypes.List
                 Value = "missing"
             };
 
+            // Act
             var result = await RemoveFromListCommandHandler.Handle(command, stub);
 
+            // Assert
             result.RemovedCount.ShouldBe(0L);
         }
 
         [Fact]
         public async Task Handle_NullCommand_ThrowsArgumentNullException()
         {
+
+            // Arrange
             var stub = new StubListRepository(0);
 
+            // Act
+
+            // Assert
             await Should.ThrowAsync<ArgumentNullException>(
                 () => RemoveFromListCommandHandler.Handle(null!, stub));
         }
@@ -52,8 +65,13 @@ namespace Roman.RedisManager.Tests.Application.CQRS.RedisDataTypes.List
         [Fact]
         public async Task Handle_NullRepository_ThrowsArgumentNullException()
         {
+
+            // Arrange
             var command = new RemoveFromListCommand { GroupId = Guid.NewGuid(), Key = "k", Value = "v" };
 
+            // Act
+
+            // Assert
             await Should.ThrowAsync<ArgumentNullException>(
                 () => RemoveFromListCommandHandler.Handle(command, null!));
         }

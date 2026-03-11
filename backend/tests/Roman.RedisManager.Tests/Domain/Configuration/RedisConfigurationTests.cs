@@ -9,6 +9,8 @@ namespace Roman.RedisManager.Tests.Domain.Configuration
         [Fact]
         public void ResolveServerGroup_WithValidGuid_ReturnsConfiguration()
         {
+
+            // Arrange
             var config = new RedisConfiguration
             {
                 ServerGroups = new[]
@@ -26,6 +28,9 @@ namespace Roman.RedisManager.Tests.Domain.Configuration
             var guid = Guid.Parse("abc00000-0000-0000-0000-000000000000");
             var result = config.ResolveServerGroup(guid);
 
+            // Act
+
+            // Assert
             result.ShouldNotBeNull();
             result.Name.ShouldBe("foo");
             result.Id.ShouldBe(Guid.Parse("abc00000-0000-0000-0000-000000000000"));
@@ -36,6 +41,8 @@ namespace Roman.RedisManager.Tests.Domain.Configuration
         [Fact]
         public void ResolveServerGroup_WithEmptyGuid_ThrowsArgumentException()
         {
+
+            // Arrange
             var config = new RedisConfiguration
             {
                 ServerGroups = new[]
@@ -50,6 +57,9 @@ namespace Roman.RedisManager.Tests.Domain.Configuration
                 }
             };
 
+            // Act
+
+            // Assert
             var ex = Should.Throw<ArgumentException>(() => config.ResolveServerGroup(Guid.Empty));
             ex.ParamName.ShouldBe("groupId");
         }
@@ -57,6 +67,8 @@ namespace Roman.RedisManager.Tests.Domain.Configuration
         [Fact]
         public void ResolveServerGroup_WithUnknownGuid_ThrowsKeyNotFoundException()
         {
+
+            // Arrange
             var config = new RedisConfiguration
             {
                 ServerGroups = new[]
@@ -71,6 +83,9 @@ namespace Roman.RedisManager.Tests.Domain.Configuration
                 }
             };
 
+            // Act
+
+            // Assert
             Should.Throw<KeyNotFoundException>(() => config.ResolveServerGroup(Guid.Parse("22222222-2222-2222-2222-222222222222")));
         }
 
@@ -78,6 +93,8 @@ namespace Roman.RedisManager.Tests.Domain.Configuration
         [Fact]
         public void ServerGroupConfiguration_WithEmptyId_FailsValidation()
         {
+
+            // Arrange
             var config = new RedisServerGroupConfiguration
             {
                 Id = Guid.Empty,
@@ -89,6 +106,9 @@ namespace Roman.RedisManager.Tests.Domain.Configuration
             var context = new ValidationContext(config);
             var results = new List<ValidationResult>();
 
+            // Act
+
+            // Assert
             Validator.TryValidateObject(config, context, results, validateAllProperties: true).ShouldBeFalse();
             results.ShouldContain(r => r.MemberNames.Contains(nameof(RedisServerGroupConfiguration.Id)));
         }
@@ -96,6 +116,8 @@ namespace Roman.RedisManager.Tests.Domain.Configuration
         [Fact]
         public void ResolveServerGroup_WithMultipleGroups_ReturnsCorrectGroup()
         {
+
+            // Arrange
             var targetId = Guid.Parse("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa");
 
             var config = new RedisConfiguration
@@ -121,6 +143,9 @@ namespace Roman.RedisManager.Tests.Domain.Configuration
 
             var result = config.ResolveServerGroup(targetId);
 
+            // Act
+
+            // Assert
             result.Name.ShouldBe("target");
             result.Id.ShouldBe(targetId);
             result.ConnectionString.ShouldBe("conn-target");
@@ -130,14 +155,21 @@ namespace Roman.RedisManager.Tests.Domain.Configuration
         [Fact]
         public void ResolveServerGroup_WhenServerGroupsIsNull_ThrowsInvalidOperationException()
         {
+
+            // Arrange
             var config = new RedisConfiguration { ServerGroups = null! };
 
+            // Act
+
+            // Assert
             Should.Throw<InvalidOperationException>(() => config.ResolveServerGroup(Guid.NewGuid()));
         }
 
         [Fact]
         public void ServerGroupConfiguration_MissingName_FailsValidation()
         {
+
+            // Arrange
             var config = new RedisServerGroupConfiguration
             {
                 Id = Guid.NewGuid(),
@@ -149,6 +181,9 @@ namespace Roman.RedisManager.Tests.Domain.Configuration
             var context = new ValidationContext(config);
             var results = new List<ValidationResult>();
 
+            // Act
+
+            // Assert
             Validator.TryValidateObject(config, context, results, validateAllProperties: true).ShouldBeFalse();
             results.ShouldContain(r => r.MemberNames.Contains(nameof(RedisServerGroupConfiguration.Name)));
         }
@@ -156,6 +191,8 @@ namespace Roman.RedisManager.Tests.Domain.Configuration
         [Fact]
         public void ServerGroupConfiguration_MissingConnectionString_FailsValidation()
         {
+
+            // Arrange
             var config = new RedisServerGroupConfiguration
             {
                 Id = Guid.NewGuid(),
@@ -167,6 +204,9 @@ namespace Roman.RedisManager.Tests.Domain.Configuration
             var context = new ValidationContext(config);
             var results = new List<ValidationResult>();
 
+            // Act
+
+            // Assert
             Validator.TryValidateObject(config, context, results, validateAllProperties: true).ShouldBeFalse();
             results.ShouldContain(r => r.MemberNames.Contains(nameof(RedisServerGroupConfiguration.ConnectionString)));
         }
@@ -174,6 +214,8 @@ namespace Roman.RedisManager.Tests.Domain.Configuration
         [Fact]
         public void ServerGroupConfiguration_ValidObject_PassesValidation()
         {
+
+            // Arrange
             var config = new RedisServerGroupConfiguration
             {
                 Id = Guid.NewGuid(),
@@ -185,6 +227,9 @@ namespace Roman.RedisManager.Tests.Domain.Configuration
             var context = new ValidationContext(config);
             var results = new List<ValidationResult>();
 
+            // Act
+
+            // Assert
             Validator.TryValidateObject(config, context, results, validateAllProperties: true).ShouldBeTrue();
             results.ShouldBeEmpty();
         }
