@@ -22,7 +22,7 @@ Think of Roman.RedisManager as a **building with a locked door**. To get in, you
 Here is the whole journey at a glance. Each step is explained in detail below.
 
 1. **Tell your login provider about this app** — so it knows to issue passes for it.
-2. **Copy the three values you get** (Authority, Client ID, Client Secret) into `appsettings.json`.
+2. **Copy the values you get** (Authority and Client ID) into `appsettings.json`.
 3. **Decide who gets which role** — by mapping provider claims to app roles in `appsettings.json`.
 4. **Restart the API** so it reads your new settings.
 5. **Get a token and test it** with a single command.
@@ -48,10 +48,11 @@ Before the login provider will issue tokens for Roman.RedisManager, it needs to 
    - **Directory (tenant) ID** — another long code on the same page
 7. Create a secret: click **Certificates & secrets** → **New client secret** → give it a name → click **Add**. **Copy the secret value immediately** — it is only shown once.
 
-> ✅ **You now have three things you need:**
+> ✅ **You now have two things you need:**
 > - `Authority` = `https://login.microsoftonline.com/<Directory-tenant-ID>/v2.0`
 > - `ClientId` = the Application (client) ID you copied
-> - `ClientSecret` = the secret value you copied
+> 
+> *Note:* Roman.RedisManager does **not** use the client secret; it only validates that incoming tokens are issued for the configured client ID.
 
 ---
 
@@ -63,10 +64,11 @@ Before the login provider will issue tokens for Roman.RedisManager, it needs to 
 4. Under *Authorized redirect URIs* add `https://localhost` (just a placeholder — the API doesn't use it).
 5. Click **Create**. Copy the **Client ID** and **Client secret** from the dialog that appears.
 
-> ✅ **You now have three things you need:**
+> ✅ **You now have two things you need:**
 > - `Authority` = `https://accounts.google.com`
 > - `ClientId` = the Client ID you copied
-> - `ClientSecret` = the Client secret you copied
+> 
+> *Note:* The API ignores the client secret; it is only required by some OAuth flows but not for token validation.
 
 ---
 
@@ -79,10 +81,11 @@ Before the login provider will issue tokens for Roman.RedisManager, it needs to 
    - A **Client ID** and **Client Secret** for this application
 2. Confirm you can open `<issuer-url>/.well-known/openid-configuration` in a browser — it should return a JSON page. If it does, the URL is correct.
 
-> ✅ **You now have three things you need:**
+> ✅ **You now have two things you need:**
 > - `Authority` = the issuer URL
 > - `ClientId` = provided by your OIDC admin
-> - `ClientSecret` = provided by your OIDC admin
+> 
+> *Note:* The client secret is not used by the API for bearer-token validation and can be omitted from configuration.
 
 ---
 
@@ -104,8 +107,7 @@ This block tells the app: *"I trust tokens that come from this provider."*
         "Enabled": true,
         "Kind": "EntraId",
         "Authority": "https://login.microsoftonline.com/YOUR-TENANT-ID/v2.0",
-        "ClientId": "YOUR-CLIENT-ID",
-        "ClientSecret": "YOUR-SECRET-VALUE"
+        "ClientId": "YOUR-CLIENT-ID"
       }
     ]
   }
@@ -121,7 +123,7 @@ Field guide:
 | `Kind` | Must be exactly `"EntraId"`, `"Google"`, or `"GenericOidc"`. |
 | `Authority` | The issuer URL from section 1. |
 | `ClientId` | The Client ID from section 1. |
-| `ClientSecret` | The secret from section 1. |
+| `ClientSecret` | *(unused)* still accepted but ignored by the API; you can remove it.
 
 > 💡 You can add more than one provider by adding more objects inside the `Providers` array. Each needs a unique `ProviderKey`.
 

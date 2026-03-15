@@ -81,7 +81,7 @@ namespace Roman.RedisManager.Web
             {
                 options.AddPolicy(AuthorizationPolicies.ReadKeys, policy => policy
                     .RequireAuthenticatedUser()
-                    .RequireRole("redis-reader", "editor", "admin"));
+                    .RequireRole("reader", "editor", "admin"));
 
                 options.AddPolicy(AuthorizationPolicies.DeleteKeysByGroup, policy => policy
                     .RequireAuthenticatedUser()

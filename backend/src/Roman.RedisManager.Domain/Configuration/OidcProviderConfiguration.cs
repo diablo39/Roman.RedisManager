@@ -39,11 +39,6 @@ namespace Roman.RedisManager.Domain.Configuration
         [ConfigurationKeyName("ClientId")]
         public required string ClientId { get; set; }
 
-        [ConfigurationKeyName("ClientSecret")]
-        public string? ClientSecret { get; set; }
-
-        [ConfigurationKeyName("MetadataAddress")]
-        public string? MetadataAddress { get; set; }
     }
 
     public class OidcAuthenticationConfiguration : IValidatableObject
