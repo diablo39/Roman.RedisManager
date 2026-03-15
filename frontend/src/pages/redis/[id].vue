@@ -56,7 +56,7 @@
                       v-for="node in server.nodes"
                       :key="node.address"
                       :title="node.address"
-                      :subtitle="`Role: ${formatRole(node.role)} • Hosted shards: ${node.hostedShards}`"
+                      :subtitle="`Role: ${formatRole(node.role)}`"
                       prepend-icon="mdi-lan"
                     />
                   </v-list>
@@ -83,13 +83,14 @@
 </template>
 
 <script setup lang="ts">
-  type Topology = 'Cluster' | 'Master-Slave' | 'Standalone'
-  type NodeRole = 'master' | 'slave' | 'replica' | 'unknown'
+  import { getRedisServerGroupDetail } from '@/api/redisServers'
+
+  type Topology = 'Cluster' | 'Standalone' | 'Unknown'
+  type NodeRole = 'master' | 'slave' | 'replica' | 'unknown' | string
 
   interface ServerNode {
     address: string
     role: NodeRole
-    hostedShards: number
   }
 
   interface ServerDetail {
@@ -107,32 +108,8 @@
   const error = ref<string | null>(null)
   const server = ref<ServerDetail | null>(null)
 
-  const mockServers: Record<string, ServerDetail> = {
-    '1': {
-      id: '1',
-      name: 'Primary Cluster',
-      topology: 'Cluster',
-      nodes: [
-        { address: '10.0.0.1:6379', role: 'master', hostedShards: 8 },
-        { address: '10.0.0.2:6379', role: 'replica', hostedShards: 8 },
-      ],
-    },
-    '2': {
-      id: '2',
-      name: 'Analytics Master-Slave',
-      topology: 'Master-Slave',
-      nodes: [
-        { address: '10.0.1.1:6379', role: 'master', hostedShards: 4 },
-        { address: '10.0.1.2:6379', role: 'slave', hostedShards: 4 },
-      ],
-    },
-    '3': {
-      id: '3',
-      name: 'Standalone Cache',
-      topology: 'Standalone',
-      nodes: [{ address: '10.0.2.1:6379', role: 'master', hostedShards: 1 }],
-    },
-  }
+  const redisServersStore = useRedisServersStore()
+  const { servers } = storeToRefs(redisServersStore)
 
   const formatRole = (role: NodeRole): string => {
     if (role === 'master') return 'Master'
@@ -146,16 +123,28 @@
     error.value = null
 
     try {
-      await new Promise(resolve => setTimeout(resolve, 300))
-      const result = mockServers[id.value]
-
-      if (!result) {
-        throw new Error('Server not found')
+      if (!id.value) {
+        throw new Error('Server id is required')
       }
 
-      server.value = result
+      if (servers.value.length === 0) {
+        await redisServersStore.reset()
+      }
+
+      const selected = servers.value.find(item => item.id === id.value)
+      const details = await getRedisServerGroupDetail(id.value)
+
+      server.value = {
+        id: id.value,
+        name: selected?.name ?? id.value,
+        topology: selected?.groupType ?? 'Unknown',
+        nodes: details.nodes.map(node => ({
+          address: `${node.host}:${node.port}`,
+          role: node.role,
+        })),
+      }
     } catch (e) {
-      error.value = 'Unable to load server details'
+      error.value = e instanceof Error ? e.message : 'Unable to load server details'
       server.value = null
     } finally {
       loading.value = false

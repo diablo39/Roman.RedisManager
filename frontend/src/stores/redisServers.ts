@@ -3,12 +3,12 @@
  * Manages Redis server list with pagination
  */
 
-import type { RedisServerDto } from '@/api/redisServers'
+import type { RedisServerGroupDto } from '@/api/redisServers'
 import { getRedisServers } from '@/api/redisServers'
 
 export const useRedisServersStore = defineStore('redisServers', {
   state: () => ({
-    servers: [] as RedisServerDto[],
+    servers: [] as RedisServerGroupDto[],
     pageNumber: 1,
     pageSize: 10,
     totalCount: 0,
@@ -75,9 +75,9 @@ export const useRedisServersStore = defineStore('redisServers', {
         const result = await getRedisServers(this.pageNumber, this.pageSize)
 
         if (append) {
-          this.servers.push(...result.servers)
+          this.servers.push(...result.serverGroups)
         } else {
-          this.servers = result.servers
+          this.servers = result.serverGroups
         }
 
         this.totalCount = result.totalCount

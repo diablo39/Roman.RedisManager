@@ -3,12 +3,15 @@
  * Resolves the backend API base URL from environment variables
  */
 
-// Read from Vite environment variables (VITE_ prefix required)
-const backendUrl = import.meta.env.VITE_BACKEND_URL
+const devBackendUrl = 'https://localhost:7244/'
+const backendUrl = import.meta.env.VITE_BACKEND_URL?.trim()
 
-// Default to root if not set, ensure trailing slash
+const normalizeUrl = (url: string): string => (url.endsWith('/') ? url : `${url}/`)
+
+// In development use local backend by default.
+// In production default to same-origin deployment.
 export const apiBaseUrl = backendUrl
-  ? backendUrl.endsWith('/')
-    ? backendUrl
-    : `${backendUrl}/`
-  : '/'
+  ? normalizeUrl(backendUrl)
+  : import.meta.env.DEV
+    ? devBackendUrl
+    : '/'
