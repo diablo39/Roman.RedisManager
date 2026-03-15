@@ -24,6 +24,10 @@ namespace Roman.RedisManager.Web.Controllers
     {
         private readonly IMessageBus _bus = bus;
 
+        /// <summary>
+        /// Adds one or more members with scores to a Redis sorted set.
+        /// </summary>
+        /// <param name="request">The target group, key, scored entries, and optional TTL.</param>
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -63,6 +67,13 @@ namespace Roman.RedisManager.Web.Controllers
             }
         }
 
+        /// <summary>
+        /// Gets a score-ordered range of members from a Redis sorted set.
+        /// </summary>
+        /// <param name="groupId">The Redis server group identifier.</param>
+        /// <param name="key">The Redis sorted set key.</param>
+        /// <param name="start">The zero-based start index.</param>
+        /// <param name="stop">The inclusive stop index, where -1 means end of set.</param>
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -106,6 +117,10 @@ namespace Roman.RedisManager.Web.Controllers
             }
         }
 
+        /// <summary>
+        /// Removes one or more members from a Redis sorted set.
+        /// </summary>
+        /// <param name="request">The target group, key, and sorted-set members to remove.</param>
         [HttpPost("remove")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]

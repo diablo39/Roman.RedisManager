@@ -19,10 +19,18 @@ namespace Roman.RedisManager.Web.Controllers
     {
         private readonly IMessageBus _bus = bus;
 
+        /// <summary>
+        /// Searches keys in a Redis server group using a glob pattern and continuation token paging.
+        /// </summary>
+        /// <param name="groupId">The Redis server group identifier.</param>
+        /// <param name="pattern">The Redis key pattern, for example * or user:*.</param>
+        /// <param name="continuationToken">An optional opaque token returned by a previous search page.</param>
+        /// <param name="pageSize">The maximum number of keys to return in the page.</param>
         [HttpGet]
         [Authorize(Policy = AuthorizationPolicies.ReadKeys)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<RedisKeysSearchQueryResult>> SearchKeys(
@@ -80,10 +88,17 @@ namespace Roman.RedisManager.Web.Controllers
             }
         }
 
+        /// <summary>
+        /// Deletes a key from a Redis server group.
+        /// </summary>
+        /// <param name="key">The Redis key to delete.</param>
+        /// <param name="groupId">The Redis server group identifier.</param>
         [HttpDelete("{key}")]
         [Authorize(Policy = AuthorizationPolicies.DeleteKeysByGroup)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<DeleteKeyCommandResult>> DeleteKey(
@@ -115,10 +130,16 @@ namespace Roman.RedisManager.Web.Controllers
             }
         }
 
+        /// <summary>
+        /// Retrieves metadata for a Redis key.
+        /// </summary>
+        /// <param name="key">The Redis key to inspect.</param>
+        /// <param name="groupId">The Redis server group identifier.</param>
         [HttpGet("{key}/metadata")]
         [Authorize(Policy = AuthorizationPolicies.ReadKeys)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<GetKeyMetadataQueryResult>> GetKeyMetadata(
@@ -150,10 +171,16 @@ namespace Roman.RedisManager.Web.Controllers
             }
         }
 
+        /// <summary>
+        /// Retrieves the value payload for a Redis key.
+        /// </summary>
+        /// <param name="key">The Redis key to read.</param>
+        /// <param name="groupId">The Redis server group identifier.</param>
         [HttpGet("{key}/value")]
         [Authorize(Policy = AuthorizationPolicies.ReadKeys)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<GetKeyValueQueryResult>> GetKeyValue(

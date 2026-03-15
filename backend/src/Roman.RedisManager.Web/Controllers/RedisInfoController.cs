@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Roman.RedisManager.Application.CQRS;
 using System;
@@ -12,7 +13,17 @@ namespace Roman.RedisManager.Web.Controllers
     {
         private readonly IMessageBus _bus = bus;
 
+        /// <summary>
+        /// Gets Redis INFO command data for a specific Redis host in a server group.
+        /// </summary>
+        /// <param name="groupId">The Redis server group identifier.</param>
+        /// <param name="host">The Redis host name or IP address.</param>
+        /// <param name="port">The Redis TCP port.</param>
         [HttpGet]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<RedisInfoQueryResult> GetInfo([FromQuery] Guid groupId, [FromQuery] string host, [FromQuery] int port)
         {
             return await _bus.InvokeAsync<RedisInfoQueryResult>(

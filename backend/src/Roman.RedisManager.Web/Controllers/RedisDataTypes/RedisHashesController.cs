@@ -23,6 +23,10 @@ namespace Roman.RedisManager.Web.Controllers
     {
         private readonly IMessageBus _bus = bus;
 
+        /// <summary>
+        /// Sets one or more fields in a Redis hash.
+        /// </summary>
+        /// <param name="request">The target group, key, fields payload, and optional TTL.</param>
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -62,6 +66,13 @@ namespace Roman.RedisManager.Web.Controllers
             }
         }
 
+        /// <summary>
+        /// Gets fields from a Redis hash using cursor-based pagination.
+        /// </summary>
+        /// <param name="groupId">The Redis server group identifier.</param>
+        /// <param name="key">The Redis hash key.</param>
+        /// <param name="cursor">The scan cursor returned from a previous page.</param>
+        /// <param name="pageSize">The maximum number of fields to return.</param>
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -105,6 +116,10 @@ namespace Roman.RedisManager.Web.Controllers
             }
         }
 
+        /// <summary>
+        /// Removes one or more fields from a Redis hash.
+        /// </summary>
+        /// <param name="request">The target group, key, and field names to remove.</param>
         [HttpPost("remove")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]

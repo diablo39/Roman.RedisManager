@@ -26,6 +26,10 @@ namespace Roman.RedisManager.Web.Controllers
     {
         private readonly IMessageBus _bus = bus;
 
+        /// <summary>
+        /// Pushes one or more values to a Redis list.
+        /// </summary>
+        /// <param name="request">The target group, key, values, direction, and optional TTL.</param>
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -66,6 +70,13 @@ namespace Roman.RedisManager.Web.Controllers
             }
         }
 
+        /// <summary>
+        /// Gets a range of values from a Redis list.
+        /// </summary>
+        /// <param name="groupId">The Redis server group identifier.</param>
+        /// <param name="key">The Redis list key.</param>
+        /// <param name="start">The zero-based start index.</param>
+        /// <param name="stop">The inclusive stop index, where -1 means end of list.</param>
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -109,6 +120,10 @@ namespace Roman.RedisManager.Web.Controllers
             }
         }
 
+        /// <summary>
+        /// Removes matching values from a Redis list.
+        /// </summary>
+        /// <param name="request">The target group, key, value to remove, and remove count.</param>
         [HttpPost("remove")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]

@@ -10,7 +10,9 @@
         "tags": [
           "RedisHashes"
         ],
+        "summary": "Sets one or more fields in a Redis hash.",
         "requestBody": {
+          "description": "The target group, key, fields payload, and optional TTL.",
           "content": {
             "application/json": {
               "schema": {
@@ -120,10 +122,12 @@
         "tags": [
           "RedisHashes"
         ],
+        "summary": "Gets fields from a Redis hash using cursor-based pagination.",
         "parameters": [
           {
             "name": "groupId",
             "in": "query",
+            "description": "The Redis server group identifier.",
             "schema": {
               "type": "string",
               "format": "uuid"
@@ -132,6 +136,7 @@
           {
             "name": "key",
             "in": "query",
+            "description": "The Redis hash key.",
             "schema": {
               "type": "string"
             }
@@ -139,6 +144,7 @@
           {
             "name": "cursor",
             "in": "query",
+            "description": "The scan cursor returned from a previous page.",
             "schema": {
               "pattern": "^-?(?:0|[1-9]\\d*)$",
               "type": [
@@ -152,6 +158,7 @@
           {
             "name": "pageSize",
             "in": "query",
+            "description": "The maximum number of fields to return.",
             "schema": {
               "pattern": "^-?(?:0|[1-9]\\d*)$",
               "type": [
@@ -255,7 +262,9 @@
         "tags": [
           "RedisHashes"
         ],
+        "summary": "Removes one or more fields from a Redis hash.",
         "requestBody": {
+          "description": "The target group, key, and field names to remove.",
           "content": {
             "application/json": {
               "schema": {
@@ -367,7 +376,9 @@
         "tags": [
           "RedisLists"
         ],
+        "summary": "Pushes one or more values to a Redis list.",
         "requestBody": {
+          "description": "The target group, key, values, direction, and optional TTL.",
           "content": {
             "application/json": {
               "schema": {
@@ -477,10 +488,12 @@
         "tags": [
           "RedisLists"
         ],
+        "summary": "Gets a range of values from a Redis list.",
         "parameters": [
           {
             "name": "groupId",
             "in": "query",
+            "description": "The Redis server group identifier.",
             "schema": {
               "type": "string",
               "format": "uuid"
@@ -489,6 +502,7 @@
           {
             "name": "key",
             "in": "query",
+            "description": "The Redis list key.",
             "schema": {
               "type": "string"
             }
@@ -496,6 +510,7 @@
           {
             "name": "start",
             "in": "query",
+            "description": "The zero-based start index.",
             "schema": {
               "pattern": "^-?(?:0|[1-9]\\d*)$",
               "type": [
@@ -509,6 +524,7 @@
           {
             "name": "stop",
             "in": "query",
+            "description": "The inclusive stop index, where -1 means end of list.",
             "schema": {
               "pattern": "^-?(?:0|[1-9]\\d*)$",
               "type": [
@@ -612,7 +628,9 @@
         "tags": [
           "RedisLists"
         ],
+        "summary": "Removes matching values from a Redis list.",
         "requestBody": {
+          "description": "The target group, key, value to remove, and remove count.",
           "content": {
             "application/json": {
               "schema": {
@@ -724,7 +742,9 @@
         "tags": [
           "RedisSets"
         ],
+        "summary": "Adds one or more members to a Redis set.",
         "requestBody": {
+          "description": "The target group, key, members, and optional TTL.",
           "content": {
             "application/json": {
               "schema": {
@@ -834,10 +854,12 @@
         "tags": [
           "RedisSets"
         ],
+        "summary": "Gets members from a Redis set using cursor-based pagination.",
         "parameters": [
           {
             "name": "groupId",
             "in": "query",
+            "description": "The Redis server group identifier.",
             "schema": {
               "type": "string",
               "format": "uuid"
@@ -846,6 +868,7 @@
           {
             "name": "key",
             "in": "query",
+            "description": "The Redis set key.",
             "schema": {
               "type": "string"
             }
@@ -853,6 +876,7 @@
           {
             "name": "cursor",
             "in": "query",
+            "description": "The scan cursor returned from a previous page.",
             "schema": {
               "pattern": "^-?(?:0|[1-9]\\d*)$",
               "type": [
@@ -866,6 +890,7 @@
           {
             "name": "pageSize",
             "in": "query",
+            "description": "The maximum number of members to return.",
             "schema": {
               "pattern": "^-?(?:0|[1-9]\\d*)$",
               "type": [
@@ -969,7 +994,9 @@
         "tags": [
           "RedisSets"
         ],
+        "summary": "Removes one or more members from a Redis set.",
         "requestBody": {
+          "description": "The target group, key, and set members to remove.",
           "content": {
             "application/json": {
               "schema": {
@@ -1081,7 +1108,9 @@
         "tags": [
           "RedisSortedSets"
         ],
+        "summary": "Adds one or more members with scores to a Redis sorted set.",
         "requestBody": {
+          "description": "The target group, key, scored entries, and optional TTL.",
           "content": {
             "application/json": {
               "schema": {
@@ -1191,10 +1220,12 @@
         "tags": [
           "RedisSortedSets"
         ],
+        "summary": "Gets a score-ordered range of members from a Redis sorted set.",
         "parameters": [
           {
             "name": "groupId",
             "in": "query",
+            "description": "The Redis server group identifier.",
             "schema": {
               "type": "string",
               "format": "uuid"
@@ -1203,6 +1234,7 @@
           {
             "name": "key",
             "in": "query",
+            "description": "The Redis sorted set key.",
             "schema": {
               "type": "string"
             }
@@ -1210,6 +1242,7 @@
           {
             "name": "start",
             "in": "query",
+            "description": "The zero-based start index.",
             "schema": {
               "pattern": "^-?(?:0|[1-9]\\d*)$",
               "type": [
@@ -1223,6 +1256,7 @@
           {
             "name": "stop",
             "in": "query",
+            "description": "The inclusive stop index, where -1 means end of set.",
             "schema": {
               "pattern": "^-?(?:0|[1-9]\\d*)$",
               "type": [
@@ -1326,7 +1360,9 @@
         "tags": [
           "RedisSortedSets"
         ],
+        "summary": "Removes one or more members from a Redis sorted set.",
         "requestBody": {
+          "description": "The target group, key, and sorted-set members to remove.",
           "content": {
             "application/json": {
               "schema": {
@@ -1438,7 +1474,9 @@
         "tags": [
           "RedisStrings"
         ],
+        "summary": "Sets or updates a Redis string value.",
         "requestBody": {
+          "description": "The target group, key, value, optional TTL, and set condition.",
           "content": {
             "application/json": {
               "schema": {
@@ -1548,10 +1586,12 @@
         "tags": [
           "RedisStrings"
         ],
+        "summary": "Gets a Redis string value by key.",
         "parameters": [
           {
             "name": "groupId",
             "in": "query",
+            "description": "The Redis server group identifier.",
             "schema": {
               "type": "string",
               "format": "uuid"
@@ -1560,6 +1600,7 @@
           {
             "name": "key",
             "in": "query",
+            "description": "The Redis key to read.",
             "schema": {
               "type": "string"
             }
@@ -1657,10 +1698,12 @@
         "tags": [
           "RedisInfo"
         ],
+        "summary": "Gets Redis INFO command data for a specific Redis host in a server group.",
         "parameters": [
           {
             "name": "groupId",
             "in": "query",
+            "description": "The Redis server group identifier.",
             "schema": {
               "type": "string",
               "format": "uuid"
@@ -1669,6 +1712,7 @@
           {
             "name": "host",
             "in": "query",
+            "description": "The Redis host name or IP address.",
             "schema": {
               "type": "string"
             }
@@ -1676,6 +1720,7 @@
           {
             "name": "port",
             "in": "query",
+            "description": "The Redis TCP port.",
             "schema": {
               "pattern": "^-?(?:0|[1-9]\\d*)$",
               "type": [
@@ -1706,6 +1751,49 @@
                 }
               }
             }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
           }
         }
       }
@@ -1715,10 +1803,12 @@
         "tags": [
           "RedisKeys"
         ],
+        "summary": "Searches keys in a Redis server group using a glob pattern and continuation token paging.",
         "parameters": [
           {
             "name": "groupId",
             "in": "query",
+            "description": "The Redis server group identifier.",
             "required": true,
             "schema": {
               "type": "string",
@@ -1728,6 +1818,7 @@
           {
             "name": "pattern",
             "in": "query",
+            "description": "The Redis key pattern, for example * or user:*.",
             "schema": {
               "type": "string",
               "default": "*"
@@ -1736,6 +1827,7 @@
           {
             "name": "continuationToken",
             "in": "query",
+            "description": "An optional opaque token returned by a previous search page.",
             "schema": {
               "type": "string"
             }
@@ -1743,6 +1835,7 @@
           {
             "name": "pageSize",
             "in": "query",
+            "description": "The maximum number of keys to return in the page.",
             "schema": {
               "pattern": "^-?(?:0|[1-9]\\d*)$",
               "type": [
@@ -1795,6 +1888,26 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
           "404": {
             "description": "Not Found",
             "content": {
@@ -1826,10 +1939,12 @@
         "tags": [
           "RedisKeys"
         ],
+        "summary": "Deletes a key from a Redis server group.",
         "parameters": [
           {
             "name": "key",
             "in": "path",
+            "description": "The Redis key to delete.",
             "required": true,
             "schema": {
               "type": "string"
@@ -1838,6 +1953,7 @@
           {
             "name": "groupId",
             "in": "query",
+            "description": "The Redis server group identifier.",
             "schema": {
               "type": "string",
               "format": "uuid"
@@ -1867,6 +1983,46 @@
           },
           "400": {
             "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
             "content": {
               "text/plain": {
                 "schema": {
@@ -1916,10 +2072,12 @@
         "tags": [
           "RedisKeys"
         ],
+        "summary": "Retrieves metadata for a Redis key.",
         "parameters": [
           {
             "name": "key",
             "in": "path",
+            "description": "The Redis key to inspect.",
             "required": true,
             "schema": {
               "type": "string"
@@ -1928,6 +2086,7 @@
           {
             "name": "groupId",
             "in": "query",
+            "description": "The Redis server group identifier.",
             "schema": {
               "type": "string",
               "format": "uuid"
@@ -1957,6 +2116,26 @@
           },
           "400": {
             "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
             "content": {
               "text/plain": {
                 "schema": {
@@ -2006,10 +2185,12 @@
         "tags": [
           "RedisKeys"
         ],
+        "summary": "Retrieves the value payload for a Redis key.",
         "parameters": [
           {
             "name": "key",
             "in": "path",
+            "description": "The Redis key to read.",
             "required": true,
             "schema": {
               "type": "string"
@@ -2018,6 +2199,7 @@
           {
             "name": "groupId",
             "in": "query",
+            "description": "The Redis server group identifier.",
             "schema": {
               "type": "string",
               "format": "uuid"
@@ -2047,6 +2229,26 @@
           },
           "400": {
             "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
             "content": {
               "text/plain": {
                 "schema": {
@@ -2096,10 +2298,12 @@
         "tags": [
           "RedisServerGroups"
         ],
+        "summary": "Lists configured Redis server groups with pagination.",
         "parameters": [
           {
             "name": "pageNumber",
             "in": "query",
+            "description": "The 1-based page number.",
             "schema": {
               "pattern": "^-?(?:0|[1-9]\\d*)$",
               "type": [
@@ -2113,6 +2317,7 @@
           {
             "name": "pageSize",
             "in": "query",
+            "description": "The number of groups per page.",
             "schema": {
               "pattern": "^-?(?:0|[1-9]\\d*)$",
               "type": [
@@ -2144,6 +2349,49 @@
                 }
               }
             }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
           }
         }
       }
@@ -2153,10 +2401,12 @@
         "tags": [
           "RedisServerGroups"
         ],
+        "summary": "Gets details for a specific Redis server group.",
         "parameters": [
           {
             "name": "id",
             "in": "path",
+            "description": "The Redis server group identifier.",
             "required": true,
             "schema": {
               "type": "string",
@@ -2181,6 +2431,26 @@
               "text/json": {
                 "schema": {
                   "$ref": "#/components/schemas/RedisServerGroupDetailQueryResult"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
                 }
               }
             }

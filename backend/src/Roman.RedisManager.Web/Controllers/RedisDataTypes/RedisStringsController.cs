@@ -20,6 +20,10 @@ namespace Roman.RedisManager.Web.Controllers
     {
         private readonly IMessageBus _bus = bus;
 
+        /// <summary>
+        /// Sets or updates a Redis string value.
+        /// </summary>
+        /// <param name="request">The target group, key, value, optional TTL, and set condition.</param>
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -60,6 +64,11 @@ namespace Roman.RedisManager.Web.Controllers
             }
         }
 
+        /// <summary>
+        /// Gets a Redis string value by key.
+        /// </summary>
+        /// <param name="groupId">The Redis server group identifier.</param>
+        /// <param name="key">The Redis key to read.</param>
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]

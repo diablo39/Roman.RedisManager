@@ -24,10 +24,12 @@ namespace Roman.RedisManager.Tests.Web.Authorization
             var baselineClient = _factory.CreateClient();
             TestAuthTokenFactory.ApplyBearer(baselineClient, "https://login.microsoftonline.com/common/v2.0", "entra", tokenClaims);
 
-            var overrideSettings = new Dictionary<string, string?>
-            {
-                ["Security:Authorization:RoleClaimMappings:0:AllowedValues:0"] = "ops_readers"
-            };
+            var overrideSettings = TestConfigurationOverrides.ForRoleClaimMappings(
+                new RoleClaimMappingOverride(
+                    RoleName: "reader",
+                    ProviderKey: "entra",
+                    ClaimKey: "groups",
+                    AllowedValues: new[] { "ops_readers" }));
 
             var updatedClient = _factory.WithWebHostBuilder(builder =>
             {
