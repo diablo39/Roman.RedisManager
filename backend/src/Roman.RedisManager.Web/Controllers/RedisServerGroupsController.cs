@@ -24,7 +24,7 @@ namespace Roman.RedisManager.Web.Controllers
         /// <param name="pageNumber">The 1-based page number.</param>
         /// <param name="pageSize">The number of groups per page.</param>
         [HttpGet]
-        [Authorize(Policy = AuthorizationPolicies.ReadKeys)]
+        [Authorize(Policy = AuthorizationPolicies.Reader)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -40,7 +40,7 @@ namespace Roman.RedisManager.Web.Controllers
         /// </summary>
         /// <param name="id">The Redis server group identifier.</param>
         [HttpGet("{id}")]
-        [Authorize(Policy = AuthorizationPolicies.ReadKeys)]
+        [Authorize(Policy = AuthorizationPolicies.Reader)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]

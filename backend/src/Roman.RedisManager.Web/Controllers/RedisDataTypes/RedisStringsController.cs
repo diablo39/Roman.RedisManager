@@ -1,8 +1,10 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Roman.RedisManager.Application.CQRS.RedisDataTypes.String;
 using Roman.RedisManager.Domain.Entities.RedisData;
 using Roman.RedisManager.Infrastructure.Exceptions;
+using Roman.RedisManager.Web.Authorization;
 using Wolverine;
 
 namespace Roman.RedisManager.Web.Controllers
@@ -25,8 +27,11 @@ namespace Roman.RedisManager.Web.Controllers
         /// </summary>
         /// <param name="request">The target group, key, value, optional TTL, and set condition.</param>
         [HttpPost]
+        [Authorize(Policy = AuthorizationPolicies.Editor)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -70,8 +75,11 @@ namespace Roman.RedisManager.Web.Controllers
         /// <param name="groupId">The Redis server group identifier.</param>
         /// <param name="key">The Redis key to read.</param>
         [HttpGet]
+        [Authorize(Policy = AuthorizationPolicies.Reader)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]

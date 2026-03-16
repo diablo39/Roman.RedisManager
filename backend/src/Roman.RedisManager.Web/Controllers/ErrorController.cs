@@ -1,7 +1,9 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Roman.RedisManager.Web.Controllers
 {
+    [AllowAnonymous]
     [ApiController]
     [Route("/error")]
     [ApiExplorerSettings(IgnoreApi = true)]

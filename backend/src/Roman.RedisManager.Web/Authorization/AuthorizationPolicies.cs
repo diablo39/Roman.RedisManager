@@ -2,7 +2,7 @@ namespace Roman.RedisManager.Web.Authorization
 {
     public static class AuthorizationPolicies
     {
-        public const string ReadKeys = "ReadKeys";
-        public const string DeleteKeysByGroup = "DeleteKeysByGroup";
+        public const string Reader = "Reader";
+        public const string Editor = "Editor";
     }
 }

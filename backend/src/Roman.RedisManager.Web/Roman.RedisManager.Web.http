@@ -8,13 +8,30 @@ GET {{Roman.RedisManager.Web_HostAddress}}/api/redis-server-groups
 
 ###
 
-### Authenticated read call (bearer)
+### 401 Unauthorized — no token (expect 401)
+GET {{Roman.RedisManager.Web_HostAddress}}/api/redis-server-groups
+
+###
+
+### 403 Forbidden — authenticated but wrong role (expect 403 with JSON body)
 GET {{Roman.RedisManager.Web_HostAddress}}/api/redis-server-groups
 Authorization: Bearer {{BearerToken}}
 
 ###
 
-### Authenticated delete call (bearer + group-scoped policy)
+### 200 OK — Reader policy: authenticated with reader role
+GET {{Roman.RedisManager.Web_HostAddress}}/api/redis-server-groups
+Authorization: Bearer {{BearerToken}}
+
+###
+
+### 200 OK — Editor policy: authenticated with editor role
+DELETE {{Roman.RedisManager.Web_HostAddress}}/api/redis-keys/test:string?groupId={{RedisServerGroupId}}
+Authorization: Bearer {{BearerToken}}
+
+###
+
+### 403 Forbidden — reader-only user attempts mutation (expect 403)
 DELETE {{Roman.RedisManager.Web_HostAddress}}/api/redis-keys/test:string?groupId={{RedisServerGroupId}}
 Authorization: Bearer {{BearerToken}}
 

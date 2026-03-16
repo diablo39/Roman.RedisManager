@@ -24,9 +24,6 @@ namespace Roman.RedisManager.Domain.Configuration
         [ConfigurationKeyName("GroupType")]
         public required GroupType GroupType { get; set; }
 
-        [ConfigurationKeyName("AuthorizationOverrides")]
-        public AuthorizationOverridesConfiguration? AuthorizationOverrides { get; set; }
-
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
             if (Id == Guid.Empty)
@@ -34,16 +31,5 @@ namespace Roman.RedisManager.Domain.Configuration
                 yield return new ValidationResult("Id must be a non-empty GUID.", new[] { nameof(Id) });
             }
         }
-    }
-
-    public class AuthorizationOverridesConfiguration
-    {
-        [ConfigurationKeyName("Mode")]
-        public PermissionOverrideMode Mode { get; set; } = PermissionOverrideMode.ReplaceDefaults;
-
-        [Required]
-        [MinLength(1)]
-        [ConfigurationKeyName("Rules")]
-        public required IEnumerable<PermissionRuleConfiguration> Rules { get; set; }
     }
 }

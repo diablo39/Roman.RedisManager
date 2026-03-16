@@ -1,8 +1,10 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Roman.RedisManager.Application.CQRS.RedisDataTypes.SortedSet;
 using Roman.RedisManager.Domain.Entities.RedisData;
 using Roman.RedisManager.Infrastructure.Exceptions;
+using Roman.RedisManager.Web.Authorization;
 using Wolverine;
 
 namespace Roman.RedisManager.Web.Controllers
@@ -29,8 +31,11 @@ namespace Roman.RedisManager.Web.Controllers
         /// </summary>
         /// <param name="request">The target group, key, scored entries, and optional TTL.</param>
         [HttpPost]
+        [Authorize(Policy = AuthorizationPolicies.Editor)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -75,8 +80,11 @@ namespace Roman.RedisManager.Web.Controllers
         /// <param name="start">The zero-based start index.</param>
         /// <param name="stop">The inclusive stop index, where -1 means end of set.</param>
         [HttpGet]
+        [Authorize(Policy = AuthorizationPolicies.Reader)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -122,8 +130,11 @@ namespace Roman.RedisManager.Web.Controllers
         /// </summary>
         /// <param name="request">The target group, key, and sorted-set members to remove.</param>
         [HttpPost("remove")]
+        [Authorize(Policy = AuthorizationPolicies.Editor)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
