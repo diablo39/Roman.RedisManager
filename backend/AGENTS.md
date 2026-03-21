@@ -8,7 +8,7 @@ This file is the canonical instruction source for this repository.
 - Do not duplicate the same rules in `CLAUDE.md` or `.github/copilot-instructions.md`.
 - Pointer files should only reference this file and contain agent-specific deltas when strictly necessary.
 
-# Copilot Instructions — Roman.RedisManager
+# Instructions
 
 ## Important Note
 
