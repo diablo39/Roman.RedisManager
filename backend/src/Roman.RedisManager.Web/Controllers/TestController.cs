@@ -1,8 +1,10 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Hosting;
 
 namespace Roman.RedisManager.Web.Controllers
 {
+    [AllowAnonymous]
     [ApiController]
     [Route("api/test")]
     [ApiExplorerSettings(IgnoreApi = true)] // hide from Swagger/OpenAPI

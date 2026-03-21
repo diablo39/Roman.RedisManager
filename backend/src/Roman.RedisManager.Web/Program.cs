@@ -1,5 +1,4 @@
 using Roman.RedisManager.Domain.Configuration;
-using Roman.RedisManager.Domain.Entities;
 using Roman.RedisManager.Domain.Repositories;
 using Roman.RedisManager.Domain.Repositories.RedisDataTypes;
 using Roman.RedisManager.Infrastructure.Redis;
@@ -8,12 +7,11 @@ using Roman.RedisManager.Infrastructure.Repositories;
 using Roman.RedisManager.Infrastructure.Repositories.RedisDataTypes;
 using Roman.RedisManager.Web.Authentication;
 using Roman.RedisManager.Web.Authorization;
-using Roman.RedisManager.Web.Authorization.Handlers;
-using Roman.RedisManager.Web.Authorization.Requirements;
 using Wolverine;
 using System.Diagnostics;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization.Policy;
 using Microsoft.AspNetCore.Authentication;
 // using Microsoft.AspNetCore.Mvc.Infrastructure; // no longer needed
 
@@ -55,12 +53,6 @@ namespace Roman.RedisManager.Web
                 .ValidateDataAnnotations()
                 .ValidateOnStart();
 
-            builder.Services
-                .AddOptions<AuthorizationPermissionConfiguration>()
-                .Bind(builder.Configuration.GetSection(AuthorizationRoleMappingConfiguration.SectionName).GetSection("Permissions"))
-                .ValidateDataAnnotations()
-                .ValidateOnStart();
-
             builder.Services.AddSingleton<IRedisConnectionManager, RedisConnectionManager>();
             builder.Services.AddSingleton<IContinuationTokenCodec, ContinuationTokenCodec>();
             builder.Services.AddSingleton<IRedisRepository, RedisRepository>();
@@ -70,24 +62,27 @@ namespace Roman.RedisManager.Web
             builder.Services.AddSingleton<IRedisSetRepository, RedisSetRepository>();
             builder.Services.AddSingleton<IRedisHashRepository, RedisHashRepository>();
             builder.Services.AddSingleton<IRedisSortedSetRepository, RedisSortedSetRepository>();
-            builder.Services.AddSingleton<IGroupContextAccessor, RouteGroupContextAccessor>();
             builder.Services.AddSingleton<AuthorizationDecisionLogger>();
             builder.Services.AddSingleton<RoleClaimMappingEvaluator>();
-            builder.Services.AddSingleton<IAuthorizationHandler, GroupPermissionAuthorizationHandler>();
 
-            builder.Services.AddConfiguredIdentity();
+            builder.Services.AddConfiguredIdentity(builder.Configuration);
 
             builder.Services.AddAuthorization(options =>
             {
-                options.AddPolicy(AuthorizationPolicies.ReadKeys, policy => policy
+                options.AddPolicy(AuthorizationPolicies.Reader, policy => policy
                     .RequireAuthenticatedUser()
-                    .RequireRole("reader", "editor", "admin"));
+                    .RequireRole("reader", "admin"));
 
-                options.AddPolicy(AuthorizationPolicies.DeleteKeysByGroup, policy => policy
+                options.AddPolicy(AuthorizationPolicies.Editor, policy => policy
                     .RequireAuthenticatedUser()
-                    .AddRequirements(new GroupPermissionRequirement(PermissionAction.DeleteKey)));
+                    .RequireRole("editor", "admin"));
+
+                options.FallbackPolicy = new AuthorizationPolicyBuilder()
+                    .RequireAuthenticatedUser()
+                    .Build();
             });
 
+            builder.Services.AddSingleton<IAuthorizationMiddlewareResultHandler, CustomAuthorizationResultHandler>();
             builder.Services.AddTransient<IClaimsTransformation, NormalizedRoleClaimsTransformation>();
 
             builder.Services.AddControllers();
@@ -110,7 +105,11 @@ namespace Roman.RedisManager.Web
                     details.Extensions["requestPath"] = context.Request.Path.ToString();
                 };
             });
-            builder.Services.AddOpenApi();
+            builder.Services.AddOpenApi(options =>
+            {
+                options.AddDocumentTransformer<OpenApi.SecuritySchemeTransformer>();
+                options.AddOperationTransformer<OpenApi.SecurityRequirementOperationTransformer>();
+            });
 
             builder.UseWolverine(opts =>
             {
@@ -129,7 +128,7 @@ namespace Roman.RedisManager.Web
 
             if (app.Environment.IsDevelopment())
             {
-                app.MapOpenApi();
+                app.MapOpenApi().AllowAnonymous();
                 app.UseSwaggerUI(options =>
                 {
                     options.SwaggerEndpoint("/openapi/v1.json", "v1");

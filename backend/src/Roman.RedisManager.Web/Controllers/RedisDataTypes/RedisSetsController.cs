@@ -1,7 +1,9 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Roman.RedisManager.Application.CQRS.RedisDataTypes.Set;
 using Roman.RedisManager.Infrastructure.Exceptions;
+using Roman.RedisManager.Web.Authorization;
 using Wolverine;
 
 namespace Roman.RedisManager.Web.Controllers
@@ -28,8 +30,11 @@ namespace Roman.RedisManager.Web.Controllers
         /// </summary>
         /// <param name="request">The target group, key, members, and optional TTL.</param>
         [HttpPost]
+        [Authorize(Policy = AuthorizationPolicies.Editor)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -74,8 +79,11 @@ namespace Roman.RedisManager.Web.Controllers
         /// <param name="cursor">The scan cursor returned from a previous page.</param>
         /// <param name="pageSize">The maximum number of members to return.</param>
         [HttpGet]
+        [Authorize(Policy = AuthorizationPolicies.Reader)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -121,8 +129,11 @@ namespace Roman.RedisManager.Web.Controllers
         /// </summary>
         /// <param name="request">The target group, key, and set members to remove.</param>
         [HttpPost("remove")]
+        [Authorize(Policy = AuthorizationPolicies.Editor)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]

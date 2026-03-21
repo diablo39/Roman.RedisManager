@@ -26,3 +26,5 @@ tests/Roman.RedisManager.Tests/StrykerOutput/**
 # OS artifacts
 .DS_Store
 Thumbs.db
+
+.claude/settings.local.json

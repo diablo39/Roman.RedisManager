@@ -1,4 +1,3 @@
-using Roman.RedisManager.Domain.Entities;
 using System.Security.Claims;
 
 namespace Roman.RedisManager.Web.Authorization
@@ -14,24 +13,20 @@ namespace Roman.RedisManager.Web.Authorization
 
         public void LogDecision(
             ClaimsPrincipal user,
-            PermissionAction action,
-            Guid? groupId,
-            bool allowed,
-            AuthorizationDecisionReason reason)
+            string policyName,
+            bool allowed)
         {
             var userId = user.FindFirstValue(ClaimTypes.NameIdentifier) ?? "anonymous";
             var roles = string.Join(',', user.FindAll(ClaimTypes.Role).Select(role => role.Value));
             var providerKey = user.FindFirstValue("provider") ?? "unknown";
 
             _logger.LogInformation(
-                "Authorization decision user={UserId} provider={ProviderKey} roles={Roles} action={Action} groupId={GroupId} allowed={Allowed} reason={Reason}",
+                "Authorization decision user={UserId} provider={ProviderKey} roles={Roles} policy={PolicyName} allowed={Allowed}",
                 userId,
                 providerKey,
                 roles,
-                action,
-                groupId,
-                allowed,
-                reason);
+                policyName,
+                allowed);
         }
     }
 }

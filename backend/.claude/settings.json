@@ -1,0 +1,24 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(dotnet test:*)",
+      "Bash(dotnet build:*)",
+      "Bash(dotnet run:*)",
+      "Bash(dotnet list:*)",
+      "Bash(dotnet stryker:*)"
+    ]
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash $CLAUDE_PROJECT_DIR/.claude/hooks/mutation-testing-reminder.sh"
+          }
+        ]
+      }
+    ]
+  }
+}

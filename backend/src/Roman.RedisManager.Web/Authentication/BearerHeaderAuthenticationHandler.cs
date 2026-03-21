@@ -85,6 +85,7 @@ namespace Roman.RedisManager.Web.Authentication
             if (root.TryGetProperty("roles", out var rolesElement))
             {
                 AppendStringOrArrayClaims(claims, "roles", rolesElement);
+                AppendStringOrArrayClaims(claims, ClaimTypes.Role, rolesElement);
             }
 
             if (root.TryGetProperty("role", out var roleElement))

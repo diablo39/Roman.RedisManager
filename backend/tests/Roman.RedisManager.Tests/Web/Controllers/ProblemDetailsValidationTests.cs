@@ -41,6 +41,7 @@ namespace Roman.RedisManager.Tests.Web.Controllers
         {
             // Arrange
             var client = _factory.CreateClient();
+            TestAuthTokenFactory.ApplyBearer(client, "admin");
 
             // Act
             var response = await client.GetAsync("/api/this-route-does-not-exist");

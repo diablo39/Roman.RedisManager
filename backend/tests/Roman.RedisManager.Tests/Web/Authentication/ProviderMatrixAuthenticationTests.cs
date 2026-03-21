@@ -19,7 +19,7 @@ namespace Roman.RedisManager.Tests.Web.Authentication
             {
                 new { Issuer = "https://login.microsoftonline.com/common/v2.0", Provider = "entra" },
                 new { Issuer = "https://accounts.google.com", Provider = "google" },
-                new { Issuer = "https://issuer.example.com", Provider = "generic" }
+                new { Issuer = "https://issuer.dev.local", Provider = "generic" }
             };
 
             // Act

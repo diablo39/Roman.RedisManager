@@ -16,7 +16,7 @@ namespace Roman.RedisManager.Tests.Web.Authorization
         {
             // Arrange
             var client = _factory.CreateClient();
-            TestAuthTokenFactory.ApplyBearer(client, "https://issuer.example.com", "generic");
+            TestAuthTokenFactory.ApplyBearer(client, "https://issuer.dev.local", "generic");
 
             // Act
             var response = await client.GetAsync("/api/redis-server-groups");

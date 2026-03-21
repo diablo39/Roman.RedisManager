@@ -27,7 +27,7 @@ namespace Roman.RedisManager.Web.Controllers
         /// <param name="continuationToken">An optional opaque token returned by a previous search page.</param>
         /// <param name="pageSize">The maximum number of keys to return in the page.</param>
         [HttpGet]
-        [Authorize(Policy = AuthorizationPolicies.ReadKeys)]
+        [Authorize(Policy = AuthorizationPolicies.Reader)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -94,7 +94,7 @@ namespace Roman.RedisManager.Web.Controllers
         /// <param name="key">The Redis key to delete.</param>
         /// <param name="groupId">The Redis server group identifier.</param>
         [HttpDelete("{key}")]
-        [Authorize(Policy = AuthorizationPolicies.DeleteKeysByGroup)]
+        [Authorize(Policy = AuthorizationPolicies.Editor)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -136,7 +136,7 @@ namespace Roman.RedisManager.Web.Controllers
         /// <param name="key">The Redis key to inspect.</param>
         /// <param name="groupId">The Redis server group identifier.</param>
         [HttpGet("{key}/metadata")]
-        [Authorize(Policy = AuthorizationPolicies.ReadKeys)]
+        [Authorize(Policy = AuthorizationPolicies.Reader)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -177,7 +177,7 @@ namespace Roman.RedisManager.Web.Controllers
         /// <param name="key">The Redis key to read.</param>
         /// <param name="groupId">The Redis server group identifier.</param>
         [HttpGet("{key}/value")]
-        [Authorize(Policy = AuthorizationPolicies.ReadKeys)]
+        [Authorize(Policy = AuthorizationPolicies.Reader)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
