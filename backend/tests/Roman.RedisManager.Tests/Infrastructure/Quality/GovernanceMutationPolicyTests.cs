@@ -10,37 +10,28 @@ namespace Roman.RedisManager.Tests.Infrastructure.Quality
 {
     public class GovernanceMutationPolicyTests
     {
-        [Fact]
-        public void GovernanceFiles_MutationLoopPolicyPresent_ContainsRequiredPhrases()
+        [Theory]
+        [InlineData(".", "AGENTS.md")]
+        [InlineData(".specify", "memory", "constitution.md")]
+        [InlineData(".specify", "templates", "spec-template.md")]
+        [InlineData(".specify", "templates", "plan-template.md")]
+        [InlineData(".specify", "templates", "tasks-template.md")]
+        [InlineData(".github", "prompts", "speckit.implement.prompt.md")]
+        [InlineData(".github", "prompts", "speckit.tasks.prompt.md")]
+        [InlineData("..", ".specify", "templates", "agent-file-template.md")]
+        public void GovernanceFiles_MutationLoopPolicyPresent_ContainsRequiredPhrases(params string[] pathSegments)
         {
-
             // Arrange
             var backendRoot = ResolveBackendRoot();
-            var files = new[]
-            {
-                Path.Combine(backendRoot, ".", "AGENTS.md"),
-                Path.Combine(backendRoot, ".specify", "memory", "constitution.md"),
-                Path.Combine(backendRoot, ".specify", "templates", "spec-template.md"),
-                Path.Combine(backendRoot, ".specify", "templates", "plan-template.md"),
-                Path.Combine(backendRoot, ".specify", "templates", "tasks-template.md"),
-                Path.Combine(backendRoot, ".github", "prompts", "speckit.implement.prompt.md"),
-                Path.Combine(backendRoot, ".github", "prompts", "speckit.tasks.prompt.md"),
-                Path.Combine(backendRoot, "..", ".specify", "templates", "agent-file-template.md")
-            };
-
-            foreach (var file in files)
-
-            {
+            var file = Path.Combine([backendRoot, .. pathSegments]);
 
             // Act
+            File.Exists(file).ShouldBeTrue($"Expected governance file not found: {file}");
+            var content = File.ReadAllText(file);
 
             // Assert
-                File.Exists(file).ShouldBeTrue($"Expected governance file not found: {file}");
-
-                var content = File.ReadAllText(file);
-                content.ShouldContain("run -> analyze -> improve -> rerun");
-                content.ShouldContain("mutation");
-            }
+            content.ShouldContain("run -> analyze -> improve -> rerun");
+            content.ShouldContain("mutation");
         }
 
         private static string ResolveBackendRoot()
