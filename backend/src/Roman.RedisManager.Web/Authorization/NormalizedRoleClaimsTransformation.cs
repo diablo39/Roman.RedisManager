@@ -26,7 +26,13 @@ namespace Roman.RedisManager.Web.Authorization
                 return Task.FromResult(principal);
             }
 
-            var issuer = identity.FindFirst("iss")?.Value;
+            var issuer = identity.Claims
+                .Select(claim => claim.Issuer)
+                .FirstOrDefault(value => !string.IsNullOrWhiteSpace(value) &&
+                    !string.Equals(value, ClaimsIdentity.DefaultIssuer, StringComparison.OrdinalIgnoreCase));
+
+            issuer ??= identity.FindFirst("iss")?.Value;
+
             var provider = _providerResolver.ResolveProviderByIssuer(issuer);
             if (provider is null)
             {

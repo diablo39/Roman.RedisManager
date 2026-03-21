@@ -65,7 +65,7 @@ namespace Roman.RedisManager.Web
             builder.Services.AddSingleton<AuthorizationDecisionLogger>();
             builder.Services.AddSingleton<RoleClaimMappingEvaluator>();
 
-            builder.Services.AddConfiguredIdentity();
+            builder.Services.AddConfiguredIdentity(builder.Configuration);
 
             builder.Services.AddAuthorization(options =>
             {

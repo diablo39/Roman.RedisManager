@@ -18,7 +18,7 @@ namespace Roman.RedisManager.Tests.Infrastructure.Quality
             var backendRoot = ResolveBackendRoot();
             var files = new[]
             {
-                Path.Combine(backendRoot, ".github", "copilot-instructions.md"),
+                Path.Combine(backendRoot, ".", "AGENTS.md"),
                 Path.Combine(backendRoot, ".specify", "memory", "constitution.md"),
                 Path.Combine(backendRoot, ".specify", "templates", "spec-template.md"),
                 Path.Combine(backendRoot, ".specify", "templates", "plan-template.md"),
