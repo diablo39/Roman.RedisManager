@@ -39,6 +39,12 @@ namespace Roman.RedisManager.Domain.Configuration
         [ConfigurationKeyName("ClientId")]
         public required string ClientId { get; set; }
 
+        [ConfigurationKeyName("ValidateAudience")]
+        public bool ValidateAudience { get; set; } = false;
+
+        [ConfigurationKeyName("SigningKey")]
+        public string? SigningKey { get; set; }
+
     }
 
     public class OidcAuthenticationConfiguration : IValidatableObject
