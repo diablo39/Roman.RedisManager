@@ -1,0 +1,114 @@
+openapi: 3.0.3
+info:
+  title: Authentication Bootstrap API
+  version: 1.0.0
+  description: Browser-safe authentication bootstrap contract for SPA OIDC initialization.
+paths:
+  /api/authentication/bootstrap:
+    get:
+      tags:
+        - Authentication
+      summary: Get browser-safe OIDC bootstrap settings
+      operationId: getAuthenticationBootstrap
+      security: []
+      responses:
+        '200':
+          description: Bootstrap configuration returned with deterministic availability state.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthenticationBootstrapResponse'
+components:
+  schemas:
+    AuthenticationBootstrapResponse:
+      type: object
+      required:
+        - bootstrapState
+        - providers
+      properties:
+        bootstrapState:
+          type: string
+          enum:
+            - available
+            - unavailable
+        unavailableReasonCodes:
+          type: array
+          items:
+            type: string
+        providers:
+          type: array
+          items:
+            $ref: '#/components/schemas/AuthenticationProviderSummary'
+        generatedAtUtc:
+          type: string
+          format: date-time
+        version:
+          type: string
+    AuthenticationProviderSummary:
+      type: object
+      required:
+        - providerKey
+        - displayName
+        - kind
+        - oidc
+      properties:
+        providerKey:
+          type: string
+        displayName:
+          type: string
+        kind:
+          type: string
+          enum:
+            - EntraId
+            - Google
+            - GenericOidc
+        oidc:
+          $ref: '#/components/schemas/FrontendOidcBootstrapProfile'
+    FrontendOidcBootstrapProfile:
+      type: object
+      required:
+        - authority
+        - clientId
+        - redirectUri
+        - scope
+        - responseType
+      properties:
+        authority:
+          type: string
+        clientId:
+          type: string
+        redirectUri:
+          type: string
+          format: uri
+        scope:
+          type: string
+        responseType:
+          type: string
+          example: code
+        postLogoutRedirectUri:
+          type: string
+          format: uri
+        silentRedirectUri:
+          type: string
+          format: uri
+        automaticSilentRenew:
+          type: boolean
+        metadataOverrides:
+          $ref: '#/components/schemas/OidcMetadataOverrides'
+    OidcMetadataOverrides:
+      type: object
+      properties:
+        issuer:
+          type: string
+        authorizationEndpoint:
+          type: string
+          format: uri
+        tokenEndpoint:
+          type: string
+          format: uri
+        userInfoEndpoint:
+          type: string
+          format: uri
+        endSessionEndpoint:
+          type: string
+          format: uri
