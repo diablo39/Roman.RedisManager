@@ -2,6 +2,7 @@
  * Redis server groups API client
  */
 
+import { getAuthHeaders } from './authentication'
 import { apiBaseUrl } from './config'
 
 /**
@@ -44,11 +45,15 @@ interface ProblemDetails {
   detail?: string | null
 }
 
-async function parseErrorMessage(response: Response, fallback: string): Promise<string> {
+async function parseErrorMessage (response: Response, fallback: string): Promise<string> {
   try {
     const payload = (await response.json()) as ProblemDetails
-    if (payload.detail) return payload.detail
-    if (payload.title) return payload.title
+    if (payload.detail) {
+      return payload.detail
+    }
+    if (payload.title) {
+      return payload.title
+    }
     return fallback
   } catch {
     return fallback
@@ -63,10 +68,10 @@ async function parseErrorMessage(response: Response, fallback: string): Promise<
  * @returns Promise resolving to paginated server-group list
  * @throws Error if the request fails
  */
-export async function getRedisServers(
+export async function getRedisServers (
   pageNumber: number,
   pageSize: number,
-  signal?: AbortSignal
+  signal?: AbortSignal,
 ): Promise<RedisServersQueryResult> {
   const params = new URLSearchParams({
     pageNumber: pageNumber.toString(),
@@ -74,7 +79,7 @@ export async function getRedisServers(
   })
   const url = `${apiBaseUrl}api/redis-server-groups?${params.toString()}`
 
-  const response = await fetch(url, { signal })
+  const response = await fetch(url, { signal, headers: await getAuthHeaders() })
 
   if (!response.ok) {
     const message = await parseErrorMessage(response, 'Failed to fetch Redis server groups')
@@ -89,12 +94,12 @@ export async function getRedisServers(
  * @param id - Redis server group identifier
  * @param signal - Optional AbortSignal for request cancellation
  */
-export async function getRedisServerGroupDetail(
+export async function getRedisServerGroupDetail (
   id: string,
-  signal?: AbortSignal
+  signal?: AbortSignal,
 ): Promise<RedisServerGroupDetailQueryResult> {
   const url = `${apiBaseUrl}api/redis-server-groups/${encodeURIComponent(id)}`
-  const response = await fetch(url, { signal })
+  const response = await fetch(url, { signal, headers: await getAuthHeaders() })
 
   if (!response.ok) {
     const message = await parseErrorMessage(response, 'Failed to fetch Redis server group details')

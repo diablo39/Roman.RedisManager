@@ -1,9 +1,18 @@
 {
-  "servers": {
-    "my-mcp-server-4eccf67c": {
-      "url": "https://mcp.vuetifyjs.com/mcp",
-      "type": "http"
-    }
-  },
-  "inputs": []
+	"servers": {
+		"Vuetify MCP": {
+			"url": "https://mcp.vuetifyjs.com/mcp",
+			"type": "http"
+		},
+		"microsoft/playwright-mcp": {
+			"type": "stdio",
+			"command": "npx",
+			"args": [
+				"@playwright/mcp@latest"
+			],
+			"gallery": "https://api.mcp.github.com",
+			"version": "0.0.1-seed"
+		}
+	},
+	"inputs": []
 }

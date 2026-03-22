@@ -13,5 +13,5 @@
 </template>
 
 <script lang="ts" setup>
-console.log('Index page loaded')
+  console.log('Index page loaded')
 </script>

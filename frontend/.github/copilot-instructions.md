@@ -15,24 +15,50 @@ This file provides AI coding assistants with comprehensive instructions for gene
 This project has access to the **Vuetify Model Context Protocol (MCP) server** which provides real-time access to Vuetify documentation and API information. When working with Vuetify components, directives, or features:
 
 **Available MCP Tools**:
+
 - `get_component_api_by_version` - Get complete API documentation for any Vuetify component
 - `get_directive_api_by_version` - Get API information for Vuetify directives (v-ripple, etc.)
 - `get_feature_guide` - Access feature documentation (accessibility, theming, etc.)
 - `get_vuetify_api_by_version` - Download and cache Vuetify API types by version
 
 **When to Use MCP Server**:
+
 - When unsure about component props, events, or slots
 - When implementing complex Vuetify features
 - To verify correct API usage for components
 - To explore available Vuetify component options
 
 **Example Usage**:
+
 ```
 Need v-data-table props? → Use get_component_api_by_version('v-data-table')
 Need theming guide? → Use get_feature_guide('theme')
 ```
 
 ---
+
+## Playwright MCP Server
+
+This project may use a **Playwright Model Context Protocol (MCP) server** for browser automation, end-to-end testing, and capturing runtime browser state. The Playwright MCP provides programmatic actions such as navigation, clicking, typing, file uploads, waiting for selectors or network activity, handling dialogs, and taking screenshots or accessibility snapshots.
+
+When to Use Playwright MCP Server:
+
+- Automating end-to-end UI flows (for example: sign-in redirect flows, OAuth/OIDC callback handling, complex multi-step interactions).
+- Reproducing and debugging browser-only issues (cookies, localStorage/sessionStorage, CORS redirects, cross-origin flows).
+- Capturing visual snapshots or accessibility snapshots for regression testing.
+- Verifying integrations that require a real browser (third-party identity providers, redirects, popup flows, file uploads).
+- Collecting page console logs and network traces to diagnose flaky UI behavior.
+
+When NOT to use Playwright MCP Server:
+
+- For fast unit tests or isolated component tests — use Vitest + @vue/test-utils instead.
+- For purely backend or API contract checks that don't require a browser context.
+
+Example Usage:
+
+```
+Need to verify login redirect behavior across providers? → Use Playwright to navigate to `/login`, click the provider button, follow the external redirect, and capture the final page snapshot and console logs.
+```
 
 ## Project Context
 
@@ -87,12 +113,12 @@ This is a **frontend-only** application that communicates with a separate backen
 </template>
 
 <script setup lang="ts">
-// Vue APIs auto-imported (ref, computed, watch, etc.)
-const count = ref(0);
+  // Vue APIs auto-imported (ref, computed, watch, etc.)
+  const count = ref(0)
 </script>
 
 <style scoped lang="sass">
-// Custom styles only if needed
+  // Custom styles only if needed
 </style>
 ```
 
@@ -117,14 +143,14 @@ const count = ref(0);
 </template>
 
 <script setup lang="ts">
-// Minimal page logic
-const route = useRoute();
+  // Minimal page logic
+  const route = useRoute()
 </script>
 
 <route lang="yaml">
 meta:
   layout: default
-  title: "Page Title"
+  title: 'Page Title'
 </route>
 ```
 
@@ -153,7 +179,7 @@ meta:
 </template>
 
 <script setup lang="ts">
-// Minimal or no logic
+  // Minimal or no logic
 </script>
 ```
 
@@ -173,7 +199,7 @@ meta:
 **Template**:
 
 ```typescript
-export const useXxxStore = defineStore("xxx", {
+export const useXxxStore = defineStore('xxx', {
   state: () => ({
     items: [] as Item[],
     loading: false,
@@ -182,21 +208,21 @@ export const useXxxStore = defineStore("xxx", {
 
   getters: {
     itemCount(): number {
-      return this.items.length;
+      return this.items.length
     },
   },
 
   actions: {
     async fetchItems() {
-      this.loading = true;
+      this.loading = true
       try {
-        this.items = await api.getItems();
+        this.items = await api.getItems()
       } finally {
-        this.loading = false;
+        this.loading = false
       }
     },
   },
-});
+})
 ```
 
 ### Router Configuration
@@ -260,10 +286,7 @@ For a new feature like "Connection Manager":
           @click="selectConnection(conn.id)"
         >
           <template #prepend>
-            <v-icon
-              :color="conn.active ? 'success' : 'grey'"
-              icon="mdi-circle"
-            />
+            <v-icon :color="conn.active ? 'success' : 'grey'" icon="mdi-circle" />
           </template>
         </v-list-item>
       </v-list>
@@ -272,16 +295,16 @@ For a new feature like "Connection Manager":
 </template>
 
 <script setup lang="ts">
-const connectionsStore = useConnectionsStore();
-const { connections } = storeToRefs(connectionsStore);
+  const connectionsStore = useConnectionsStore()
+  const { connections } = storeToRefs(connectionsStore)
 
-const selectConnection = (id: string) => {
-  connectionsStore.setActive(id);
-};
+  const selectConnection = (id: string) => {
+    connectionsStore.setActive(id)
+  }
 
-onMounted(() => {
-  connectionsStore.fetchConnections();
-});
+  onMounted(() => {
+    connectionsStore.fetchConnections()
+  })
 </script>
 ```
 
@@ -290,14 +313,14 @@ onMounted(() => {
 ```typescript
 // src/stores/connections.ts
 interface Connection {
-  id: string;
-  name: string;
-  host: string;
-  port: number;
-  active: boolean;
+  id: string
+  name: string
+  host: string
+  port: number
+  active: boolean
 }
 
-export const useConnectionsStore = defineStore("connections", {
+export const useConnectionsStore = defineStore('connections', {
   state: () => ({
     connections: [] as Connection[],
     activeId: null as string | null,
@@ -306,26 +329,26 @@ export const useConnectionsStore = defineStore("connections", {
 
   getters: {
     activeConnection(): Connection | null {
-      return this.connections.find((c) => c.id === this.activeId) || null;
+      return this.connections.find(c => c.id === this.activeId) || null
     },
   },
 
   actions: {
     async fetchConnections() {
-      this.loading = true;
+      this.loading = true
       try {
         // API call
-        this.connections = await api.getConnections();
+        this.connections = await api.getConnections()
       } finally {
-        this.loading = false;
+        this.loading = false
       }
     },
 
     setActive(id: string) {
-      this.activeId = id;
+      this.activeId = id
     },
   },
-});
+})
 ```
 
 **Step 4: Create Page (if needed)**
@@ -339,7 +362,7 @@ export const useConnectionsStore = defineStore("connections", {
 </template>
 
 <script setup lang="ts">
-// Minimal - component does the work
+  // Minimal - component does the work
 </script>
 ```
 
@@ -473,12 +496,7 @@ export const useConnectionsStore = defineStore("connections", {
       />
 
       <v-list>
-        <v-list-item
-          v-for="key in filteredKeys"
-          :key="key"
-          :title="key"
-          @click="selectKey(key)"
-        >
+        <v-list-item v-for="key in filteredKeys" :key="key" :title="key" @click="selectKey(key)">
           <template #append>
             <v-icon icon="mdi-chevron-right" />
           </template>
@@ -489,24 +507,24 @@ export const useConnectionsStore = defineStore("connections", {
 </template>
 
 <script setup lang="ts">
-const keysStore = useKeysStore();
-const { keys } = storeToRefs(keysStore);
+  const keysStore = useKeysStore()
+  const { keys } = storeToRefs(keysStore)
 
-const searchPattern = ref("");
+  const searchPattern = ref('')
 
-const filteredKeys = computed(() => {
-  if (!searchPattern.value) return keys.value;
-  const pattern = searchPattern.value.toLowerCase();
-  return keys.value.filter((k) => k.toLowerCase().includes(pattern));
-});
+  const filteredKeys = computed(() => {
+    if (!searchPattern.value) return keys.value
+    const pattern = searchPattern.value.toLowerCase()
+    return keys.value.filter(k => k.toLowerCase().includes(pattern))
+  })
 
-const selectKey = (key: string) => {
-  keysStore.setSelectedKey(key);
-};
+  const selectKey = (key: string) => {
+    keysStore.setSelectedKey(key)
+  }
 
-onMounted(() => {
-  keysStore.fetchKeys();
-});
+  onMounted(() => {
+    keysStore.fetchKeys()
+  })
 </script>
 ```
 
@@ -514,7 +532,7 @@ onMounted(() => {
 
 ```typescript
 // src/stores/keys.ts
-export const useKeysStore = defineStore("keys", {
+export const useKeysStore = defineStore('keys', {
   state: () => ({
     keys: [] as string[],
     selectedKey: null as string | null,
@@ -523,19 +541,19 @@ export const useKeysStore = defineStore("keys", {
 
   actions: {
     async fetchKeys() {
-      this.loading = true;
+      this.loading = true
       try {
-        this.keys = await api.getKeys();
+        this.keys = await api.getKeys()
       } finally {
-        this.loading = false;
+        this.loading = false
       }
     },
 
     setSelectedKey(key: string) {
-      this.selectedKey = key;
+      this.selectedKey = key
     },
   },
-});
+})
 ```
 
 **Page**:
@@ -572,17 +590,17 @@ export const useKeysStore = defineStore("keys", {
 </template>
 
 <script setup lang="ts">
-import { useTheme } from "vuetify";
+  import { useTheme } from 'vuetify'
 
-const theme = useTheme();
+  const theme = useTheme()
 
-const isDark = computed(() => theme.global.current.value.dark);
+  const isDark = computed(() => theme.global.current.value.dark)
 
-const toggleTheme = () => {
-  theme.global.name.value = isDark.value ? "light" : "dark";
-};
+  const toggleTheme = () => {
+    theme.global.name.value = isDark.value ? 'light' : 'dark'
+  }
 
-// Existing items array...
+  // Existing items array...
 </script>
 ```
 
@@ -626,17 +644,17 @@ When creating files:
 
 ```vue
 <script setup lang="ts">
-const loading = ref(false);
-const data = ref(null);
+  const loading = ref(false)
+  const data = ref(null)
 
-onMounted(async () => {
-  loading.value = true;
-  try {
-    data.value = await fetchData();
-  } finally {
-    loading.value = false;
-  }
-});
+  onMounted(async () => {
+    loading.value = true
+    try {
+      data.value = await fetchData()
+    } finally {
+      loading.value = false
+    }
+  })
 </script>
 
 <template>
@@ -649,14 +667,14 @@ onMounted(async () => {
 
 ```vue
 <script setup lang="ts">
-const form = reactive({
-  name: "",
-  email: "",
-});
+  const form = reactive({
+    name: '',
+    email: '',
+  })
 
-const submit = async () => {
-  await api.submit(form);
-};
+  const submit = async () => {
+    await api.submit(form)
+  }
 </script>
 
 <template>
@@ -710,8 +728,8 @@ Use `@` alias for imports:
 All code should be fully typed. Use inline type assertions:
 
 ```typescript
-const items = [] as Item[];
-const user = null as User | null;
+const items = [] as Item[]
+const user = null as User | null
 ```
 
 ### Vuetify Resources
@@ -720,6 +738,12 @@ const user = null as User | null;
 - Icons: https://pictogrammers.com/library/mdi/
 
 ---
+
+## Testing
+
+- **Test locations**: Put unit tests in `tests/unit` and component tests in `tests/component`.
+- **Do not use** `src/__tests__/` — move any tests from there into the `tests/` tree.
+- **Imports**: Tests located in `tests/` should import source modules from `src/` (use relative paths like `../../src/...` as appropriate).
 
 **End of Instructions**
 

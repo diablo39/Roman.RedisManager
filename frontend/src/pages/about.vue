@@ -2,7 +2,7 @@
   <v-container class="fill-height">
     <v-card class="mx-auto" max-width="800" rounded="lg" variant="tonal">
       <v-card-title class="d-flex align-center">
-        <v-icon icon="mdi-information" class="mr-2" />
+        <v-icon class="mr-2" icon="mdi-information" />
         About Roman Redis Manager
       </v-card-title>
 
@@ -20,23 +20,23 @@
         <v-list density="compact">
           <v-list-item
             prepend-icon="mdi-vuejs"
-            title="Vue 3"
             subtitle="Progressive JavaScript Framework"
+            title="Vue 3"
           />
           <v-list-item
             prepend-icon="mdi-material-design"
-            title="Vuetify 3"
             subtitle="Material Design Component Framework"
+            title="Vuetify 3"
           />
           <v-list-item
             prepend-icon="mdi-language-typescript"
-            title="TypeScript"
             subtitle="Type-safe Development"
+            title="TypeScript"
           />
           <v-list-item
             prepend-icon="mdi-lightning-bolt"
-            title="Vite"
             subtitle="Next Generation Frontend Tooling"
+            title="Vite"
           />
         </v-list>
       </v-card-text>

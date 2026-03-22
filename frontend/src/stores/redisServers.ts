@@ -20,21 +20,21 @@ export const useRedisServersStore = defineStore('redisServers', {
     /**
      * Check if previous page is available
      */
-    hasPrev(): boolean {
+    hasPrev (): boolean {
       return this.pageNumber > 1
     },
 
     /**
      * Check if next page is available
      */
-    hasNext(): boolean {
+    hasNext (): boolean {
       return this.pageNumber * this.pageSize < this.totalCount
     },
 
     /**
      * Calculate total number of pages
      */
-    totalPages(): number {
+    totalPages (): number {
       return this.totalCount > 0 ? Math.ceil(this.totalCount / this.pageSize) : 0
     },
   },
@@ -43,7 +43,7 @@ export const useRedisServersStore = defineStore('redisServers', {
     /**
      * Reset the list and fetch the first page
      */
-    async reset() {
+    async reset () {
       this.servers = []
       this.pageNumber = 1
       this.totalCount = 0
@@ -54,8 +54,10 @@ export const useRedisServersStore = defineStore('redisServers', {
     /**
      * Load the next page of servers
      */
-    async loadNextPage() {
-      if (this.loading || !this.hasNext) return
+    async loadNextPage () {
+      if (this.loading || !this.hasNext) {
+        return
+      }
 
       this.pageNumber++
       await this.fetchServers(true)
@@ -65,7 +67,7 @@ export const useRedisServersStore = defineStore('redisServers', {
      * Internal fetch implementation
      * @param append - Whether to append results to existing list
      */
-    async fetchServers(append: boolean) {
+    async fetchServers (append: boolean) {
       this.loading = true
       // error shouldn't be cleared here if we want to keep showing previous data + error toast,
       // but for now let's clear it to allow retries
@@ -84,12 +86,14 @@ export const useRedisServersStore = defineStore('redisServers', {
         // Check if backend returned a different page/size than requested
         this.pageNumber = result.pageNumber
         this.pageSize = result.pageSize
-      } catch (err) {
-        this.error = err instanceof Error ? err.message : 'Failed to load servers'
-        console.error('Error fetching Redis servers:', err)
+      } catch (error) {
+        this.error = error instanceof Error ? error.message : 'Failed to load servers'
+        console.error('Error fetching Redis servers:', error)
         // If appending failed, we might want to revert pageNumber so user can try again
-        if (append) this.pageNumber--
-        throw err // Re-throw for UI to handle (e.g. infinite scroll 'error' status)
+        if (append) {
+          this.pageNumber--
+        }
+        throw error // Re-throw for UI to handle (e.g. infinite scroll 'error' status)
       } finally {
         this.loading = false
       }
