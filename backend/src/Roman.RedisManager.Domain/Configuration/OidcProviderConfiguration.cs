@@ -45,6 +45,39 @@ namespace Roman.RedisManager.Domain.Configuration
         [ConfigurationKeyName("SigningKey")]
         public string? SigningKey { get; set; }
 
+        [ConfigurationKeyName("BootstrapRedirectUri")]
+        public string? BootstrapRedirectUri { get; set; }
+
+        [ConfigurationKeyName("BootstrapScope")]
+        public string? BootstrapScope { get; set; }
+
+        [ConfigurationKeyName("BootstrapResponseType")]
+        public string BootstrapResponseType { get; set; } = "code";
+
+        [ConfigurationKeyName("BootstrapPostLogoutRedirectUri")]
+        public string? BootstrapPostLogoutRedirectUri { get; set; }
+
+        [ConfigurationKeyName("BootstrapSilentRedirectUri")]
+        public string? BootstrapSilentRedirectUri { get; set; }
+
+        [ConfigurationKeyName("BootstrapAutomaticSilentRenew")]
+        public bool? BootstrapAutomaticSilentRenew { get; set; }
+
+        [ConfigurationKeyName("BootstrapMetadataIssuer")]
+        public string? BootstrapMetadataIssuer { get; set; }
+
+        [ConfigurationKeyName("BootstrapMetadataAuthorizationEndpoint")]
+        public string? BootstrapMetadataAuthorizationEndpoint { get; set; }
+
+        [ConfigurationKeyName("BootstrapMetadataTokenEndpoint")]
+        public string? BootstrapMetadataTokenEndpoint { get; set; }
+
+        [ConfigurationKeyName("BootstrapMetadataUserInfoEndpoint")]
+        public string? BootstrapMetadataUserInfoEndpoint { get; set; }
+
+        [ConfigurationKeyName("BootstrapMetadataEndSessionEndpoint")]
+        public string? BootstrapMetadataEndSessionEndpoint { get; set; }
+
     }
 
     public class OidcAuthenticationConfiguration : IValidatableObject
@@ -59,11 +92,6 @@ namespace Roman.RedisManager.Domain.Configuration
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
             var providers = Providers?.ToList() ?? new List<OidcProviderConfiguration>();
-
-            if (!providers.Any(provider => provider.Enabled))
-            {
-                yield return new ValidationResult("At least one enabled OIDC provider is required.", new[] { nameof(Providers) });
-            }
 
             var duplicateKey = providers
                 .GroupBy(provider => provider.ProviderKey, StringComparer.OrdinalIgnoreCase)

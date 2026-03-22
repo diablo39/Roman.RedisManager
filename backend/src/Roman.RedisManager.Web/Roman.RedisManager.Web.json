@@ -5,6 +5,27 @@
     "version": "1.0.0"
   },
   "paths": {
+    "/api/authentication/bootstrap": {
+      "get": {
+        "tags": [
+          "AuthenticationBootstrap"
+        ],
+        "summary": "Gets authentication bootstrap configuration for SPA startup.",
+        "description": "Returns enabled and sign-in-capable providers with browser-safe OIDC configuration.\r\n\r\nExample request:\r\n```GET /api/authentication/bootstrap```\r\n\r\nResponse semantics:\r\n- `bootstrapState = available`: at least one provider can be used for interactive sign-in.\r\n- `bootstrapState = unavailable`: no provider is currently sign-in-capable; see `unavailableReasonCodes`.",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthenticationBootstrapQueryResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/redis/data/hashes": {
       "post": {
         "tags": [
@@ -3293,6 +3314,187 @@
           }
         }
       },
+      "AuthenticationBootstrapMetadataOverridesDto": {
+        "required": [
+          "issuer",
+          "authorizationEndpoint",
+          "tokenEndpoint",
+          "userInfoEndpoint",
+          "endSessionEndpoint"
+        ],
+        "type": "object",
+        "properties": {
+          "issuer": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "OIDC issuer identifier override."
+          },
+          "authorizationEndpoint": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "OIDC authorization endpoint override."
+          },
+          "tokenEndpoint": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "OIDC token endpoint override."
+          },
+          "userInfoEndpoint": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "OIDC user info endpoint override."
+          },
+          "endSessionEndpoint": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "OIDC end-session endpoint override."
+          }
+        }
+      },
+      "AuthenticationBootstrapOidcProfileDto": {
+        "required": [
+          "authority",
+          "clientId",
+          "redirectUri",
+          "scope",
+          "responseType",
+          "postLogoutRedirectUri",
+          "silentRedirectUri",
+          "automaticSilentRenew",
+          "metadataOverrides"
+        ],
+        "type": "object",
+        "properties": {
+          "authority": {
+            "type": "string",
+            "description": "OIDC authority (issuer base URL)."
+          },
+          "clientId": {
+            "type": "string",
+            "description": "Public client identifier for the SPA."
+          },
+          "redirectUri": {
+            "type": "string",
+            "description": "Frontend redirect URI used after sign-in."
+          },
+          "scope": {
+            "type": "string",
+            "description": "Space-delimited scopes requested during sign-in."
+          },
+          "responseType": {
+            "type": "string",
+            "description": "OIDC response type used by the frontend client."
+          },
+          "postLogoutRedirectUri": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "Optional frontend redirect URI used after sign-out."
+          },
+          "silentRedirectUri": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "Optional silent renew callback URI."
+          },
+          "automaticSilentRenew": {
+            "type": [
+              "null",
+              "boolean"
+            ],
+            "description": "Indicates whether automatic silent renew is enabled."
+          },
+          "metadataOverrides": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "description": "Optional discovery metadata override values.",
+                "$ref": "#/components/schemas/AuthenticationBootstrapMetadataOverridesDto"
+              }
+            ]
+          }
+        }
+      },
+      "AuthenticationBootstrapProviderDto": {
+        "required": [
+          "providerKey",
+          "displayName",
+          "kind",
+          "oidc"
+        ],
+        "type": "object",
+        "properties": {
+          "providerKey": {
+            "type": "string",
+            "description": "Stable unique key for the provider."
+          },
+          "displayName": {
+            "type": "string",
+            "description": "Display name used by the frontend login UI."
+          },
+          "kind": {
+            "description": "Provider kind (EntraId, Google, GenericOidc).",
+            "$ref": "#/components/schemas/OidcProviderKind"
+          },
+          "oidc": {
+            "description": "OIDC configuration used by the frontend for this provider.",
+            "$ref": "#/components/schemas/AuthenticationBootstrapOidcProfileDto"
+          }
+        }
+      },
+      "AuthenticationBootstrapQueryResult": {
+        "required": [
+          "bootstrapState",
+          "unavailableReasonCodes",
+          "providers",
+          "generatedAtUtc",
+          "version"
+        ],
+        "type": "object",
+        "properties": {
+          "bootstrapState": {
+            "type": "string",
+            "description": "Endpoint-level bootstrap state: available or unavailable."
+          },
+          "unavailableReasonCodes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Machine-readable reason codes when bootstrapState is unavailable."
+          },
+          "providers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AuthenticationBootstrapProviderDto"
+            },
+            "description": "Enabled and sign-in-capable providers."
+          },
+          "generatedAtUtc": {
+            "type": "string",
+            "description": "UTC timestamp indicating when the bootstrap response was generated.",
+            "format": "date-time"
+          },
+          "version": {
+            "type": "string",
+            "description": "Bootstrap response schema version."
+          }
+        }
+      },
       "DeleteKeyCommandResult": {
         "required": [
           "deleted"
@@ -3493,6 +3695,9 @@
       "ListDirection": {
         "type": "integer",
         "default": 1
+      },
+      "OidcProviderKind": {
+        "type": "integer"
       },
       "ProblemDetails": {
         "type": "object",
@@ -4067,6 +4272,9 @@
     }
   },
   "tags": [
+    {
+      "name": "AuthenticationBootstrap"
+    },
     {
       "name": "RedisHashes"
     },
