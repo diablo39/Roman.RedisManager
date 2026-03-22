@@ -5,11 +5,28 @@
     "version": "1.0.0"
   },
   "paths": {
+    "/api/authentication/bootstrap": {
+      "get": {
+        "tags": ["AuthenticationBootstrap"],
+        "summary": "Gets authentication bootstrap configuration for SPA startup.",
+        "description": "Returns enabled and sign-in-capable providers with browser-safe OIDC configuration.\r\n\r\nExample request:\r\n```GET /api/authentication/bootstrap```\r\n\r\nResponse semantics:\r\n- `bootstrapState = available`: at least one provider can be used for interactive sign-in.\r\n- `bootstrapState = unavailable`: no provider is currently sign-in-capable; see `unavailableReasonCodes`.",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthenticationBootstrapQueryResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/redis/data/hashes": {
       "post": {
-        "tags": [
-          "RedisHashes"
-        ],
+        "tags": ["RedisHashes"],
         "summary": "Sets one or more fields in a Redis hash.",
         "requestBody": {
           "description": "The target group, key, fields payload, and optional TTL.",
@@ -73,6 +90,46 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
           "404": {
             "description": "Not Found",
             "content": {
@@ -116,12 +173,15 @@
           "500": {
             "description": "Internal Server Error"
           }
-        }
+        },
+        "security": [
+          {
+            "Bearer": ["Editor"]
+          }
+        ]
       },
       "get": {
-        "tags": [
-          "RedisHashes"
-        ],
+        "tags": ["RedisHashes"],
         "summary": "Gets fields from a Redis hash using cursor-based pagination.",
         "parameters": [
           {
@@ -147,10 +207,7 @@
             "description": "The scan cursor returned from a previous page.",
             "schema": {
               "pattern": "^-?(?:0|[1-9]\\d*)$",
-              "type": [
-                "integer",
-                "string"
-              ],
+              "type": ["integer", "string"],
               "format": "int64",
               "default": 0
             }
@@ -161,10 +218,7 @@
             "description": "The maximum number of fields to return.",
             "schema": {
               "pattern": "^-?(?:0|[1-9]\\d*)$",
-              "type": [
-                "integer",
-                "string"
-              ],
+              "type": ["integer", "string"],
               "format": "int32",
               "default": 100
             }
@@ -211,6 +265,46 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
           "404": {
             "description": "Not Found",
             "content": {
@@ -254,14 +348,17 @@
           "500": {
             "description": "Internal Server Error"
           }
-        }
+        },
+        "security": [
+          {
+            "Bearer": ["Reader"]
+          }
+        ]
       }
     },
     "/api/redis/data/hashes/remove": {
       "post": {
-        "tags": [
-          "RedisHashes"
-        ],
+        "tags": ["RedisHashes"],
         "summary": "Removes one or more fields from a Redis hash.",
         "requestBody": {
           "description": "The target group, key, and field names to remove.",
@@ -325,6 +422,46 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
           "404": {
             "description": "Not Found",
             "content": {
@@ -368,14 +505,17 @@
           "500": {
             "description": "Internal Server Error"
           }
-        }
+        },
+        "security": [
+          {
+            "Bearer": ["Editor"]
+          }
+        ]
       }
     },
     "/api/redis/data/lists": {
       "post": {
-        "tags": [
-          "RedisLists"
-        ],
+        "tags": ["RedisLists"],
         "summary": "Pushes one or more values to a Redis list.",
         "requestBody": {
           "description": "The target group, key, values, direction, and optional TTL.",
@@ -439,6 +579,46 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
           "404": {
             "description": "Not Found",
             "content": {
@@ -482,12 +662,15 @@
           "500": {
             "description": "Internal Server Error"
           }
-        }
+        },
+        "security": [
+          {
+            "Bearer": ["Editor"]
+          }
+        ]
       },
       "get": {
-        "tags": [
-          "RedisLists"
-        ],
+        "tags": ["RedisLists"],
         "summary": "Gets a range of values from a Redis list.",
         "parameters": [
           {
@@ -513,10 +696,7 @@
             "description": "The zero-based start index.",
             "schema": {
               "pattern": "^-?(?:0|[1-9]\\d*)$",
-              "type": [
-                "integer",
-                "string"
-              ],
+              "type": ["integer", "string"],
               "format": "int64",
               "default": 0
             }
@@ -527,10 +707,7 @@
             "description": "The inclusive stop index, where -1 means end of list.",
             "schema": {
               "pattern": "^-?(?:0|[1-9]\\d*)$",
-              "type": [
-                "integer",
-                "string"
-              ],
+              "type": ["integer", "string"],
               "format": "int64",
               "default": -1
             }
@@ -577,6 +754,46 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
           "404": {
             "description": "Not Found",
             "content": {
@@ -620,14 +837,17 @@
           "500": {
             "description": "Internal Server Error"
           }
-        }
+        },
+        "security": [
+          {
+            "Bearer": ["Reader"]
+          }
+        ]
       }
     },
     "/api/redis/data/lists/remove": {
       "post": {
-        "tags": [
-          "RedisLists"
-        ],
+        "tags": ["RedisLists"],
         "summary": "Removes matching values from a Redis list.",
         "requestBody": {
           "description": "The target group, key, value to remove, and remove count.",
@@ -691,6 +911,46 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
           "404": {
             "description": "Not Found",
             "content": {
@@ -734,14 +994,17 @@
           "500": {
             "description": "Internal Server Error"
           }
-        }
+        },
+        "security": [
+          {
+            "Bearer": ["Editor"]
+          }
+        ]
       }
     },
     "/api/redis/data/sets": {
       "post": {
-        "tags": [
-          "RedisSets"
-        ],
+        "tags": ["RedisSets"],
         "summary": "Adds one or more members to a Redis set.",
         "requestBody": {
           "description": "The target group, key, members, and optional TTL.",
@@ -805,6 +1068,46 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
           "404": {
             "description": "Not Found",
             "content": {
@@ -848,12 +1151,15 @@
           "500": {
             "description": "Internal Server Error"
           }
-        }
+        },
+        "security": [
+          {
+            "Bearer": ["Editor"]
+          }
+        ]
       },
       "get": {
-        "tags": [
-          "RedisSets"
-        ],
+        "tags": ["RedisSets"],
         "summary": "Gets members from a Redis set using cursor-based pagination.",
         "parameters": [
           {
@@ -879,10 +1185,7 @@
             "description": "The scan cursor returned from a previous page.",
             "schema": {
               "pattern": "^-?(?:0|[1-9]\\d*)$",
-              "type": [
-                "integer",
-                "string"
-              ],
+              "type": ["integer", "string"],
               "format": "int64",
               "default": 0
             }
@@ -893,10 +1196,7 @@
             "description": "The maximum number of members to return.",
             "schema": {
               "pattern": "^-?(?:0|[1-9]\\d*)$",
-              "type": [
-                "integer",
-                "string"
-              ],
+              "type": ["integer", "string"],
               "format": "int32",
               "default": 100
             }
@@ -943,6 +1243,46 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
           "404": {
             "description": "Not Found",
             "content": {
@@ -986,14 +1326,17 @@
           "500": {
             "description": "Internal Server Error"
           }
-        }
+        },
+        "security": [
+          {
+            "Bearer": ["Reader"]
+          }
+        ]
       }
     },
     "/api/redis/data/sets/remove": {
       "post": {
-        "tags": [
-          "RedisSets"
-        ],
+        "tags": ["RedisSets"],
         "summary": "Removes one or more members from a Redis set.",
         "requestBody": {
           "description": "The target group, key, and set members to remove.",
@@ -1057,6 +1400,46 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
           "404": {
             "description": "Not Found",
             "content": {
@@ -1100,14 +1483,17 @@
           "500": {
             "description": "Internal Server Error"
           }
-        }
+        },
+        "security": [
+          {
+            "Bearer": ["Editor"]
+          }
+        ]
       }
     },
     "/api/redis/data/sorted-sets": {
       "post": {
-        "tags": [
-          "RedisSortedSets"
-        ],
+        "tags": ["RedisSortedSets"],
         "summary": "Adds one or more members with scores to a Redis sorted set.",
         "requestBody": {
           "description": "The target group, key, scored entries, and optional TTL.",
@@ -1171,6 +1557,46 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
           "404": {
             "description": "Not Found",
             "content": {
@@ -1214,12 +1640,15 @@
           "500": {
             "description": "Internal Server Error"
           }
-        }
+        },
+        "security": [
+          {
+            "Bearer": ["Editor"]
+          }
+        ]
       },
       "get": {
-        "tags": [
-          "RedisSortedSets"
-        ],
+        "tags": ["RedisSortedSets"],
         "summary": "Gets a score-ordered range of members from a Redis sorted set.",
         "parameters": [
           {
@@ -1245,10 +1674,7 @@
             "description": "The zero-based start index.",
             "schema": {
               "pattern": "^-?(?:0|[1-9]\\d*)$",
-              "type": [
-                "integer",
-                "string"
-              ],
+              "type": ["integer", "string"],
               "format": "int64",
               "default": 0
             }
@@ -1259,10 +1685,7 @@
             "description": "The inclusive stop index, where -1 means end of set.",
             "schema": {
               "pattern": "^-?(?:0|[1-9]\\d*)$",
-              "type": [
-                "integer",
-                "string"
-              ],
+              "type": ["integer", "string"],
               "format": "int64",
               "default": -1
             }
@@ -1309,6 +1732,46 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
           "404": {
             "description": "Not Found",
             "content": {
@@ -1352,14 +1815,17 @@
           "500": {
             "description": "Internal Server Error"
           }
-        }
+        },
+        "security": [
+          {
+            "Bearer": ["Reader"]
+          }
+        ]
       }
     },
     "/api/redis/data/sorted-sets/remove": {
       "post": {
-        "tags": [
-          "RedisSortedSets"
-        ],
+        "tags": ["RedisSortedSets"],
         "summary": "Removes one or more members from a Redis sorted set.",
         "requestBody": {
           "description": "The target group, key, and sorted-set members to remove.",
@@ -1423,6 +1889,46 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
           "404": {
             "description": "Not Found",
             "content": {
@@ -1466,14 +1972,17 @@
           "500": {
             "description": "Internal Server Error"
           }
-        }
+        },
+        "security": [
+          {
+            "Bearer": ["Editor"]
+          }
+        ]
       }
     },
     "/api/redis/data/strings": {
       "post": {
-        "tags": [
-          "RedisStrings"
-        ],
+        "tags": ["RedisStrings"],
         "summary": "Sets or updates a Redis string value.",
         "requestBody": {
           "description": "The target group, key, value, optional TTL, and set condition.",
@@ -1537,6 +2046,46 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
           "404": {
             "description": "Not Found",
             "content": {
@@ -1580,12 +2129,15 @@
           "500": {
             "description": "Internal Server Error"
           }
-        }
+        },
+        "security": [
+          {
+            "Bearer": ["Editor"]
+          }
+        ]
       },
       "get": {
-        "tags": [
-          "RedisStrings"
-        ],
+        "tags": ["RedisStrings"],
         "summary": "Gets a Redis string value by key.",
         "parameters": [
           {
@@ -1647,6 +2199,46 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
           "404": {
             "description": "Not Found",
             "content": {
@@ -1690,14 +2282,17 @@
           "500": {
             "description": "Internal Server Error"
           }
-        }
+        },
+        "security": [
+          {
+            "Bearer": ["Reader"]
+          }
+        ]
       }
     },
     "/api/commands/redis-info": {
       "get": {
-        "tags": [
-          "RedisInfo"
-        ],
+        "tags": ["RedisInfo"],
         "summary": "Gets Redis INFO command data for a specific Redis host in a server group.",
         "parameters": [
           {
@@ -1723,10 +2318,7 @@
             "description": "The Redis TCP port.",
             "schema": {
               "pattern": "^-?(?:0|[1-9]\\d*)$",
-              "type": [
-                "integer",
-                "string"
-              ],
+              "type": ["integer", "string"],
               "format": "int32"
             }
           }
@@ -1772,6 +2364,26 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
           "404": {
             "description": "Not Found",
             "content": {
@@ -1795,14 +2407,17 @@
           "500": {
             "description": "Internal Server Error"
           }
-        }
+        },
+        "security": [
+          {
+            "Bearer": ["Reader"]
+          }
+        ]
       }
     },
     "/api/redis-keys": {
       "get": {
-        "tags": [
-          "RedisKeys"
-        ],
+        "tags": ["RedisKeys"],
         "summary": "Searches keys in a Redis server group using a glob pattern and continuation token paging.",
         "parameters": [
           {
@@ -1838,10 +2453,7 @@
             "description": "The maximum number of keys to return in the page.",
             "schema": {
               "pattern": "^-?(?:0|[1-9]\\d*)$",
-              "type": [
-                "integer",
-                "string"
-              ],
+              "type": ["integer", "string"],
               "format": "int32",
               "default": 100
             }
@@ -1931,14 +2543,17 @@
           "500": {
             "description": "Internal Server Error"
           }
-        }
+        },
+        "security": [
+          {
+            "Bearer": ["Reader"]
+          }
+        ]
       }
     },
     "/api/redis-keys/{key}": {
       "delete": {
-        "tags": [
-          "RedisKeys"
-        ],
+        "tags": ["RedisKeys"],
         "summary": "Deletes a key from a Redis server group.",
         "parameters": [
           {
@@ -2064,14 +2679,17 @@
           "500": {
             "description": "Internal Server Error"
           }
-        }
+        },
+        "security": [
+          {
+            "Bearer": ["Editor"]
+          }
+        ]
       }
     },
     "/api/redis-keys/{key}/metadata": {
       "get": {
-        "tags": [
-          "RedisKeys"
-        ],
+        "tags": ["RedisKeys"],
         "summary": "Retrieves metadata for a Redis key.",
         "parameters": [
           {
@@ -2177,14 +2795,17 @@
           "500": {
             "description": "Internal Server Error"
           }
-        }
+        },
+        "security": [
+          {
+            "Bearer": ["Reader"]
+          }
+        ]
       }
     },
     "/api/redis-keys/{key}/value": {
       "get": {
-        "tags": [
-          "RedisKeys"
-        ],
+        "tags": ["RedisKeys"],
         "summary": "Retrieves the value payload for a Redis key.",
         "parameters": [
           {
@@ -2290,14 +2911,17 @@
           "500": {
             "description": "Internal Server Error"
           }
-        }
+        },
+        "security": [
+          {
+            "Bearer": ["Reader"]
+          }
+        ]
       }
     },
     "/api/redis-server-groups": {
       "get": {
-        "tags": [
-          "RedisServerGroups"
-        ],
+        "tags": ["RedisServerGroups"],
         "summary": "Lists configured Redis server groups with pagination.",
         "parameters": [
           {
@@ -2306,10 +2930,7 @@
             "description": "The 1-based page number.",
             "schema": {
               "pattern": "^-?(?:0|[1-9]\\d*)$",
-              "type": [
-                "integer",
-                "string"
-              ],
+              "type": ["integer", "string"],
               "format": "int32",
               "default": 1
             }
@@ -2320,10 +2941,7 @@
             "description": "The number of groups per page.",
             "schema": {
               "pattern": "^-?(?:0|[1-9]\\d*)$",
-              "type": [
-                "integer",
-                "string"
-              ],
+              "type": ["integer", "string"],
               "format": "int32",
               "default": 10
             }
@@ -2393,14 +3011,17 @@
           "500": {
             "description": "Internal Server Error"
           }
-        }
+        },
+        "security": [
+          {
+            "Bearer": ["Reader"]
+          }
+        ]
       }
     },
     "/api/redis-server-groups/{id}": {
       "get": {
-        "tags": [
-          "RedisServerGroups"
-        ],
+        "tags": ["RedisServerGroups"],
         "summary": "Gets details for a specific Redis server group.",
         "parameters": [
           {
@@ -2478,16 +3099,19 @@
           "500": {
             "description": "Internal Server Error"
           }
-        }
+        },
+        "security": [
+          {
+            "Bearer": ["Reader"]
+          }
+        ]
       }
     }
   },
   "components": {
     "schemas": {
       "AddToSetCommandResult": {
-        "required": [
-          "success"
-        ],
+        "required": ["success"],
         "type": "object",
         "properties": {
           "success": {
@@ -2496,11 +3120,7 @@
         }
       },
       "AddToSetRequest": {
-        "required": [
-          "groupId",
-          "key",
-          "members"
-        ],
+        "required": ["groupId", "key", "members"],
         "type": "object",
         "properties": {
           "groupId": {
@@ -2518,17 +3138,12 @@
           },
           "ttl": {
             "pattern": "^-?(\\d+\\.)?\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,7})?$",
-            "type": [
-              "null",
-              "string"
-            ]
+            "type": ["null", "string"]
           }
         }
       },
       "AddToSortedSetCommandResult": {
-        "required": [
-          "success"
-        ],
+        "required": ["success"],
         "type": "object",
         "properties": {
           "success": {
@@ -2537,11 +3152,7 @@
         }
       },
       "AddToSortedSetRequest": {
-        "required": [
-          "groupId",
-          "key",
-          "entries"
-        ],
+        "required": ["groupId", "key", "entries"],
         "type": "object",
         "properties": {
           "groupId": {
@@ -2559,17 +3170,164 @@
           },
           "ttl": {
             "pattern": "^-?(\\d+\\.)?\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,7})?$",
-            "type": [
-              "null",
-              "string"
+            "type": ["null", "string"]
+          }
+        }
+      },
+      "AuthenticationBootstrapMetadataOverridesDto": {
+        "required": [
+          "issuer",
+          "authorizationEndpoint",
+          "tokenEndpoint",
+          "userInfoEndpoint",
+          "endSessionEndpoint"
+        ],
+        "type": "object",
+        "properties": {
+          "issuer": {
+            "type": ["null", "string"],
+            "description": "OIDC issuer identifier override."
+          },
+          "authorizationEndpoint": {
+            "type": ["null", "string"],
+            "description": "OIDC authorization endpoint override."
+          },
+          "tokenEndpoint": {
+            "type": ["null", "string"],
+            "description": "OIDC token endpoint override."
+          },
+          "userInfoEndpoint": {
+            "type": ["null", "string"],
+            "description": "OIDC user info endpoint override."
+          },
+          "endSessionEndpoint": {
+            "type": ["null", "string"],
+            "description": "OIDC end-session endpoint override."
+          }
+        }
+      },
+      "AuthenticationBootstrapOidcProfileDto": {
+        "required": [
+          "authority",
+          "clientId",
+          "redirectUri",
+          "scope",
+          "responseType",
+          "postLogoutRedirectUri",
+          "silentRedirectUri",
+          "automaticSilentRenew",
+          "metadataOverrides"
+        ],
+        "type": "object",
+        "properties": {
+          "authority": {
+            "type": "string",
+            "description": "OIDC authority (issuer base URL)."
+          },
+          "clientId": {
+            "type": "string",
+            "description": "Public client identifier for the SPA."
+          },
+          "redirectUri": {
+            "type": "string",
+            "description": "Frontend redirect URI used after sign-in."
+          },
+          "scope": {
+            "type": "string",
+            "description": "Space-delimited scopes requested during sign-in."
+          },
+          "responseType": {
+            "type": "string",
+            "description": "OIDC response type used by the frontend client."
+          },
+          "postLogoutRedirectUri": {
+            "type": ["null", "string"],
+            "description": "Optional frontend redirect URI used after sign-out."
+          },
+          "silentRedirectUri": {
+            "type": ["null", "string"],
+            "description": "Optional silent renew callback URI."
+          },
+          "automaticSilentRenew": {
+            "type": ["null", "boolean"],
+            "description": "Indicates whether automatic silent renew is enabled."
+          },
+          "metadataOverrides": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "description": "Optional discovery metadata override values.",
+                "$ref": "#/components/schemas/AuthenticationBootstrapMetadataOverridesDto"
+              }
             ]
           }
         }
       },
-      "DeleteKeyCommandResult": {
+      "AuthenticationBootstrapProviderDto": {
+        "required": ["providerKey", "displayName", "kind", "oidc"],
+        "type": "object",
+        "properties": {
+          "providerKey": {
+            "type": "string",
+            "description": "Stable unique key for the provider."
+          },
+          "displayName": {
+            "type": "string",
+            "description": "Display name used by the frontend login UI."
+          },
+          "kind": {
+            "description": "Provider kind (EntraId, Google, GenericOidc).",
+            "$ref": "#/components/schemas/OidcProviderKind"
+          },
+          "oidc": {
+            "description": "OIDC configuration used by the frontend for this provider.",
+            "$ref": "#/components/schemas/AuthenticationBootstrapOidcProfileDto"
+          }
+        }
+      },
+      "AuthenticationBootstrapQueryResult": {
         "required": [
-          "deleted"
+          "bootstrapState",
+          "unavailableReasonCodes",
+          "providers",
+          "generatedAtUtc",
+          "version"
         ],
+        "type": "object",
+        "properties": {
+          "bootstrapState": {
+            "type": "string",
+            "description": "Endpoint-level bootstrap state: available or unavailable."
+          },
+          "unavailableReasonCodes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Machine-readable reason codes when bootstrapState is unavailable."
+          },
+          "providers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AuthenticationBootstrapProviderDto"
+            },
+            "description": "Enabled and sign-in-capable providers."
+          },
+          "generatedAtUtc": {
+            "type": "string",
+            "description": "UTC timestamp indicating when the bootstrap response was generated.",
+            "format": "date-time"
+          },
+          "version": {
+            "type": "string",
+            "description": "Bootstrap response schema version."
+          }
+        }
+      },
+      "DeleteKeyCommandResult": {
+        "required": ["deleted"],
         "type": "object",
         "properties": {
           "deleted": {
@@ -2578,11 +3336,7 @@
         }
       },
       "GetHashFieldsQueryResult": {
-        "required": [
-          "fields",
-          "cursor",
-          "hasMoreResults"
-        ],
+        "required": ["fields", "cursor", "hasMoreResults"],
         "type": "object",
         "properties": {
           "fields": {
@@ -2593,10 +3347,7 @@
           },
           "cursor": {
             "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": [
-              "integer",
-              "string"
-            ],
+            "type": ["integer", "string"],
             "format": "int64"
           },
           "hasMoreResults": {
@@ -2605,9 +3356,7 @@
         }
       },
       "GetKeyMetadataQueryResult": {
-        "required": [
-          "metadata"
-        ],
+        "required": ["metadata"],
         "type": "object",
         "properties": {
           "metadata": {
@@ -2630,43 +3379,28 @@
             "type": "string"
           },
           "stringValue": {
-            "type": [
-              "null",
-              "string"
-            ]
+            "type": ["null", "string"]
           },
           "listValues": {
-            "type": [
-              "null",
-              "array"
-            ],
+            "type": ["null", "array"],
             "items": {
               "type": "string"
             }
           },
           "setMembers": {
-            "type": [
-              "null",
-              "array"
-            ],
+            "type": ["null", "array"],
             "items": {
               "type": "string"
             }
           },
           "hashFields": {
-            "type": [
-              "null",
-              "object"
-            ],
+            "type": ["null", "object"],
             "additionalProperties": {
               "type": "string"
             }
           },
           "sortedSetEntries": {
-            "type": [
-              "null",
-              "array"
-            ],
+            "type": ["null", "array"],
             "items": {
               "$ref": "#/components/schemas/SortedSetEntryDto"
             }
@@ -2674,9 +3408,7 @@
         }
       },
       "GetListRangeQueryResult": {
-        "required": [
-          "values"
-        ],
+        "required": ["values"],
         "type": "object",
         "properties": {
           "values": {
@@ -2688,11 +3420,7 @@
         }
       },
       "GetSetMembersQueryResult": {
-        "required": [
-          "members",
-          "cursor",
-          "hasMoreResults"
-        ],
+        "required": ["members", "cursor", "hasMoreResults"],
         "type": "object",
         "properties": {
           "members": {
@@ -2703,10 +3431,7 @@
           },
           "cursor": {
             "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": [
-              "integer",
-              "string"
-            ],
+            "type": ["integer", "string"],
             "format": "int64"
           },
           "hasMoreResults": {
@@ -2715,9 +3440,7 @@
         }
       },
       "GetSortedSetRangeQueryResult": {
-        "required": [
-          "entries"
-        ],
+        "required": ["entries"],
         "type": "object",
         "properties": {
           "entries": {
@@ -2729,30 +3452,19 @@
         }
       },
       "GetStringQueryResult": {
-        "required": [
-          "value"
-        ],
+        "required": ["value"],
         "type": "object",
         "properties": {
           "value": {
-            "type": [
-              "null",
-              "string"
-            ]
+            "type": ["null", "string"]
           }
         }
       },
       "GroupType": {
-        "enum": [
-          "Standalone",
-          "Cluster"
-        ]
+        "enum": ["Standalone", "Cluster"]
       },
       "HashFieldDto": {
-        "required": [
-          "field",
-          "value"
-        ],
+        "required": ["field", "value"],
         "type": "object",
         "properties": {
           "field": {
@@ -2767,48 +3479,33 @@
         "type": "integer",
         "default": 1
       },
+      "OidcProviderKind": {
+        "type": "integer"
+      },
       "ProblemDetails": {
         "type": "object",
         "properties": {
           "type": {
-            "type": [
-              "null",
-              "string"
-            ]
+            "type": ["null", "string"]
           },
           "title": {
-            "type": [
-              "null",
-              "string"
-            ]
+            "type": ["null", "string"]
           },
           "status": {
             "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": [
-              "null",
-              "integer",
-              "string"
-            ],
+            "type": ["null", "integer", "string"],
             "format": "int32"
           },
           "detail": {
-            "type": [
-              "null",
-              "string"
-            ]
+            "type": ["null", "string"]
           },
           "instance": {
-            "type": [
-              "null",
-              "string"
-            ]
+            "type": ["null", "string"]
           }
         }
       },
       "PushToListCommandResult": {
-        "required": [
-          "success"
-        ],
+        "required": ["success"],
         "type": "object",
         "properties": {
           "success": {
@@ -2817,11 +3514,7 @@
         }
       },
       "PushToListRequest": {
-        "required": [
-          "groupId",
-          "key",
-          "values"
-        ],
+        "required": ["groupId", "key", "values"],
         "type": "object",
         "properties": {
           "groupId": {
@@ -2842,17 +3535,12 @@
           },
           "ttl": {
             "pattern": "^-?(\\d+\\.)?\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,7})?$",
-            "type": [
-              "null",
-              "string"
-            ]
+            "type": ["null", "string"]
           }
         }
       },
       "RedisInfoQueryResult": {
-        "required": [
-          "sections"
-        ],
+        "required": ["sections"],
         "type": "object",
         "properties": {
           "sections": {
@@ -2867,12 +3555,7 @@
         }
       },
       "RedisKeyDto": {
-        "required": [
-          "key",
-          "type",
-          "ttlMilliseconds",
-          "hasExpiration"
-        ],
+        "required": ["key", "type", "ttlMilliseconds", "hasExpiration"],
         "type": "object",
         "properties": {
           "key": {
@@ -2883,11 +3566,7 @@
           },
           "ttlMilliseconds": {
             "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": [
-              "null",
-              "integer",
-              "string"
-            ],
+            "type": ["null", "integer", "string"],
             "format": "int64"
           },
           "hasExpiration": {
@@ -2896,10 +3575,7 @@
         }
       },
       "RedisKeyMetadataDto": {
-        "required": [
-          "type",
-          "ttlMilliseconds"
-        ],
+        "required": ["type", "ttlMilliseconds"],
         "type": "object",
         "properties": {
           "type": {
@@ -2907,21 +3583,13 @@
           },
           "ttlMilliseconds": {
             "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": [
-              "null",
-              "integer",
-              "string"
-            ],
+            "type": ["null", "integer", "string"],
             "format": "int64"
           }
         }
       },
       "RedisKeysSearchQueryResult": {
-        "required": [
-          "keys",
-          "hasMoreResults",
-          "continuationToken"
-        ],
+        "required": ["keys", "hasMoreResults", "continuationToken"],
         "type": "object",
         "properties": {
           "keys": {
@@ -2934,17 +3602,12 @@
             "type": "boolean"
           },
           "continuationToken": {
-            "type": [
-              "null",
-              "string"
-            ]
+            "type": ["null", "string"]
           }
         }
       },
       "RedisServerGroupDetailQueryResult": {
-        "required": [
-          "nodes"
-        ],
+        "required": ["nodes"],
         "type": "object",
         "properties": {
           "nodes": {
@@ -2956,11 +3619,7 @@
         }
       },
       "RedisServerGroupDto": {
-        "required": [
-          "name",
-          "id",
-          "groupType"
-        ],
+        "required": ["name", "id", "groupType"],
         "type": "object",
         "properties": {
           "name": {
@@ -2976,12 +3635,7 @@
         }
       },
       "RedisServerGroupsQueryResult": {
-        "required": [
-          "serverGroups",
-          "totalCount",
-          "pageNumber",
-          "pageSize"
-        ],
+        "required": ["serverGroups", "totalCount", "pageNumber", "pageSize"],
         "type": "object",
         "properties": {
           "serverGroups": {
@@ -2992,36 +3646,23 @@
           },
           "totalCount": {
             "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": [
-              "integer",
-              "string"
-            ],
+            "type": ["integer", "string"],
             "format": "int32"
           },
           "pageNumber": {
             "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": [
-              "integer",
-              "string"
-            ],
+            "type": ["integer", "string"],
             "format": "int32"
           },
           "pageSize": {
             "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": [
-              "integer",
-              "string"
-            ],
+            "type": ["integer", "string"],
             "format": "int32"
           }
         }
       },
       "RedisServerNodeDto": {
-        "required": [
-          "host",
-          "port",
-          "role"
-        ],
+        "required": ["host", "port", "role"],
         "type": "object",
         "properties": {
           "host": {
@@ -3029,10 +3670,7 @@
           },
           "port": {
             "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": [
-              "integer",
-              "string"
-            ],
+            "type": ["integer", "string"],
             "format": "int32"
           },
           "role": {
@@ -3041,10 +3679,7 @@
         }
       },
       "RedisSortedSetEntry": {
-        "required": [
-          "member",
-          "score"
-        ],
+        "required": ["member", "score"],
         "type": "object",
         "properties": {
           "member": {
@@ -3052,36 +3687,24 @@
           },
           "score": {
             "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?(?:[eE][+-]?\\d+)?$",
-            "type": [
-              "number",
-              "string"
-            ],
+            "type": ["number", "string"],
             "format": "double"
           }
         }
       },
       "RemoveFromListCommandResult": {
-        "required": [
-          "removedCount"
-        ],
+        "required": ["removedCount"],
         "type": "object",
         "properties": {
           "removedCount": {
             "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": [
-              "integer",
-              "string"
-            ],
+            "type": ["integer", "string"],
             "format": "int64"
           }
         }
       },
       "RemoveFromListRequest": {
-        "required": [
-          "groupId",
-          "key",
-          "value"
-        ],
+        "required": ["groupId", "key", "value"],
         "type": "object",
         "properties": {
           "groupId": {
@@ -3096,37 +3719,25 @@
           },
           "count": {
             "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": [
-              "integer",
-              "string"
-            ],
+            "type": ["integer", "string"],
             "format": "int64",
             "default": 0
           }
         }
       },
       "RemoveFromSetCommandResult": {
-        "required": [
-          "removedCount"
-        ],
+        "required": ["removedCount"],
         "type": "object",
         "properties": {
           "removedCount": {
             "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": [
-              "integer",
-              "string"
-            ],
+            "type": ["integer", "string"],
             "format": "int64"
           }
         }
       },
       "RemoveFromSetRequest": {
-        "required": [
-          "groupId",
-          "key",
-          "members"
-        ],
+        "required": ["groupId", "key", "members"],
         "type": "object",
         "properties": {
           "groupId": {
@@ -3145,27 +3756,18 @@
         }
       },
       "RemoveFromSortedSetCommandResult": {
-        "required": [
-          "removedCount"
-        ],
+        "required": ["removedCount"],
         "type": "object",
         "properties": {
           "removedCount": {
             "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": [
-              "integer",
-              "string"
-            ],
+            "type": ["integer", "string"],
             "format": "int64"
           }
         }
       },
       "RemoveFromSortedSetRequest": {
-        "required": [
-          "groupId",
-          "key",
-          "members"
-        ],
+        "required": ["groupId", "key", "members"],
         "type": "object",
         "properties": {
           "groupId": {
@@ -3184,27 +3786,18 @@
         }
       },
       "RemoveHashFieldsCommandResult": {
-        "required": [
-          "removedCount"
-        ],
+        "required": ["removedCount"],
         "type": "object",
         "properties": {
           "removedCount": {
             "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": [
-              "integer",
-              "string"
-            ],
+            "type": ["integer", "string"],
             "format": "int64"
           }
         }
       },
       "RemoveHashFieldsRequest": {
-        "required": [
-          "groupId",
-          "key",
-          "fields"
-        ],
+        "required": ["groupId", "key", "fields"],
         "type": "object",
         "properties": {
           "groupId": {
@@ -3227,9 +3820,7 @@
         "default": 0
       },
       "SetHashFieldsCommandResult": {
-        "required": [
-          "success"
-        ],
+        "required": ["success"],
         "type": "object",
         "properties": {
           "success": {
@@ -3238,11 +3829,7 @@
         }
       },
       "SetHashFieldsRequest": {
-        "required": [
-          "groupId",
-          "key",
-          "fields"
-        ],
+        "required": ["groupId", "key", "fields"],
         "type": "object",
         "properties": {
           "groupId": {
@@ -3260,17 +3847,12 @@
           },
           "ttl": {
             "pattern": "^-?(\\d+\\.)?\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,7})?$",
-            "type": [
-              "null",
-              "string"
-            ]
+            "type": ["null", "string"]
           }
         }
       },
       "SetStringCommandResult": {
-        "required": [
-          "success"
-        ],
+        "required": ["success"],
         "type": "object",
         "properties": {
           "success": {
@@ -3279,12 +3861,7 @@
         }
       },
       "SetStringRequest": {
-        "required": [
-          "groupId",
-          "key",
-          "value",
-          "ttl"
-        ],
+        "required": ["groupId", "key", "value", "ttl"],
         "type": "object",
         "properties": {
           "groupId": {
@@ -3299,10 +3876,7 @@
           },
           "ttl": {
             "pattern": "^-?(\\d+\\.)?\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,7})?$",
-            "type": [
-              "null",
-              "string"
-            ]
+            "type": ["null", "string"]
           },
           "condition": {
             "$ref": "#/components/schemas/SetCondition"
@@ -3310,10 +3884,7 @@
         }
       },
       "SortedSetEntryDto": {
-        "required": [
-          "member",
-          "score"
-        ],
+        "required": ["member", "score"],
         "type": "object",
         "properties": {
           "member": {
@@ -3321,17 +3892,25 @@
           },
           "score": {
             "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?(?:[eE][+-]?\\d+)?$",
-            "type": [
-              "number",
-              "string"
-            ],
+            "type": ["number", "string"],
             "format": "double"
           }
         }
       }
+    },
+    "securitySchemes": {
+      "Bearer": {
+        "type": "http",
+        "description": "Enter a valid Bearer token",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
     }
   },
   "tags": [
+    {
+      "name": "AuthenticationBootstrap"
+    },
     {
       "name": "RedisHashes"
     },
@@ -3358,3 +3937,4 @@
     }
   ]
 }
+
