@@ -1,5 +1,3 @@
-
-
 /**
  * T025 — Unit tests for US3 error recovery paths
  *
@@ -63,14 +61,14 @@ const bootstrapWithProvider: AuthenticationBootstrapResult = {
   version: '1.0',
 }
 
-function mockFetchSuccess (result: AuthenticationBootstrapResult): void {
+function mockFetchSuccess(result: AuthenticationBootstrapResult): void {
   global.fetch = vi.fn().mockResolvedValue({
     ok: true,
     json: () => Promise.resolve(result),
   } as Response)
 }
 
-function mockFetchFailure (): void {
+function mockFetchFailure(): void {
   global.fetch = vi.fn().mockResolvedValue({
     ok: false,
     status: 503,

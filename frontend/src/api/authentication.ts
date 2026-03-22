@@ -116,14 +116,48 @@ export function createUserManager(provider: AuthenticationBootstrapProvider): Us
 // ---------------------------------------------------------------------------
 
 export async function getAuthHeaders(): Promise<Record<string, string>> {
-  if (!activeUserManager) {
-    return {}
+  // Prefer the active UserManager when available
+  if (activeUserManager) {
+    const user = await activeUserManager.getUser()
+    if (user && !user.expired) {
+      return { Authorization: `Bearer ${user.access_token}` }
+    }
   }
-  const user = await activeUserManager.getUser()
-  if (!user || user.expired) {
-    return {}
+
+  // Fallback: some code paths call protected APIs before the
+  // UserManager instance is reconstructed in memory. In that case the
+  // token may still be present in localStorage under the oidc-client key
+  // (format: "oidc.user:<authority>:<client_id>"). Try to read it.
+  try {
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i)
+      if (!key) continue
+      if (!key.startsWith('oidc.user')) continue
+
+      const raw = localStorage.getItem(key)
+      if (!raw) continue
+
+      try {
+        const parsed = JSON.parse(raw) as { access_token?: string; expired?: boolean; expires_at?: number }
+        if (parsed.access_token) {
+          // prefer explicit `expired` flag when present, otherwise use expires_at
+          if (parsed.expired === true) continue
+          if (typeof parsed.expires_at === 'number') {
+            const now = Math.floor(Date.now() / 1000)
+            if (parsed.expires_at <= now) continue
+          }
+
+          return { Authorization: `Bearer ${parsed.access_token}` }
+        }
+      } catch {
+        // ignore parse errors and continue
+      }
+    }
+  } catch {
+    // localStorage might be unavailable in some environments — ignore
   }
-  return { Authorization: `Bearer ${user.access_token}` }
+
+  return {}
 }
 
 // ---------------------------------------------------------------------------

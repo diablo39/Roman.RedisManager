@@ -96,7 +96,7 @@ global.fetch = vi.fn().mockResolvedValue({
     }),
 } as Response)
 
-function createTestRouter (ensureValidReturn: boolean) {
+function createTestRouter(ensureValidReturn: boolean) {
   const routes: RouteRecordRaw[] = [
     { path: '/', component: { template: '<div>home</div>' } },
     { path: '/login', component: { template: '<div>login</div>' }, meta: { public: true } },

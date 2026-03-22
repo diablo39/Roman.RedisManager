@@ -6,16 +6,7 @@
  * vitest config.
  */
 import { defineStore, storeToRefs } from 'pinia'
-import {
-  computed,
-  nextTick,
-  onMounted,
-  onUnmounted,
-  reactive,
-  ref,
-  watch,
-  watchEffect,
-} from 'vue'
+import { computed, nextTick, onMounted, onUnmounted, reactive, ref, watch, watchEffect } from 'vue'
 
 Object.assign(globalThis, {
   // Pinia
