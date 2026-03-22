@@ -102,9 +102,13 @@ All five gates re-evaluated after Phase 1 design artifacts were produced:
 - **Code Quality Gate** ✅: All new files are TypeScript with strict types. No
   `any` usage planned. `npm run lint` and `npm run type-check` will be run before
   any merge.
-- **Testing Gate** ⚠️: No automated test framework in the project. Manual
-  verification steps are defined in quickstart.md. This is an **accepted
-  pre-existing gap**, not a new violation.
+- **Testing Gate** ⚠️: No automated test framework is configured in the project.
+  Manual verification steps are defined in quickstart.md. This is an **accepted
+  pre-existing gap** with the following exception record:
+  - **Exception**: Automated testing infrastructure is absent.
+  - **Target remediation**: Next feature cycle (before feature `010`).
+  - **Tracked by**: tasks.md T022 (follow-up task to establish test framework and
+    add retroactive component tests for this feature).
 - **UX Consistency Gate** ✅: Login page uses the same v-card, v-btn, v-alert,
   v-progress-circular patterns as existing pages. Separated login layout avoids
   flashing the authenticated chrome. Error display follows the retry-alert pattern

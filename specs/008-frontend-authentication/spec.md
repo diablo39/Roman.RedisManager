@@ -116,8 +116,8 @@ As a user, I receive a clear outcome when authentication cannot start or complet
 ### Measurable Outcomes
 
 - **SC-001**: 100% of signed-out requests to protected pages are redirected to the sign-in flow before protected page content is displayed.
-- **SC-002**: In normal operating conditions, users can see the currently available sign-in providers within 10 seconds of opening the sign-in entry point.
+- **SC-002**: In normal operating conditions, users can see the currently available sign-in providers within 2 seconds of opening the sign-in entry point on a standard 4G connection.
 - **SC-003**: At least 95% of successful sign-ins return the user to the originally requested in-app destination when that destination is valid.
 - **SC-004**: 100% of unavailable-provider states present users with a readable explanation instead of a dead-end or broken sign-in action.
-- **SC-005**: At least 90% of first-attempt users can identify a valid provider and start sign-in without external assistance.
+- **SC-005**: The login screen design MUST make available providers immediately discoverable and each provider button MUST use the provider's display name as its label, so that first-attempt users can identify a valid provider and start sign-in without external assistance. _(Qualitative design principle — validated by UX review, not automated measurement.)_
 - **SC-006**: Already-authenticated users who open the sign-in route are redirected away from it in all standard usage scenarios.
