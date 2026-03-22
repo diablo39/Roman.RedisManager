@@ -111,6 +111,21 @@ namespace Roman.RedisManager.Web
                 options.AddOperationTransformer<OpenApi.SecurityRequirementOperationTransformer>();
             });
 
+            // Add permissive CORS policy for Development and Testing environments to simplify SPA testing.
+            if (builder.Environment.IsDevelopment() || string.Equals(builder.Environment.EnvironmentName, "Testing", StringComparison.OrdinalIgnoreCase))
+            {
+                builder.Services.AddCors(options =>
+                {
+                    options.AddPolicy("PermissiveDevCors", policy =>
+                    {
+                        policy.SetIsOriginAllowed(_ => true)
+                              .AllowAnyHeader()
+                              .AllowAnyMethod()
+                              .AllowCredentials();
+                    });
+                });
+            }
+
             builder.UseWolverine(opts =>
             {
                 foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
@@ -133,6 +148,12 @@ namespace Roman.RedisManager.Web
                 {
                     options.SwaggerEndpoint("/openapi/v1.json", "v1");
                 });
+            }
+
+            // Enable permissive CORS in Development and Testing to allow local SPA testing.
+            if (app.Environment.IsDevelopment() || string.Equals(app.Environment.EnvironmentName, "Testing", StringComparison.OrdinalIgnoreCase))
+            {
+                app.UseCors("PermissiveDevCors");
             }
 
             // Problem details middleware: exception handler and status code pages
