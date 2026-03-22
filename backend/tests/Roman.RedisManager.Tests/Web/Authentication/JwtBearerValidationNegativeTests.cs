@@ -95,5 +95,32 @@ namespace Roman.RedisManager.Tests.Web.Authentication
             // Assert
             response.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
         }
+
+        [Fact]
+        public async Task ProtectedEndpoint_WithMissingAuthorizationHeader_ReturnsUnauthorized()
+        {
+            // Arrange
+            var client = _factory.CreateClient();
+
+            // Act
+            var response = await client.GetAsync("/api/redis-server-groups");
+
+            // Assert
+            response.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
+        }
+
+        [Fact]
+        public async Task ProtectedEndpoint_WithMalformedBearerToken_ReturnsUnauthorized()
+        {
+            // Arrange
+            var client = _factory.CreateClient();
+            client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", "not-a-valid-jwt-token");
+
+            // Act
+            var response = await client.GetAsync("/api/redis-server-groups");
+
+            // Assert
+            response.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
+        }
     }
 }

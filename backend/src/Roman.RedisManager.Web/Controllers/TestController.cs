@@ -14,10 +14,12 @@ namespace Roman.RedisManager.Web.Controllers
 
         public TestController(IWebHostEnvironment env) => _env = env;
 
+        private bool IsTestEnvironment() => _env.IsDevelopment() || _env.IsEnvironment("Testing");
+
         [HttpGet("unauth")]
         public IActionResult GetUnauthenticated()
         {
-            if (!_env.IsDevelopment())
+            if (!IsTestEnvironment())
                 return NotFound();
             return Unauthorized();
         }
@@ -25,7 +27,7 @@ namespace Roman.RedisManager.Web.Controllers
         [HttpGet("forbidden")]
         public IActionResult GetForbidden()
         {
-            if (!_env.IsDevelopment())
+            if (!IsTestEnvironment())
                 return NotFound();
             return StatusCode(StatusCodes.Status403Forbidden);
         }
@@ -33,7 +35,7 @@ namespace Roman.RedisManager.Web.Controllers
         [HttpGet("server-error")]
         public IActionResult GetServerError()
         {
-            if (!_env.IsDevelopment())
+            if (!IsTestEnvironment())
                 return NotFound();
 
             // Throwing exception triggers the global exception handler, resulting in problem details
