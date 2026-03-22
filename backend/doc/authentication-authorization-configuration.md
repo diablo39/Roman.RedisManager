@@ -464,10 +464,58 @@ That's it — no pull requests, no deployments (beyond restarting the API).
 
 The configuration format is fully documented in the spec files:
 
-- `specs/001-oidc-role-authorization/identity-configuration.md` — every field in the `Authentication` section explained, with all allowed values.
-- `specs/001-oidc-role-authorization/authorization-configuration.md` — the full list of `Action` names you can use in `Permissions`.
+- `specs/005-oidc-role-authorization/identity-configuration.md` — every field in the `Authentication` section explained, with all allowed values.
+- `specs/005-oidc-role-authorization/authorization-configuration.md` — the full list of `Action` names you can use in `Permissions`.
 
 These are useful if you want to add a new provider type, write automation scripts, or understand why a particular setting exists.
+
+---
+
+## 8. SPA bootstrap endpoint
+
+For browser applications, you can fetch OIDC startup settings from a dedicated anonymous endpoint:
+
+```http
+GET /api/authentication/bootstrap
+```
+
+### What this endpoint returns
+
+- `bootstrapState`: `available` or `unavailable`
+- `unavailableReasonCodes`: machine-readable reason codes when unavailable
+- `providers`: enabled and sign-in-capable providers only
+- Per-provider browser-safe OIDC settings:
+  - `authority`
+  - `clientId`
+  - `redirectUri`
+  - `scope`
+  - `responseType`
+  - optional logout/silent-renew URIs
+  - optional metadata overrides
+
+### What this endpoint never returns
+
+- Signing keys
+- Backend-only token validation internals
+- Any server-side secret values
+
+### Provider bootstrap settings in appsettings
+
+Inside each `Security:Authentication:Providers[]` item, configure these optional fields:
+
+- `BootstrapRedirectUri`
+- `BootstrapScope`
+- `BootstrapResponseType`
+- `BootstrapPostLogoutRedirectUri`
+- `BootstrapSilentRedirectUri`
+- `BootstrapAutomaticSilentRenew`
+- `BootstrapMetadataIssuer`
+- `BootstrapMetadataAuthorizationEndpoint`
+- `BootstrapMetadataTokenEndpoint`
+- `BootstrapMetadataUserInfoEndpoint`
+- `BootstrapMetadataEndSessionEndpoint`
+
+If no provider is sign-in-capable, the endpoint still returns HTTP 200 with `bootstrapState = unavailable` and reason codes.
 
 ---
 

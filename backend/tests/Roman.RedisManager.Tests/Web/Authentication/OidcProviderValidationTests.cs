@@ -6,7 +6,7 @@ namespace Roman.RedisManager.Tests.Web.Authentication
     public class OidcProviderValidationTests
     {
         [Fact]
-        public void Validate_NoEnabledProviders_ReturnsValidationError()
+        public void Validate_NoEnabledProviders_IsAllowed()
         {
             // Arrange
             var configuration = new OidcAuthenticationConfiguration
@@ -32,8 +32,8 @@ namespace Roman.RedisManager.Tests.Web.Authentication
             var isValid = Validator.TryValidateObject(configuration, validationContext, validationResults, validateAllProperties: true);
 
             // Assert
-            isValid.ShouldBeFalse();
-            validationResults.ShouldContain(result => result.ErrorMessage!.Contains("At least one enabled OIDC provider is required", StringComparison.Ordinal));
+            isValid.ShouldBeTrue();
+            validationResults.ShouldBeEmpty();
         }
     }
 }
