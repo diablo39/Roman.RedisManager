@@ -71,6 +71,7 @@
     "unref": true,
     "useAppStore": true,
     "useAttrs": true,
+    "useAuthenticationStore": true,
     "useCssModule": true,
     "useCssVars": true,
     "useId": true,

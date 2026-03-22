@@ -60,6 +60,7 @@ declare global {
   const unref: typeof import('vue').unref
   const useAppStore: typeof import('./stores/app').useAppStore
   const useAttrs: typeof import('vue').useAttrs
+  const useAuthenticationStore: typeof import('./stores/authentication').useAuthenticationStore
   const useCssModule: typeof import('vue').useCssModule
   const useCssVars: typeof import('vue').useCssVars
   const useId: typeof import('vue').useId
@@ -140,6 +141,7 @@ declare module 'vue' {
     readonly unref: UnwrapRef<typeof import('vue')['unref']>
     readonly useAppStore: UnwrapRef<typeof import('./stores/app')['useAppStore']>
     readonly useAttrs: UnwrapRef<typeof import('vue')['useAttrs']>
+    readonly useAuthenticationStore: UnwrapRef<typeof import('./stores/authentication')['useAuthenticationStore']>
     readonly useCssModule: UnwrapRef<typeof import('vue')['useCssModule']>
     readonly useCssVars: UnwrapRef<typeof import('vue')['useCssVars']>
     readonly useId: UnwrapRef<typeof import('vue')['useId']>

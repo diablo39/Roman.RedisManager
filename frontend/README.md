@@ -14,12 +14,12 @@ This is the official scaffolding tool for Vuetify, designed to give you a head s
 
 Set up your project using your preferred package manager. Use the corresponding command to install the dependencies:
 
-| Package Manager                                                | Command        |
-|---------------------------------------------------------------|----------------|
-| [yarn](https://yarnpkg.com/getting-started)                   | `yarn install` |
-| [npm](https://docs.npmjs.com/cli/v7/commands/npm-install)     | `npm install`  |
-| [pnpm](https://pnpm.io/installation)                          | `pnpm install` |
-| [bun](https://bun.sh/#getting-started)                        | `bun install`  |
+| Package Manager                                           | Command        |
+| --------------------------------------------------------- | -------------- |
+| [yarn](https://yarnpkg.com/getting-started)               | `yarn install` |
+| [npm](https://docs.npmjs.com/cli/v7/commands/npm-install) | `npm install`  |
+| [pnpm](https://pnpm.io/installation)                      | `pnpm install` |
+| [bun](https://bun.sh/#getting-started)                    | `bun install`  |
 
 After completing the installation, your environment is ready for Vuetify development.
 
@@ -63,6 +63,22 @@ yarn build
 
 Once the build process is completed, your application will be ready for deployment in a production environment.
 
+## Authentication Flow
+
+This frontend uses OpenID Connect provider discovery from the backend bootstrap endpoint:
+
+- Endpoint: `GET /api/authentication/bootstrap`
+- Login route: `/login`
+- Callback route: `/auth/callback`
+
+Behavior summary:
+
+- All non-authentication routes are protected by a global router guard.
+- Unauthenticated navigation to protected routes redirects to `/login` and preserves `returnUrl`.
+- The sign-in page loads currently available providers and starts redirect sign-in with `oidc-client-ts`.
+- The callback page finalizes sign-in, restores navigation to the saved `returnUrl`, and shows retryable errors.
+- Session validity is checked before protected-route access, and expired sessions are invalidated and redirected back to `/login`.
+
 ## 💪 Support Vuetify Development
 
 This project is built with [Vuetify](https://vuetifyjs.com/en/), a UI Library with a comprehensive collection of Vue components. Vuetify is an MIT licensed Open Source project that has been made possible due to the generous contributions by our [sponsors and backers](https://vuetifyjs.com/introduction/sponsors-and-backers/). If you are interested in supporting this project, please consider:
@@ -76,6 +92,7 @@ This project is built with [Vuetify](https://vuetifyjs.com/en/), a UI Library wi
 - [Making a one-time donation with Paypal](https://paypal.me/vuetify)
 
 ## 📑 License
+
 [MIT](http://opensource.org/licenses/MIT)
 
 Copyright (c) 2016-present Vuetify, LLC

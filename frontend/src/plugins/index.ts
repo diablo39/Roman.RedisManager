@@ -10,11 +10,11 @@ import router from '../router'
 import pinia from '../stores'
 
 // Plugins
+import { initializeOidcPlugin } from './oidc'
 import vuetify from './vuetify'
 
-export function registerPlugins (app: App) {
-  app
-    .use(vuetify)
-    .use(router)
-    .use(pinia)
+export function registerPlugins(app: App) {
+  initializeOidcPlugin()
+
+  app.use(vuetify).use(router).use(pinia)
 }

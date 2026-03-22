@@ -13,5 +13,11 @@
 </template>
 
 <script lang="ts" setup>
-console.log('Index page loaded')
+  // Protected home page. Route access is enforced by the global auth guard.
 </script>
+
+<route lang="yaml">
+meta:
+  layout: default
+  title: 'Home'
+</route>

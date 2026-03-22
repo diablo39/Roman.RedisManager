@@ -3,7 +3,7 @@
     <v-card rounded="lg" variant="tonal">
       <v-card-title class="d-flex align-center justify-space-between">
         <span class="text-subtitle-1">Redis Server</span>
-        <v-chip v-if="server" color="primary" variant="tonal" size="small">
+        <v-chip v-if="server" color="primary" size="small" variant="tonal">
           {{ server.topology }}
         </v-chip>
       </v-card-title>
@@ -12,18 +12,18 @@
 
       <v-card-text>
         <div v-if="loading" class="d-flex justify-center py-6">
-          <v-progress-circular indeterminate color="primary" :aria-label="`Loading server ${id}`" />
+          <v-progress-circular :aria-label="`Loading server ${id}`" color="primary" indeterminate />
         </div>
 
-        <v-alert v-else-if="error" type="error" variant="tonal" class="mb-4">
+        <v-alert v-else-if="error" class="mb-4" type="error" variant="tonal">
           <div class="d-flex align-center justify-space-between flex-wrap ga-2">
             <span>{{ error }}</span>
-            <v-btn size="small" variant="text" color="primary" @click="fetchServer">Retry</v-btn>
+            <v-btn color="primary" size="small" variant="text" @click="fetchServer">Retry</v-btn>
           </div>
         </v-alert>
 
         <template v-else-if="server">
-          <v-tabs v-model="tab" density="compact" class="mb-4">
+          <v-tabs v-model="tab" class="mb-4" density="compact">
             <v-tab value="info">Server info</v-tab>
             <v-tab value="keys">Keys</v-tab>
           </v-tabs>
@@ -32,16 +32,16 @@
             <v-window-item value="info">
               <v-card variant="flat">
                 <v-card-text class="pa-0">
-                  <v-list density="compact" class="mb-4">
+                  <v-list class="mb-4" density="compact">
                     <v-list-item
-                      title="Name"
-                      :subtitle="server.name"
                       prepend-icon="mdi-label-outline"
+                      :subtitle="server.name"
+                      title="Name"
                     />
                     <v-list-item
-                      title="Topology"
-                      :subtitle="server.topology"
                       prepend-icon="mdi-lan-connect"
+                      :subtitle="server.topology"
+                      title="Topology"
                     />
                   </v-list>
 
@@ -49,15 +49,15 @@
 
                   <v-list density="comfortable">
                     <v-list-subheader>Nodes</v-list-subheader>
-                    <v-alert v-if="!server.nodes.length" type="info" variant="tonal" class="ma-2">
+                    <v-alert v-if="server.nodes.length === 0" class="ma-2" type="info" variant="tonal">
                       No nodes reported for this server.
                     </v-alert>
                     <v-list-item
                       v-for="node in server.nodes"
                       :key="node.address"
-                      :title="node.address"
-                      :subtitle="`Role: ${formatRole(node.role)}`"
                       prepend-icon="mdi-lan"
+                      :subtitle="`Role: ${formatRole(node.role)}`"
+                      :title="node.address"
                     />
                   </v-list>
                 </v-card-text>
@@ -68,7 +68,7 @@
               <div
                 class="d-flex flex-column align-center justify-center py-10 text-medium-emphasis"
               >
-                <v-icon icon="mdi-key" size="48" class="mb-3" />
+                <v-icon class="mb-3" icon="mdi-key" size="48" />
                 <div class="text-subtitle-1">Keys view coming soon</div>
                 <div class="text-body-2">Browse and manage Redis keys will appear here.</div>
               </div>
@@ -111,14 +111,14 @@
   const redisServersStore = useRedisServersStore()
   const { servers } = storeToRefs(redisServersStore)
 
-  const formatRole = (role: NodeRole): string => {
+  function formatRole (role: NodeRole): string {
     if (role === 'master') return 'Master'
     if (role === 'slave') return 'Slave'
     if (role === 'replica') return 'Replica'
     return 'Unknown'
   }
 
-  const fetchServer = async () => {
+  async function fetchServer () {
     loading.value = true
     error.value = null
 
@@ -143,8 +143,8 @@
           role: node.role,
         })),
       }
-    } catch (e) {
-      error.value = e instanceof Error ? e.message : 'Unable to load server details'
+    } catch (error_) {
+      error.value = error_ instanceof Error ? error_.message : 'Unable to load server details'
       server.value = null
     } finally {
       loading.value = false

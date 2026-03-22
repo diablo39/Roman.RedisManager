@@ -1,15 +1,15 @@
 <template>
   <v-card class="fill-height">
     <v-expansion-panels v-model="openPanels" density="comfortable" variant="accordion">
-      <v-expansion-panel :value="0" title="Servers">
+      <v-expansion-panel title="Servers" :value="0">
         <v-expansion-panel-text class="pa-0">
           <v-infinite-scroll :height="300" :items="servers" @load="onLoad">
             <template v-for="server in servers" :key="server.id">
               <v-list-item
+                nav
                 prepend-icon="mdi-database"
                 :title="server.name"
                 :to="`/redis/${server.id}`"
-                nav
               />
             </template>
 
@@ -18,19 +18,19 @@
             </template>
 
             <template #error="{ props }">
-              <v-alert type="error" variant="tonal" class="ma-2">
+              <v-alert class="ma-2" type="error" variant="tonal">
                 <div class="text-caption">Failed to load</div>
-                <v-btn v-bind="props" size="small" variant="text" class="mt-2">Retry</v-btn>
+                <v-btn v-bind="props" class="mt-2" size="small" variant="text">Retry</v-btn>
               </v-alert>
             </template>
           </v-infinite-scroll>
         </v-expansion-panel-text>
       </v-expansion-panel>
 
-      <v-expansion-panel :value="1" title="Settings">
+      <v-expansion-panel title="Settings" :value="1">
         <v-expansion-panel-text class="pa-0">
           <v-list>
-            <v-list-item prepend-icon="mdi-information" title="About" nav to="/about" />
+            <v-list-item nav prepend-icon="mdi-information" title="About" to="/about" />
           </v-list>
         </v-expansion-panel-text>
       </v-expansion-panel>
@@ -44,7 +44,7 @@
 
   const openPanels = ref([0])
 
-  async function onLoad({
+  async function onLoad ({
     done,
   }: {
     done: (status: 'ok' | 'empty' | 'loading' | 'error') => void
@@ -57,7 +57,7 @@
     try {
       await redisServersStore.loadNextPage()
       done('ok')
-    } catch (e) {
+    } catch {
       done('error')
     }
   }
