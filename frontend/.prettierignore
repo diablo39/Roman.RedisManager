@@ -1,8 +1,12 @@
 node_modules
 dist
+build
 .nuxt
 .output
 .vite
 coverage
 *.log
 *.d.ts
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
