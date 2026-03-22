@@ -138,7 +138,11 @@ export async function getAuthHeaders(): Promise<Record<string, string>> {
       if (!raw) continue
 
       try {
-        const parsed = JSON.parse(raw) as { access_token?: string; expired?: boolean; expires_at?: number }
+        const parsed = JSON.parse(raw) as {
+          access_token?: string
+          expired?: boolean
+          expires_at?: number
+        }
         if (parsed.access_token) {
           // prefer explicit `expired` flag when present, otherwise use expires_at
           if (parsed.expired === true) continue
