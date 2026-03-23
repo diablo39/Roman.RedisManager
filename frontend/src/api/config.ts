@@ -12,6 +12,6 @@ const normalizeUrl = (url: string): string => (url.endsWith('/') ? url : `${url}
 // In production default to same-origin deployment.
 export const apiBaseUrl = backendUrl
   ? normalizeUrl(backendUrl)
-  : import.meta.env.DEV
-    ? devBackendUrl
-    : '/'
+  : (import.meta.env.DEV
+      ? devBackendUrl
+      : '/')

@@ -20,6 +20,8 @@ declare module 'vue-router/auto-routes' {
   export interface RouteNamedMap {
     '/': RouteRecordInfo<'/', '/', Record<never, never>, Record<never, never>>,
     '/about': RouteRecordInfo<'/about', '/about', Record<never, never>, Record<never, never>>,
+    '/auth/callback': RouteRecordInfo<'/auth/callback', '/auth/callback', Record<never, never>, Record<never, never>>,
+    '/login': RouteRecordInfo<'/login', '/login', Record<never, never>, Record<never, never>>,
     '/redis/[id]': RouteRecordInfo<'/redis/[id]', '/redis/:id', { id: ParamValue<true> }, { id: ParamValue<false> }>,
   }
 
@@ -40,6 +42,14 @@ declare module 'vue-router/auto-routes' {
     }
     'src/pages/about.vue': {
       routes: '/about'
+      views: never
+    }
+    'src/pages/auth/callback.vue': {
+      routes: '/auth/callback'
+      views: never
+    }
+    'src/pages/login.vue': {
+      routes: '/login'
       views: never
     }
     'src/pages/redis/[id].vue': {
