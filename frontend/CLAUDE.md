@@ -178,15 +178,36 @@ export async function fetchSomething(
 
 ---
 
-## Styling
+## Design System (ArchitectUI-inspired)
 
-- Use `@` alias for `src/` imports
-- Icons: Material Design Icons with `mdi-` prefix (browse at pictogrammers.com/library/mdi/)
-- Prefer Vuetify utility classes (`mb-4`, `pa-2`, `d-flex`, `text-medium-emphasis`, etc.) over custom CSS
-- Theme: custom `architectLight` theme in `src/plugins/vuetify.ts` (primary `#1976D2`, bg `#f5f5f5`)
-- Card headers: use `.card-header-separated` class for ArchitectUI-style separated header with border
-- Shadows: ArchitectUI soft multi-layer shadow variable `$shadow-architect` in `settings.scss`
-- Scoped styles only when Vuetify utilities are insufficient
+Use `/ui-scaffold` skill to get full code templates for any UI pattern (page, card, table, search, dialog, etc.).
+
+Copilot reference: `.github/instructions/design-system.instructions.md`
+
+### Theme
+
+- Primary `#1976D2`, Background `#f5f5f5`, Surface `#FFFFFF`
+- Theme name: `architectLight` in `src/plugins/vuetify.ts`
+- Never hardcode colors — use theme tokens
+
+### Key UI Rules (always enforce)
+
+1. **Every page**: `<v-container fluid class="pa-6">` → page header (`text-h5` + `text-body-2`) → content
+2. **Every card**: `<v-card rounded="lg">` with `.card-header-separated` header (icon + bold title + bottom border)
+3. **No elevation props** on cards — global `$shadow-architect` in `settings.scss` handles shadows
+4. **Chips for types**: `variant="tonal"`, `size="x-small"`, color-coded (Cluster→primary, Standalone→teal, etc.)
+5. **Tables**: `<v-table density="compact" hover>` with fixed-width columns for Type/Actions
+6. **Loading**: skeleton loaders for first load, `v-progress-linear` for refreshes, `:loading` on buttons
+7. **Empty state**: centered icon (48px) + `text-subtitle-1` title + `text-body-2` description
+8. **Error state**: `v-alert type="error" variant="tonal"` with Retry button
+9. **Dialogs**: `v-dialog max-width="440"` with card-header-separated pattern inside
+10. **Search bars**: `variant="solo-filled"` with embedded button via `#append-inner` slot, or `variant="outlined"` for page-level filters
+
+### Styling
+
+- Icons: Material Design Icons with `mdi-` prefix
+- Prefer Vuetify utility classes (`mb-4`, `pa-2`, `d-flex`, `text-medium-emphasis`) over custom CSS
+- CSS classes in `src/styles/settings.scss`: `.card-header-separated`, `.card-header-title`, `.sidebar-section-header`, `.sidebar-brand`
 
 ---
 

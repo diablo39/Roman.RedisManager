@@ -2,7 +2,7 @@
   <div class="sidebar-wrapper">
     <!-- Brand -->
     <div class="sidebar-brand">
-      <v-icon class="sidebar-brand-icon" icon="mdi-database" />
+      <img src="@/assets/logo-sidebar.svg" alt="Roman Redis Manager" width="28" height="28" class="sidebar-brand-icon" />
       <span class="sidebar-brand-text">Redis Manager</span>
     </div>
 
