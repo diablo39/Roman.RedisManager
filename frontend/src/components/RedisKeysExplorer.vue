@@ -238,9 +238,15 @@
     }
   }
 
+  function refresh () {
+    search()
+  }
+
   onMounted(() => search())
 
   watch(() => props.groupId, () => search())
+
+  defineExpose({ refresh })
 </script>
 
 <style scoped>

@@ -1,21 +1,41 @@
 <template>
   <v-container fluid class="pa-6">
     <!-- Page header -->
-    <div class="mb-6">
-      <div class="d-flex align-center ga-3">
-        <div class="text-h5 font-weight-medium">
-          {{ server?.name || 'Redis Server' }}
+    <div class="d-flex align-center justify-space-between flex-wrap ga-4 mb-6">
+      <div>
+        <div class="d-flex align-center ga-3">
+          <div class="text-h5 font-weight-medium">
+            {{ server?.name || 'Redis Server' }}
+          </div>
+          <v-chip
+            v-if="server"
+            :color="server.topology === 'Cluster' ? 'primary' : 'teal'"
+            size="small"
+            variant="tonal"
+          >
+            {{ server.topology }}
+          </v-chip>
         </div>
-        <v-chip
-          v-if="server"
-          :color="server.topology === 'Cluster' ? 'primary' : 'teal'"
-          size="small"
-          variant="tonal"
-        >
-          {{ server.topology }}
-        </v-chip>
+        <div class="text-body-2 text-medium-emphasis">Server details and configuration</div>
       </div>
-      <div class="text-body-2 text-medium-emphasis">Server details and configuration</div>
+
+      <!-- Add key button with type menu -->
+      <v-menu v-if="server">
+        <template #activator="{ props: menuProps }">
+          <v-btn color="success" prepend-icon="mdi-plus" v-bind="menuProps">
+            Add
+          </v-btn>
+        </template>
+        <v-list density="compact" nav>
+          <v-list-item
+            v-for="t in keyTypes"
+            :key="t.value"
+            :prepend-icon="t.icon"
+            :title="t.label"
+            @click="openCreateDialog(t.value)"
+          />
+        </v-list>
+      </v-menu>
     </div>
 
     <!-- Loading -->
@@ -94,7 +114,7 @@
 
           <v-window-item value="keys">
             <v-card-text>
-              <RedisKeysExplorer :group-id="id" />
+              <RedisKeysExplorer ref="keysExplorer" :group-id="id" />
             </v-card-text>
           </v-window-item>
         </v-window>
@@ -102,12 +122,22 @@
     </template>
 
     <div v-else class="text-body-2 text-medium-emphasis">No server selected.</div>
+
+    <!-- Create key dialog -->
+    <CreateKeyDialog ref="createKeyDialog" :group-id="id" @created="onKeyCreated" />
+
+    <!-- Success toast -->
+    <v-snackbar v-model="showToast" color="success" :timeout="3000">
+      Key created successfully
+    </v-snackbar>
   </v-container>
 </template>
 
 <script setup lang="ts">
   import { getRedisServerGroupDetail } from '@/api/redisServers'
   import RedisKeysExplorer from '@/components/RedisKeysExplorer.vue'
+  import CreateKeyDialog from '@/components/CreateKeyDialog.vue'
+  import type { RedisKeyType } from '@/components/CreateKeyDialog.vue'
 
   type Topology = 'Cluster' | 'Standalone' | 'Unknown'
   type NodeRole = 'master' | 'slave' | 'replica' | 'unknown' | string
@@ -124,6 +154,14 @@
     nodes: ServerNode[]
   }
 
+  const keyTypes: { value: RedisKeyType; label: string; icon: string }[] = [
+    { value: 'string', label: 'String', icon: 'mdi-text' },
+    { value: 'hash', label: 'Hash', icon: 'mdi-code-braces' },
+    { value: 'list', label: 'List', icon: 'mdi-format-list-bulleted' },
+    { value: 'set', label: 'Set', icon: 'mdi-set-all' },
+    { value: 'zset', label: 'Sorted Set', icon: 'mdi-sort-numeric-ascending' },
+  ]
+
   const route = useRoute()
   const id = computed(() => String((route.params as { id?: string }).id ?? ''))
 
@@ -131,6 +169,10 @@
   const loading = ref(true)
   const error = ref<string | null>(null)
   const server = ref<ServerDetail | null>(null)
+  const showToast = ref(false)
+
+  const createKeyDialog = ref<InstanceType<typeof CreateKeyDialog> | null>(null)
+  const keysExplorer = ref<InstanceType<typeof RedisKeysExplorer> | null>(null)
 
   const redisServersStore = useRedisServersStore()
   const { servers } = storeToRefs(redisServersStore)
@@ -140,6 +182,19 @@
     if (role === 'slave') return 'Slave'
     if (role === 'replica') return 'Replica'
     return 'Unknown'
+  }
+
+  function openCreateDialog (keyType: RedisKeyType) {
+    createKeyDialog.value?.open(keyType)
+  }
+
+  function onKeyCreated () {
+    showToast.value = true
+    // Switch to keys tab and refresh
+    tab.value = 'keys'
+    nextTick(() => {
+      keysExplorer.value?.refresh?.()
+    })
   }
 
   async function fetchServer () {

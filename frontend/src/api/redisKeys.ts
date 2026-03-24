@@ -22,6 +22,46 @@ export interface DeleteKeyResult {
   deleted: boolean
 }
 
+export interface SetStringRequest {
+  groupId: string
+  key: string
+  value: string
+  ttl: string | null
+}
+
+export interface SetHashFieldsRequest {
+  groupId: string
+  key: string
+  fields: Record<string, string>
+  ttl?: string | null
+}
+
+export interface PushToListRequest {
+  groupId: string
+  key: string
+  values: string[]
+  direction?: number // 0 = left (LPUSH), 1 = right (RPUSH, default)
+  ttl?: string | null
+}
+
+export interface AddToSetRequest {
+  groupId: string
+  key: string
+  members: string[]
+  ttl?: string | null
+}
+
+export interface AddToSortedSetRequest {
+  groupId: string
+  key: string
+  entries: { member: string; score: number }[]
+  ttl?: string | null
+}
+
+export interface CommandResult {
+  success: boolean
+}
+
 interface ProblemDetails {
   title?: string | null
   detail?: string | null
@@ -91,4 +131,43 @@ export async function deleteRedisKey (
   }
 
   return await response.json()
+}
+
+async function postJson<T> (path: string, body: unknown, signal?: AbortSignal): Promise<T> {
+  const url = `${apiBaseUrl}${path}`
+  const authHeaders = await getAuthHeaders()
+
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: { ...authHeaders, 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+    signal,
+  })
+
+  if (!response.ok) {
+    const message = await parseErrorMessage(response, 'Request failed')
+    throw new Error(message)
+  }
+
+  return await response.json()
+}
+
+export function createStringKey (request: SetStringRequest, signal?: AbortSignal) {
+  return postJson<CommandResult>('api/redis/data/strings', request, signal)
+}
+
+export function createHashKey (request: SetHashFieldsRequest, signal?: AbortSignal) {
+  return postJson<CommandResult>('api/redis/data/hashes', request, signal)
+}
+
+export function createListKey (request: PushToListRequest, signal?: AbortSignal) {
+  return postJson<CommandResult>('api/redis/data/lists', request, signal)
+}
+
+export function createSetKey (request: AddToSetRequest, signal?: AbortSignal) {
+  return postJson<CommandResult>('api/redis/data/sets', request, signal)
+}
+
+export function createSortedSetKey (request: AddToSortedSetRequest, signal?: AbortSignal) {
+  return postJson<CommandResult>('api/redis/data/sorted-sets', request, signal)
 }
