@@ -10,7 +10,7 @@
       <Menu />
     </v-navigation-drawer>
 
-    <v-app-bar color="white" density="compact" :elevation="1" flat>
+    <v-app-bar color="white" :elevation="0">
       <v-app-bar-title class="text-body-1 font-weight-medium text-medium-emphasis">
         {{ pageTitle }}
       </v-app-bar-title>

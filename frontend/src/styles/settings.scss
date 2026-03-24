@@ -9,6 +9,22 @@
 //   $color-pack: false
 // );
 
+// ArchitectUI-style soft shadow
+$shadow-architect: 0 0.46875rem 2.1875rem rgba(4, 9, 20, 0.03),
+  0 0.9375rem 1.40625rem rgba(4, 9, 20, 0.03),
+  0 0.25rem 0.53125rem rgba(4, 9, 20, 0.05),
+  0 0.125rem 0.1875rem rgba(4, 9, 20, 0.03);
+
+// App bar soft shadow
+.v-app-bar {
+  box-shadow: $shadow-architect !important;
+}
+
+// Cards soft shadow
+.v-card {
+  box-shadow: $shadow-architect !important;
+}
+
 // Sidebar section headers (e.g. "SERVERS", "SETTINGS")
 .sidebar-section-header {
   padding: 16px 16px 8px;
