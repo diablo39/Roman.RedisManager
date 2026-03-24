@@ -38,7 +38,17 @@
     <!-- Loading (first load) -->
     <v-skeleton-loader v-if="loading && keys.length === 0 && !error" type="table-thead, table-tbody" />
 
-    <!-- Empty state -->
+    <!-- Instructional state (not yet searched) -->
+    <div
+      v-else-if="!loading && !searched && !error"
+      class="d-flex flex-column align-center justify-center py-10 text-medium-emphasis"
+    >
+      <v-icon class="mb-3" icon="mdi-magnify" size="48" />
+      <div class="text-subtitle-1">Search for keys</div>
+      <div class="text-body-2">Enter a key pattern in the search field above and click the search button to browse keys.</div>
+    </div>
+
+    <!-- Empty state (searched but no results) -->
     <div
       v-else-if="!loading && keys.length === 0 && !error && searched"
       class="d-flex flex-column align-center justify-center py-10 text-medium-emphasis"
@@ -239,12 +249,20 @@
   }
 
   function refresh () {
-    search()
+    if (searched.value) {
+      search()
+    }
   }
 
-  onMounted(() => search())
-
-  watch(() => props.groupId, () => search())
+  watch(() => props.groupId, () => {
+    keys.value = []
+    continuationToken.value = null
+    hasMoreResults.value = false
+    error.value = null
+    searched.value = false
+    lastSearchedPattern.value = '*'
+    pattern.value = '*'
+  })
 
   defineExpose({ refresh })
 </script>
