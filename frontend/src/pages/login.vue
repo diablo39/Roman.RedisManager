@@ -1,9 +1,14 @@
 <template>
   <v-container class="fill-height d-flex align-center justify-center">
-    <v-card rounded="lg" width="420">
-      <v-card-title class="pt-6 pb-2 text-center text-h5">Sign in</v-card-title>
+    <v-card elevation="8" rounded="xl" width="420">
+      <!-- Brand -->
+      <div class="d-flex flex-column align-center pt-8 pb-2">
+        <v-icon color="primary" icon="mdi-database" size="48" />
+        <div class="text-h5 font-weight-bold mt-2">Redis Manager</div>
+        <div class="text-body-2 text-medium-emphasis mt-1">Sign in to continue</div>
+      </div>
 
-      <v-card-text>
+      <v-card-text class="px-8 pb-8">
         <!-- Loading: waiting for provider list -->
         <div v-if="bootstrapLoading" class="d-flex justify-center py-4">
           <v-progress-circular color="primary" indeterminate />
@@ -29,6 +34,8 @@
             block
             class="mb-3"
             color="primary"
+            rounded="lg"
+            variant="elevated"
             @click="authStore.startSignIn(provider.providerKey)"
           >
             {{ provider.displayName }}
@@ -48,7 +55,6 @@
     = storeToRefs(authStore)
 
   onMounted(async () => {
-    // Preserve the return destination passed in by the route guard
     const raw = route.query.returnUrl
     const url = Array.isArray(raw) ? raw[0] : raw
     if (url) {

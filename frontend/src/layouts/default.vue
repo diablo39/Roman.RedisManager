@@ -1,20 +1,34 @@
 <template>
   <v-layout>
-    <v-app-bar color="primary" dark>
-      <template #title>Redis Manager</template>
-
-      <v-spacer />
-
-      <v-btn icon title="Clear tokens and re-login" variant="text" @click="onRelogin">
-        <v-icon icon="mdi-logout" />
-      </v-btn>
-    </v-app-bar>
-
-    <v-navigation-drawer>
+    <v-navigation-drawer
+      permanent
+      :width="260"
+      color="white"
+      :elevation="0"
+      border="e"
+    >
       <Menu />
     </v-navigation-drawer>
 
-    <v-main>
+    <v-app-bar color="white" density="compact" :elevation="1" flat>
+      <v-app-bar-title class="text-body-1 font-weight-medium text-medium-emphasis">
+        {{ pageTitle }}
+      </v-app-bar-title>
+
+      <v-spacer />
+
+      <v-btn
+        icon
+        size="small"
+        title="Logout"
+        variant="text"
+        @click="onRelogin"
+      >
+        <v-icon icon="mdi-logout" size="20" />
+      </v-btn>
+    </v-app-bar>
+
+    <v-main style="background-color: #f5f5f5; min-height: 100vh;">
       <router-view />
     </v-main>
 
@@ -41,10 +55,13 @@
   const { loading, servers } = storeToRefs(redisServersStore)
   const authStore = useAuthenticationStore()
   const router = useRouter()
+  const route = useRoute()
+
+  const pageTitle = computed(() => {
+    return (route.meta as { title?: string }).title || 'Dashboard'
+  })
 
   function onRelogin() {
-    // Clear auth session and remove OIDC-localStorage entries so the
-    // provider flow starts fresh. Then navigate to the login page.
     authStore.invalidateSession()
 
     try {

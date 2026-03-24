@@ -345,7 +345,7 @@ namespace Roman.RedisManager.Infrastructure.Repositories
 
             try
             {
-                var connection = await _connectionManager.GetConnectionAsync(groupId).ConfigureAwait(false);
+                var connection = await _connectionManager.GetConnectionAsync(groupId);
 
                 var nodes = new List<RedisServerNode>();
                 foreach (var candidate in connection.GetServers())

@@ -40,7 +40,7 @@ namespace Roman.RedisManager.Infrastructure.Redis
 
             try
             {
-                return await connectionTask.ConfigureAwait(false);
+                return await connectionTask;
             }
             catch
             {
@@ -54,8 +54,7 @@ namespace Roman.RedisManager.Infrastructure.Redis
             ArgumentNullException.ThrowIfNull(serverGroup, nameof(serverGroup));
 
             var multiplexer = await ConnectionMultiplexer
-                .ConnectAsync(serverGroup.ConnectionString)
-                .ConfigureAwait(false);
+                .ConnectAsync(serverGroup.ConnectionString);
 
             return multiplexer;
         }

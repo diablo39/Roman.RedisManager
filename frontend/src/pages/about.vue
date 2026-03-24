@@ -1,6 +1,11 @@
 <template>
-  <v-container class="fill-height">
-    <v-card class="mx-auto" max-width="800" rounded="lg" variant="tonal">
+  <v-container fluid class="pa-6">
+    <div class="mb-6">
+      <div class="text-h5 font-weight-medium">About</div>
+      <div class="text-body-2 text-medium-emphasis">Application information</div>
+    </div>
+
+    <v-card elevation="1" max-width="800" rounded="lg">
       <v-card-title class="d-flex align-center">
         <v-icon class="mr-2" icon="mdi-information" />
         About Roman Redis Manager
@@ -45,8 +50,6 @@
 </template>
 
 <script setup lang="ts">
-  // Minimal page logic
-  const route = useRoute()
 </script>
 
 <route lang="yaml">
