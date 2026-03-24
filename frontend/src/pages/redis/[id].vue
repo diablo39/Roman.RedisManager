@@ -94,11 +94,7 @@
 
           <v-window-item value="keys">
             <v-card-text>
-              <div class="d-flex flex-column align-center justify-center py-10 text-medium-emphasis">
-                <v-icon class="mb-3" icon="mdi-key" size="48" />
-                <div class="text-subtitle-1">Keys view coming soon</div>
-                <div class="text-body-2">Browse and manage Redis keys will appear here.</div>
-              </div>
+              <RedisKeysExplorer :group-id="id" />
             </v-card-text>
           </v-window-item>
         </v-window>
@@ -111,6 +107,7 @@
 
 <script setup lang="ts">
   import { getRedisServerGroupDetail } from '@/api/redisServers'
+  import RedisKeysExplorer from '@/components/RedisKeysExplorer.vue'
 
   type Topology = 'Cluster' | 'Standalone' | 'Unknown'
   type NodeRole = 'master' | 'slave' | 'replica' | 'unknown' | string
