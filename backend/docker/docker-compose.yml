@@ -1,54 +1,57 @@
+version: "3.8"
+
 services:
   redis-master:
     image: redis:8.6.0
     container_name: redis-master
-    command: ["redis-server", "--port", "6379"]
-    ports:
-      - "8000:6379"
+    network_mode: "host"
+    command: ["redis-server", "--port", "8000"]
     volumes:
       - redis-master-data:/data
+    # ports not needed with host network
+    # volumes and others remain
+    # networks removed
 
   redis-slave-1:
     image: redis:8.6.0
     container_name: redis-slave-1
+    network_mode: "host"
     depends_on:
       - redis-master
-    command: ["redis-server", "--port", "6379", "--replicaof", "redis-master", "6379"]
-    ports:
-      - "8001:6379"
+    command: ["redis-server", "--port", "8001", "--replicaof", "127.0.0.1", "8000"]
     volumes:
       - redis-slave-1-data:/data
+    # ports not needed with host network
+    # networks removed
 
   redis-cluster-7000:
     image: redis:8.6.0
     container_name: redis-cluster-7000
-    command: ["redis-server", "--port", "7000", "--cluster-enabled", "yes", "--cluster-config-file", "nodes-7000.conf", "--cluster-node-timeout", "5000", "--appendonly", "yes", "--cluster-announce-ip", "host.docker.internal", "--cluster-announce-port", "7000"]
-    ports:
-      - "7000:7000"
+    network_mode: "host"
+    command: ["redis-server", "--port", "7000", "--cluster-enabled", "yes", "--cluster-config-file", "nodes-7000.conf", "--cluster-node-timeout", "5000", "--appendonly", "yes"]
     volumes:
       - redis-cluster-7000-data:/data
 
   redis-cluster-7001:
     image: redis:8.6.0
     container_name: redis-cluster-7001
-    command: ["redis-server", "--port", "7001", "--cluster-enabled", "yes", "--cluster-config-file", "nodes-7001.conf", "--cluster-node-timeout", "5000", "--appendonly", "yes", "--cluster-announce-ip", "host.docker.internal", "--cluster-announce-port", "7001"]
-    ports:
-      - "7001:7001"
+    network_mode: "host"
+    command: ["redis-server", "--port", "7001", "--cluster-enabled", "yes", "--cluster-config-file", "nodes-7001.conf", "--cluster-node-timeout", "5000", "--appendonly", "yes"]
     volumes:
       - redis-cluster-7001-data:/data
 
   redis-cluster-7002:
     image: redis:8.6.0
     container_name: redis-cluster-7002
-    command: ["redis-server", "--port", "7002", "--cluster-enabled", "yes", "--cluster-config-file", "nodes-7002.conf", "--cluster-node-timeout", "5000", "--appendonly", "yes", "--cluster-announce-ip", "host.docker.internal", "--cluster-announce-port", "7002"]
-    ports:
-      - "7002:7002"
+    network_mode: "host"
+    command: ["redis-server", "--port", "7002", "--cluster-enabled", "yes", "--cluster-config-file", "nodes-7002.conf", "--cluster-node-timeout", "5000", "--appendonly", "yes"]
     volumes:
       - redis-cluster-7002-data:/data
 
   redis-cluster-init:
     image: redis:8.6.0
     container_name: redis-cluster-init
+    network_mode: "host"
     depends_on:
       - redis-cluster-7000
       - redis-cluster-7001
@@ -57,7 +60,7 @@ services:
     command: |
       "sleep 2; \
       echo 'Creating redis cluster...'; \
-      redis-cli --cluster create redis-cluster-7000:7000 redis-cluster-7001:7001 redis-cluster-7002:7002 --cluster-replicas 0 --cluster-yes || true; \
+      redis-cli --cluster create 127.0.0.1:7000 127.0.0.1:7001 127.0.0.1:7002 --cluster-replicas 0 --cluster-yes || true; \
       echo 'Cluster init finished';"
 
 
