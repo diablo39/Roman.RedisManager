@@ -24,7 +24,7 @@
     </div>
 
     <!-- Error -->
-    <v-card v-else-if="error" elevation="1" rounded="lg">
+    <v-card v-else-if="error" rounded="lg">
       <v-card-text>
         <v-alert type="error" variant="tonal">
           <div class="d-flex align-center justify-space-between flex-wrap ga-2">
@@ -37,13 +37,13 @@
 
     <!-- Content -->
     <template v-else-if="server">
-      <v-card elevation="1" rounded="lg">
-        <v-tabs v-model="tab" color="primary" density="compact">
-          <v-tab value="info">Server Info</v-tab>
-          <v-tab value="keys">Keys</v-tab>
-        </v-tabs>
-
-        <v-divider />
+      <v-card rounded="lg">
+        <div class="card-header-separated">
+          <v-tabs v-model="tab" color="primary" density="compact" class="card-header-tabs">
+            <v-tab value="info">Server Info</v-tab>
+            <v-tab value="keys">Keys</v-tab>
+          </v-tabs>
+        </div>
 
         <v-window v-model="tab">
           <v-window-item value="info">
@@ -55,13 +55,13 @@
                   <v-list density="compact" variant="flat">
                     <v-list-item
                       prepend-icon="mdi-label-outline"
-                      :subtitle="server.name"
-                      title="Name"
+                      :title="server.name"
+                      subtitle="Name"
                     />
                     <v-list-item
                       prepend-icon="mdi-lan-connect"
-                      :subtitle="server.topology"
-                      title="Topology"
+                      :title="server.topology"
+                      subtitle="Topology"
                     />
                   </v-list>
                 </v-col>

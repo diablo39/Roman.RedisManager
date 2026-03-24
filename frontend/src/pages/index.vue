@@ -64,13 +64,15 @@
         lg="3"
       >
         <v-card
-          elevation="1"
           hover
           rounded="lg"
           :to="`/redis/${card.id}`"
         >
-          <v-card-title class="d-flex align-center justify-space-between">
-            <span class="text-subtitle-1 font-weight-medium">{{ card.name }}</span>
+          <div class="card-header-separated">
+            <div class="card-header-title">
+              <v-icon color="primary" icon="mdi-database" size="20" />
+              {{ card.name }}
+            </div>
             <v-chip
               :color="card.groupType === 'Cluster' ? 'primary' : 'teal'"
               size="x-small"
@@ -78,7 +80,7 @@
             >
               {{ card.groupType }}
             </v-chip>
-          </v-card-title>
+          </div>
 
           <v-card-text>
             <div class="d-flex align-center text-body-2 text-medium-emphasis">

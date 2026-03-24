@@ -5,11 +5,13 @@
       <div class="text-body-2 text-medium-emphasis">Application information</div>
     </div>
 
-    <v-card elevation="1" max-width="800" rounded="lg">
-      <v-card-title class="d-flex align-center">
-        <v-icon class="mr-2" icon="mdi-information" />
-        About Roman Redis Manager
-      </v-card-title>
+    <v-card max-width="800" rounded="lg">
+      <div class="card-header-separated">
+        <div class="card-header-title">
+          <v-icon color="primary" icon="mdi-information" size="20" />
+          About Roman Redis Manager
+        </div>
+      </div>
 
       <v-card-text>
         <h3 class="mb-2">Application Information</h3>
