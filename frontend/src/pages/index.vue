@@ -1,8 +1,22 @@
 <template>
   <v-container fluid class="pa-6">
-    <div class="mb-6">
-      <div class="text-h5 font-weight-medium">Dashboard</div>
-      <div class="text-body-2 text-medium-emphasis">Server overview</div>
+    <div class="d-flex align-center justify-space-between flex-wrap ga-4 mb-6">
+      <div>
+        <div class="text-h5 font-weight-medium">Dashboard</div>
+        <div class="text-body-2 text-medium-emphasis">Server overview</div>
+      </div>
+      <v-text-field
+        v-model="search"
+        class="search-field"
+        clearable
+        density="compact"
+        hide-details
+        max-width="320"
+        placeholder="Search servers..."
+        prepend-inner-icon="mdi-magnify"
+        rounded="lg"
+        variant="outlined"
+      />
     </div>
 
     <!-- Loading skeletons -->
@@ -26,10 +40,23 @@
       </div>
     </v-card>
 
+    <!-- No results -->
+    <v-card
+      v-else-if="filteredCards.length === 0 && search"
+      class="text-center pa-8"
+      rounded="lg"
+    >
+      <v-icon class="mb-3" color="medium-emphasis" icon="mdi-magnify" size="48" />
+      <div class="text-h6">No matches</div>
+      <div class="text-body-2 text-medium-emphasis">
+        No servers match "{{ search }}"
+      </div>
+    </v-card>
+
     <!-- Server cards grid -->
     <v-row v-else>
       <v-col
-        v-for="card in serverCards"
+        v-for="card in filteredCards"
         :key="card.id"
         cols="12"
         sm="6"
@@ -87,7 +114,16 @@
   const redisServersStore = useRedisServersStore()
   const { servers, loading } = storeToRefs(redisServersStore)
 
+  const search = ref('')
   const serverCards = ref<ServerCard[]>([])
+
+  const filteredCards = computed(() => {
+    const q = (search.value || '').trim().toLowerCase()
+    if (!q) return serverCards.value
+    return serverCards.value.filter(c =>
+      c.name.toLowerCase().includes(q) || c.groupType.toLowerCase().includes(q),
+    )
+  })
 
   watch(servers, async (newServers) => {
     for (const srv of newServers) {
