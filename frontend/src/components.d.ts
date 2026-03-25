@@ -16,6 +16,7 @@ declare module 'vue' {
     RedisKeysExplorer: typeof import('./components/RedisKeysExplorer.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+    StringKeyDetailDialog: typeof import('./components/StringKeyDetailDialog.vue')['default']
     TtlPicker: typeof import('./components/TtlPicker.vue')['default']
   }
 }

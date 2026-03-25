@@ -10,7 +10,14 @@
       </div>
 
       <v-card-text>
-        <v-alert v-if="error" class="mb-4" closable type="error" variant="tonal" @click:close="error = null">
+        <v-alert
+          v-if="error"
+          class="mb-4"
+          closable
+          type="error"
+          variant="tonal"
+          @click:close="error = null"
+        >
           {{ error }}
         </v-alert>
 
@@ -65,7 +72,13 @@
               @click="hashFields.splice(i, 1)"
             />
           </div>
-          <v-btn class="mb-3" prepend-icon="mdi-plus" size="small" variant="text" @click="hashFields.push({ name: '', value: '' })">
+          <v-btn
+            class="mb-3"
+            prepend-icon="mdi-plus"
+            size="small"
+            variant="text"
+            @click="hashFields.push({ name: '', value: '' })"
+          >
             Add Field
           </v-btn>
         </template>
@@ -98,7 +111,13 @@
               @click="listValues.splice(i, 1)"
             />
           </div>
-          <v-btn class="mb-3" prepend-icon="mdi-plus" size="small" variant="text" @click="listValues.push('')">
+          <v-btn
+            class="mb-3"
+            prepend-icon="mdi-plus"
+            size="small"
+            variant="text"
+            @click="listValues.push('')"
+          >
             Add Value
           </v-btn>
         </template>
@@ -122,7 +141,13 @@
               @click="setMembers.splice(i, 1)"
             />
           </div>
-          <v-btn class="mb-3" prepend-icon="mdi-plus" size="small" variant="text" @click="setMembers.push('')">
+          <v-btn
+            class="mb-3"
+            prepend-icon="mdi-plus"
+            size="small"
+            variant="text"
+            @click="setMembers.push('')"
+          >
             Add Member
           </v-btn>
         </template>
@@ -155,7 +180,13 @@
               @click="zsetEntries.splice(i, 1)"
             />
           </div>
-          <v-btn class="mb-3" prepend-icon="mdi-plus" size="small" variant="text" @click="zsetEntries.push({ member: '', score: 0 })">
+          <v-btn
+            class="mb-3"
+            prepend-icon="mdi-plus"
+            size="small"
+            variant="text"
+            @click="zsetEntries.push({ member: '', score: 0 })"
+          >
             Add Entry
           </v-btn>
         </template>
@@ -167,7 +198,13 @@
       <v-card-actions>
         <v-spacer />
         <v-btn variant="text" @click="close">Cancel</v-btn>
-        <v-btn color="success" :disabled="!isValid" :loading="submitting" variant="elevated" @click="submit">
+        <v-btn
+          color="success"
+          :disabled="!isValid"
+          :loading="submitting"
+          variant="elevated"
+          @click="submit"
+        >
           Create
         </v-btn>
       </v-card-actions>
@@ -177,11 +214,11 @@
 
 <script setup lang="ts">
   import {
-    createStringKey,
     createHashKey,
     createListKey,
     createSetKey,
     createSortedSetKey,
+    createStringKey,
   } from '@/api/redisKeys'
   import TtlPicker from '@/components/TtlPicker.vue'
 
@@ -234,12 +271,18 @@
   const isValid = computed(() => {
     if (!keyName.value.trim()) return false
     switch (type.value) {
-      case 'string': return !!stringValue.value
-      case 'hash': return hashFields.value.some(f => f.name.trim() && f.value.trim())
-      case 'list': return listValues.value.some(v => v.trim())
-      case 'set': return setMembers.value.some(m => m.trim())
-      case 'zset': return zsetEntries.value.some(e => e.member.trim())
-      default: return false
+      case 'string': { return !!stringValue.value
+      }
+      case 'hash': { return hashFields.value.some(f => f.name.trim() && f.value.trim())
+      }
+      case 'list': { return listValues.value.some(v => v.trim())
+      }
+      case 'set': { return setMembers.value.some(m => m.trim())
+      }
+      case 'zset': { return zsetEntries.value.some(e => e.member.trim())
+      }
+      default: { return false
+      }
     }
   })
 
@@ -275,9 +318,10 @@
       const key = keyName.value.trim()
 
       switch (type.value) {
-        case 'string':
+        case 'string': {
           await createStringKey({ groupId, key, value: stringValue.value, ttl: ttl.value })
           break
+        }
         case 'hash': {
           const fields: Record<string, string> = {}
           for (const f of hashFields.value) {
@@ -286,7 +330,7 @@
           await createHashKey({ groupId, key, fields, ttl: ttl.value })
           break
         }
-        case 'list':
+        case 'list': {
           await createListKey({
             groupId,
             key,
@@ -295,7 +339,8 @@
             ttl: ttl.value,
           })
           break
-        case 'set':
+        }
+        case 'set': {
           await createSetKey({
             groupId,
             key,
@@ -303,7 +348,8 @@
             ttl: ttl.value,
           })
           break
-        case 'zset':
+        }
+        case 'zset': {
           await createSortedSetKey({
             groupId,
             key,
@@ -311,12 +357,13 @@
             ttl: ttl.value,
           })
           break
+        }
       }
 
       emit('created')
       close()
-    } catch (e) {
-      error.value = e instanceof Error ? e.message : 'Failed to create key'
+    } catch (error_) {
+      error.value = error_ instanceof Error ? error_.message : 'Failed to create key'
     } finally {
       submitting.value = false
     }

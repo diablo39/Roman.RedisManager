@@ -1,11 +1,11 @@
 <template>
   <v-layout>
     <v-navigation-drawer
-      permanent
-      :width="260"
+      border="e"
       color="white"
       :elevation="0"
-      border="e"
+      permanent
+      :width="260"
     >
       <Menu />
     </v-navigation-drawer>
@@ -61,7 +61,7 @@
     return (route.meta as { title?: string }).title || 'Dashboard'
   })
 
-  function onRelogin() {
+  function onRelogin () {
     authStore.invalidateSession()
 
     try {
@@ -73,7 +73,7 @@
           localStorage.removeItem(key)
         }
       }
-    } catch (e) {
+    } catch {
       // Ignore storage errors
     }
 

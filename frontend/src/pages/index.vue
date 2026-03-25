@@ -1,5 +1,5 @@
 <template>
-  <v-container fluid class="pa-6">
+  <v-container class="pa-6" fluid>
     <div class="d-flex align-center justify-space-between flex-wrap ga-4 mb-6">
       <div>
         <div class="text-h5 font-weight-medium">Dashboard</div>
@@ -21,7 +21,14 @@
 
     <!-- Loading skeletons -->
     <v-row v-if="loading && servers.length === 0">
-      <v-col v-for="i in 3" :key="i" cols="12" sm="6" md="4" lg="3">
+      <v-col
+        v-for="i in 3"
+        :key="i"
+        cols="12"
+        lg="3"
+        md="4"
+        sm="6"
+      >
         <v-skeleton-loader type="card" />
       </v-col>
     </v-row>
@@ -59,9 +66,9 @@
         v-for="card in filteredCards"
         :key="card.id"
         cols="12"
-        sm="6"
-        md="4"
         lg="3"
+        md="4"
+        sm="6"
       >
         <v-card
           hover
@@ -127,7 +134,7 @@
     )
   })
 
-  watch(servers, async (newServers) => {
+  watch(servers, async newServers => {
     for (const srv of newServers) {
       if (serverCards.value.find(s => s.id === srv.id)) continue
 
@@ -140,8 +147,12 @@
       serverCards.value.push(card)
 
       getRedisServerGroupDetail(srv.id)
-        .then(detail => { card.nodeCount = detail.nodes.length })
-        .catch(() => { card.nodeCount = -1 })
+        .then(detail => {
+          card.nodeCount = detail.nodes.length
+        })
+        .catch(() => {
+          card.nodeCount = -1
+        })
     }
   }, { immediate: true })
 
