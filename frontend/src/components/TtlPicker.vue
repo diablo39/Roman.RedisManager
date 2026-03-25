@@ -79,13 +79,14 @@
     return parts.length ? parts.join(' ') : ''
   })
 
+  // .NET TimeSpan format: [d.]hh:mm:ss
   function toTimespan (): string | null {
     if (!hasValue.value) return null
-    const totalHours = days.value * 24 + hours.value
-    const hh = String(totalHours).padStart(2, '0')
+    const hh = String(hours.value).padStart(2, '0')
     const mm = String(minutes.value).padStart(2, '0')
     const ss = String(seconds.value).padStart(2, '0')
-    return `${hh}:${mm}:${ss}`
+    const dayPrefix = days.value > 0 ? `${days.value}.` : ''
+    return `${dayPrefix}${hh}:${mm}:${ss}`
   }
 
   function clear () {
