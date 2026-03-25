@@ -137,7 +137,7 @@
           <strong style="font-family: monospace;">{{ deleteTarget?.key }}</strong>?
           This action cannot be undone.
         </v-card-text>
-        <v-card-actions>
+        <v-card-actions class="card-footer-separated">
           <v-spacer />
           <v-btn variant="text" @click="cancelDelete">Cancel</v-btn>
           <v-btn color="error" :loading="deleting" variant="elevated" @click="executeDelete">

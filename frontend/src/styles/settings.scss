@@ -45,6 +45,13 @@ $shadow-architect: 0 0.46875rem 2.1875rem rgba(4, 9, 20, 0.03),
   }
 }
 
+// ArchitectUI-style card footer — visually separated from body (mirrors header)
+.card-footer-separated {
+  border-top: 1px solid rgba(26, 54, 126, 0.125);
+  background-color: #fff;
+  border-radius: 0 0 8px 8px;
+}
+
 // Sidebar section headers (e.g. "SERVERS", "SETTINGS")
 .sidebar-section-header {
   padding: 16px 16px 8px;

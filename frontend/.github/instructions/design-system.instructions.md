@@ -261,9 +261,9 @@ Use tonal alerts with retry action:
 </v-alert>
 ```
 
-## Confirmation Dialogs
+## Dialogs (Popups)
 
-Use `v-dialog` with the card-header-separated pattern:
+All dialogs MUST use the card-header-separated AND card-footer-separated pattern — header and footer are visually separated from the body with borders:
 
 ```vue
 <v-dialog v-model="showDialog" max-width="440">
@@ -275,7 +275,7 @@ Use `v-dialog` with the card-header-separated pattern:
       </div>
     </div>
     <v-card-text>Are you sure?</v-card-text>
-    <v-card-actions>
+    <v-card-actions class="card-footer-separated">
       <v-spacer />
       <v-btn variant="text" @click="cancel">Cancel</v-btn>
       <v-btn color="error" :loading="processing" variant="elevated" @click="confirm">Delete</v-btn>
@@ -283,6 +283,14 @@ Use `v-dialog` with the card-header-separated pattern:
   </v-card>
 </v-dialog>
 ```
+
+Key rules for dialogs:
+- Header: `.card-header-separated` with icon + title (top border separator)
+- Footer: `.card-footer-separated` on `v-card-actions` (bottom border separator)
+- Both classes add a subtle blue-tinted border (`rgba(26, 54, 126, 0.125)`)
+- Cancel button: `variant="text"` (no color)
+- Primary action button: appropriate color + `variant="elevated"`
+- Always include `:loading` on primary action button for async operations
 
 ## Grid Layout
 
@@ -306,6 +314,7 @@ These custom classes are defined in `src/styles/settings.scss`:
 |-------|-------|
 | `.card-header-separated` | Card header row with bottom border separator |
 | `.card-header-title` | Flex row inside header: icon + bold title |
+| `.card-footer-separated` | Card/dialog footer row with top border separator |
 | `.sidebar-section-header` | Uppercase section labels in sidebar (e.g. "SERVERS") |
 | `.sidebar-brand` | App brand area at top of sidebar |
 

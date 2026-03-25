@@ -6,6 +6,7 @@
           <v-icon color="primary" icon="mdi-text" size="20" />
           String Key Details
         </div>
+        <v-btn icon="mdi-close" size="small" variant="text" @click="close" />
       </div>
 
       <!-- Loading state -->
@@ -82,9 +83,9 @@
         </v-card-text>
 
         <!-- Actions -->
-        <v-card-actions class="px-4 pb-4">
-          <v-btn variant="text" @click="close">Cancel</v-btn>
+        <v-card-actions class="card-footer-separated">
           <v-spacer />
+          <v-btn variant="text" @click="close">Cancel</v-btn>
           <v-btn
             color="primary"
             :disabled="!isDirty"

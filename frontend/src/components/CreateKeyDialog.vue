@@ -195,7 +195,7 @@
         <TtlPicker v-model="ttl" />
       </v-card-text>
 
-      <v-card-actions>
+      <v-card-actions class="card-footer-separated">
         <v-spacer />
         <v-btn variant="text" @click="close">Cancel</v-btn>
         <v-btn

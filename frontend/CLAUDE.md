@@ -200,14 +200,14 @@ Copilot reference: `.github/instructions/design-system.instructions.md`
 6. **Loading**: skeleton loaders for first load, `v-progress-linear` for refreshes, `:loading` on buttons
 7. **Empty state**: centered icon (48px) + `text-subtitle-1` title + `text-body-2` description
 8. **Error state**: `v-alert type="error" variant="tonal"` with Retry button
-9. **Dialogs**: `v-dialog max-width="440"` with card-header-separated pattern inside
+9. **Dialogs**: `v-dialog max-width="440"` with `.card-header-separated` header AND `.card-footer-separated` on `v-card-actions` — both header and footer must be visually separated from the body
 10. **Search bars**: `variant="solo-filled"` with embedded button via `#append-inner` slot, or `variant="outlined"` for page-level filters
 
 ### Styling
 
 - Icons: Material Design Icons with `mdi-` prefix
 - Prefer Vuetify utility classes (`mb-4`, `pa-2`, `d-flex`, `text-medium-emphasis`) over custom CSS
-- CSS classes in `src/styles/settings.scss`: `.card-header-separated`, `.card-header-title`, `.sidebar-section-header`, `.sidebar-brand`
+- CSS classes in `src/styles/settings.scss`: `.card-header-separated`, `.card-header-title`, `.card-footer-separated`, `.sidebar-section-header`, `.sidebar-brand`
 
 ---
 
