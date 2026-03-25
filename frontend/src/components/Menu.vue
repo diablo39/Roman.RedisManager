@@ -1,48 +1,77 @@
 <template>
-  <v-card class="fill-height">
-    <v-expansion-panels v-model="openPanels" density="comfortable" variant="accordion">
-      <v-expansion-panel title="Servers" :value="0">
-        <v-expansion-panel-text class="pa-0">
-          <v-infinite-scroll :height="300" :items="servers" @load="onLoad">
-            <template v-for="server in servers" :key="server.id">
-              <v-list-item
-                nav
-                prepend-icon="mdi-database"
-                :title="server.name"
-                :to="`/redis/${server.id}`"
-              />
-            </template>
+  <div class="sidebar-wrapper">
+    <!-- Brand -->
+    <div class="sidebar-brand">
+      <img src="@/assets/logo-sidebar.svg" alt="Roman Redis Manager" width="28" height="28" class="sidebar-brand-icon" />
+      <span class="sidebar-brand-text">Redis Manager</span>
+    </div>
 
-            <template #empty>
-              <!-- <div class="pa-4 text-center text-caption text-medium-emphasis">No more servers</div> -->
-            </template>
+    <v-divider />
 
-            <template #error="{ props }">
-              <v-alert class="ma-2" type="error" variant="tonal">
-                <div class="text-caption">Failed to load</div>
-                <v-btn v-bind="props" class="mt-2" size="small" variant="text">Retry</v-btn>
-              </v-alert>
-            </template>
-          </v-infinite-scroll>
-        </v-expansion-panel-text>
-      </v-expansion-panel>
+    <!-- Dashboard link -->
+    <v-list color="primary" density="compact" nav>
+      <v-list-item
+        prepend-icon="mdi-view-dashboard"
+        title="Dashboard"
+        to="/"
+        exact
+      />
+    </v-list>
 
-      <v-expansion-panel title="Settings" :value="1">
-        <v-expansion-panel-text class="pa-0">
-          <v-list>
-            <v-list-item nav prepend-icon="mdi-information" title="About" to="/about" />
-          </v-list>
-        </v-expansion-panel-text>
-      </v-expansion-panel>
-    </v-expansion-panels>
-  </v-card>
+    <!-- Servers section -->
+    <div class="sidebar-section-header">Servers</div>
+
+    <div class="sidebar-servers">
+      <v-list color="primary" density="compact" nav>
+        <v-infinite-scroll :items="servers" @load="onLoad">
+          <template v-for="server in servers" :key="server.id">
+            <v-list-item
+              prepend-icon="mdi-database"
+              :title="server.name"
+              :to="`/redis/${server.id}`"
+            >
+              <template #append>
+                <v-chip
+                  :color="server.groupType === 'Cluster' ? 'primary' : 'teal'"
+                  size="x-small"
+                  variant="tonal"
+                >
+                  {{ server.groupType }}
+                </v-chip>
+              </template>
+            </v-list-item>
+          </template>
+
+          <template #empty />
+
+          <template #error="{ props }">
+            <v-alert class="ma-2" type="error" variant="tonal">
+              <div class="text-caption">Failed to load</div>
+              <v-btn v-bind="props" class="mt-2" size="small" variant="text">Retry</v-btn>
+            </v-alert>
+          </template>
+        </v-infinite-scroll>
+      </v-list>
+    </div>
+
+    <v-divider />
+
+    <!-- Settings section -->
+    <div class="sidebar-section-header">Settings</div>
+
+    <v-list color="primary" density="compact" nav>
+      <v-list-item
+        prepend-icon="mdi-information-outline"
+        title="About"
+        to="/about"
+      />
+    </v-list>
+  </div>
 </template>
 
 <script setup lang="ts">
   const redisServersStore = useRedisServersStore()
   const { servers, hasNext } = storeToRefs(redisServersStore)
-
-  const openPanels = ref([0])
 
   async function onLoad ({
     done,
@@ -67,3 +96,17 @@
     redisServersStore.reset()
   })
 </script>
+
+<style scoped>
+  .sidebar-wrapper {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+
+  .sidebar-servers {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+  }
+</style>

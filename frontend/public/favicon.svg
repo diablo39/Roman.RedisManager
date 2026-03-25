@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="2 3 28 26" width="32" height="32">
+  <defs>
+    <linearGradient id="r1" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#EF4444"/>
+      <stop offset="100%" stop-color="#DC2626"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Database cylinder outline -->
+  <ellipse cx="16" cy="8" rx="12" ry="4" fill="#E2E8F0" stroke="#94A3B8" stroke-width="1"/>
+  <path d="M4 8 v16 a12 4 0 0 0 24 0 V8" fill="#F1F5F9" stroke="#94A3B8" stroke-width="1"/>
+  <ellipse cx="16" cy="24" rx="12" ry="4" fill="none" stroke="#94A3B8" stroke-width="1"/>
+
+  <!-- Disc partition -->
+  <path d="M4 16 a12 4 0 0 0 24 0" fill="none" stroke="#CBD5E1" stroke-width="0.75"/>
+
+  <!-- Roman arch inside cylinder -->
+  <path d="M10 24.5 V14 a6 6 0 0 1 12 0 V24.5" fill="none" stroke="url(#r1)" stroke-width="2" stroke-linecap="round"/>
+
+  <!-- Keystone -->
+  <circle cx="16" cy="9.5" r="1.5" fill="#DC2626"/>
+
+  <!-- R letter -->
+  <text x="16" y="22" text-anchor="middle" font-family="'Segoe UI',system-ui,sans-serif" font-weight="800" font-size="10" fill="#334155">R</text>
+</svg>

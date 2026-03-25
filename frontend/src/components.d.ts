@@ -11,8 +11,11 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
+    CreateKeyDialog: typeof import('./components/CreateKeyDialog.vue')['default']
     Menu: typeof import('./components/Menu.vue')['default']
+    RedisKeysExplorer: typeof import('./components/RedisKeysExplorer.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+    TtlPicker: typeof import('./components/TtlPicker.vue')['default']
   }
 }

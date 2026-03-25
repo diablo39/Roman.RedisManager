@@ -4,7 +4,74 @@
  * Configures SASS variables and Vuetify overwrites
  */
 
-// https://vuetifyjs.com/features/sass-variables/`
+// https://vuetifyjs.com/features/sass-variables/
 // @use 'vuetify/settings' with (
 //   $color-pack: false
 // );
+
+// ArchitectUI-style soft shadow
+$shadow-architect: 0 0.46875rem 2.1875rem rgba(4, 9, 20, 0.03),
+  0 0.9375rem 1.40625rem rgba(4, 9, 20, 0.03),
+  0 0.25rem 0.53125rem rgba(4, 9, 20, 0.05),
+  0 0.125rem 0.1875rem rgba(4, 9, 20, 0.03);
+
+// App bar soft shadow
+.v-app-bar {
+  box-shadow: $shadow-architect !important;
+}
+
+// Cards soft shadow
+.v-card {
+  box-shadow: $shadow-architect !important;
+}
+
+// ArchitectUI-style card header — visually separated from body
+.card-header-separated {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-bottom: 1px solid rgba(26, 54, 126, 0.125);
+  background-color: #fff;
+  border-radius: 8px 8px 0 0;
+
+  .card-header-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: rgba(0, 0, 0, 0.87);
+  }
+}
+
+// Sidebar section headers (e.g. "SERVERS", "SETTINGS")
+.sidebar-section-header {
+  padding: 16px 16px 8px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+// Sidebar brand area
+.sidebar-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px;
+  min-height: 64px;
+
+  .sidebar-brand-icon {
+    color: #1976D2;
+    font-size: 28px;
+  }
+
+  .sidebar-brand-text {
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: rgba(0, 0, 0, 0.87);
+    letter-spacing: -0.01em;
+  }
+}
