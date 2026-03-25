@@ -170,7 +170,8 @@
   const router = useRouter()
   const id = computed(() => String((route.params as { id?: string }).id ?? ''))
 
-  const tab = ref<'info' | 'keys'>('info')
+  const initialTab = route.query.tab === 'keys' || route.query.key ? 'keys' : 'info'
+  const tab = ref<'info' | 'keys'>(initialTab)
   const loading = ref(true)
   const error = ref<string | null>(null)
   const server = ref<ServerDetail | null>(null)
@@ -236,17 +237,29 @@
     }
   }
 
+  watch(tab, (newTab) => {
+    const query: Record<string, string> = {}
+    for (const [k, v] of Object.entries(route.query)) {
+      if (typeof v === 'string') query[k] = v
+    }
+    if (newTab === 'keys') {
+      query.tab = 'keys'
+    } else {
+      delete query.tab
+    }
+    router.replace({ query })
+  })
+
   function onOpenKey (key: string, type: string) {
     if (type.toLowerCase() === 'string') {
       stringKeyDialog.value?.open(key)
-      // Update URL with deep link query params (without navigation)
-      router.replace({ query: { key, type: 'string' } })
+      router.replace({ query: { ...route.query, key, type: 'string' } })
     }
   }
 
   function onKeyDialogClose () {
-    // Remove deep link query params from URL
-    router.replace({ query: {} })
+    const { key: _key, type: _type, ...rest } = route.query
+    router.replace({ query: rest })
   }
 
   // Handle deep link: if URL has ?key=...&type=string, auto-open dialog
