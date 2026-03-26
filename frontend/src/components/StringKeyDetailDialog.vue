@@ -52,7 +52,7 @@
               disabled
               hide-details
               :model-value="keyName"
-              style="font-family: monospace; font-size: 0.85rem;"
+              style="font-family: monospace; font-size: 0.85rem"
               variant="outlined"
             />
           </div>
@@ -65,7 +65,17 @@
 
           <!-- Value (editable CodeMirror editor) -->
           <div class="mb-4">
-            <div class="text-body-2 font-weight-medium mb-1">Value</div>
+            <div class="d-flex align-center justify-space-between mb-1">
+              <div class="text-body-2 font-weight-medium">Value</div>
+              <v-btn
+                prepend-icon="mdi-code-json"
+                size="small"
+                variant="text"
+                @click="formatCurrentJson"
+              >
+                Format JSON
+              </v-btn>
+            </div>
             <div class="codemirror-wrapper">
               <Codemirror
                 v-model="currentValue"
@@ -154,7 +164,7 @@
     return currentValue.value !== originalValue.value || currentTtl.value !== originalTtl.value
   })
 
-  function msToTimespan (ms: number | null): string | null {
+  function msToTimespan(ms: number | null): string | null {
     if (ms === null || ms < 0) return null
 
     const totalSeconds = Math.floor(ms / 1000)
@@ -170,7 +180,7 @@
     return `${dayPrefix}${hh}:${mm}:${ss}`
   }
 
-  function formatJsonIfValid (value: string): string {
+  function formatJsonIfValid(value: string): string {
     try {
       const parsed = JSON.parse(value)
       return JSON.stringify(parsed, null, 2)
@@ -179,7 +189,17 @@
     }
   }
 
-  function resetState () {
+  function formatCurrentJson() {
+    try {
+      const parsed = JSON.parse(currentValue.value)
+      currentValue.value = JSON.stringify(parsed, null, 2)
+      saveError.value = null
+    } catch {
+      saveError.value = 'Current value is not valid JSON'
+    }
+  }
+
+  function resetState() {
     loading.value = true
     loadError.value = null
     saving.value = false
@@ -190,7 +210,7 @@
     originalTtl.value = null
   }
 
-  async function fetchData () {
+  async function fetchData() {
     loading.value = true
     loadError.value = null
 
@@ -218,7 +238,7 @@
     }
   }
 
-  async function save () {
+  async function save() {
     saving.value = true
     saveError.value = null
 
@@ -238,18 +258,18 @@
     }
   }
 
-  function open (key: string) {
+  function open(key: string) {
     resetState()
     keyName.value = key
     visible.value = true
     fetchData()
   }
 
-  function close () {
+  function close() {
     visible.value = false
   }
 
-  function onDialogChange (value: boolean) {
+  function onDialogChange(value: boolean) {
     if (!value) {
       emit('close')
     }

@@ -34,16 +34,26 @@
 
         <!-- String form -->
         <template v-if="type === 'string'">
-          <v-textarea
-            v-model="stringValue"
-            class="mb-3"
-            density="compact"
-            hide-details="auto"
-            label="Value"
-            rows="3"
-            :rules="[v => !!v || 'Value is required']"
-            variant="outlined"
-          />
+          <div class="d-flex align-center justify-space-between mb-1">
+            <div class="text-body-2 font-weight-medium">Value</div>
+            <v-btn
+              prepend-icon="mdi-code-json"
+              size="small"
+              variant="text"
+              @click="formatStringJson"
+            >
+              Format JSON
+            </v-btn>
+          </div>
+
+          <div class="codemirror-wrapper mb-3">
+            <Codemirror
+              v-model="stringValue"
+              :extensions="stringEditorExtensions"
+              placeholder="Enter value"
+              :style="{ minHeight: '120px', maxHeight: '320px' }"
+            />
+          </div>
         </template>
 
         <!-- Hash form -->
@@ -90,7 +100,10 @@
             class="mb-3"
             density="compact"
             hide-details
-            :items="[{ title: 'Right (RPUSH)', value: 1 }, { title: 'Left (LPUSH)', value: 0 }]"
+            :items="[
+              { title: 'Right (RPUSH)', value: 1 },
+              { title: 'Left (LPUSH)', value: 0 },
+            ]"
             label="Push direction"
             variant="outlined"
           />
@@ -168,7 +181,7 @@
               density="compact"
               hide-details
               label="Score"
-              style="max-width: 120px;"
+              style="max-width: 120px"
               type="number"
               variant="outlined"
             />
@@ -213,6 +226,8 @@
 </template>
 
 <script setup lang="ts">
+  import { json } from '@codemirror/lang-json'
+  import { Codemirror } from 'vue-codemirror'
   import {
     createHashKey,
     createListKey,
@@ -268,36 +283,57 @@
     return labels[type.value]
   })
 
+  const isStringJson = computed(() => {
+    if (!stringValue.value) return false
+
+    try {
+      JSON.parse(stringValue.value)
+      return true
+    } catch {
+      return false
+    }
+  })
+
+  const stringEditorExtensions = computed(() => {
+    return type.value === 'string' && isStringJson.value ? [json()] : []
+  })
+
   const isValid = computed(() => {
     if (!keyName.value.trim()) return false
     switch (type.value) {
-      case 'string': { return !!stringValue.value
+      case 'string': {
+        return !!stringValue.value
       }
-      case 'hash': { return hashFields.value.some(f => f.name.trim() && f.value.trim())
+      case 'hash': {
+        return hashFields.value.some(f => f.name.trim() && f.value.trim())
       }
-      case 'list': { return listValues.value.some(v => v.trim())
+      case 'list': {
+        return listValues.value.some(v => v.trim())
       }
-      case 'set': { return setMembers.value.some(m => m.trim())
+      case 'set': {
+        return setMembers.value.some(m => m.trim())
       }
-      case 'zset': { return zsetEntries.value.some(e => e.member.trim())
+      case 'zset': {
+        return zsetEntries.value.some(e => e.member.trim())
       }
-      default: { return false
+      default: {
+        return false
       }
     }
   })
 
-  function open (keyType: RedisKeyType) {
+  function open(keyType: RedisKeyType) {
     type.value = keyType
     resetForm()
     dialogOpen.value = true
   }
 
-  function close () {
+  function close() {
     dialogOpen.value = false
     error.value = null
   }
 
-  function resetForm () {
+  function resetForm() {
     keyName.value = ''
     ttl.value = null
     error.value = null
@@ -309,7 +345,17 @@
     zsetEntries.value = [{ member: '', score: 0 }]
   }
 
-  async function submit () {
+  function formatStringJson() {
+    try {
+      const parsed = JSON.parse(stringValue.value)
+      stringValue.value = JSON.stringify(parsed, null, 2)
+      error.value = null
+    } catch {
+      error.value = 'String value is not valid JSON'
+    }
+  }
+
+  async function submit() {
     submitting.value = true
     error.value = null
 
@@ -371,3 +417,20 @@
 
   defineExpose({ open })
 </script>
+
+<style scoped>
+  .codemirror-wrapper {
+    border: 1px solid rgba(0, 0, 0, 0.12);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  .codemirror-wrapper :deep(.cm-editor) {
+    font-size: 0.85rem;
+  }
+
+  .codemirror-wrapper :deep(.cm-editor.cm-focused) {
+    outline: 2px solid rgb(var(--v-theme-primary));
+    outline-offset: -1px;
+  }
+</style>
