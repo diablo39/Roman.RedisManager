@@ -75,13 +75,6 @@
 - What happens when [boundary condition]?
 - How does system handle [error scenario]?
 
-### User Experience Consistency *(mandatory)*
-
-- Define which existing UX patterns this feature MUST follow (layout,
-  terminology, controls, loading/error/empty/success states).
-- Identify any intentional deviations and provide explicit rationale.
-- Describe accessibility expectations for the primary user journeys.
-
 ## Requirements *(mandatory)*
 
 <!--
@@ -96,15 +89,11 @@
 - **FR-003**: Users MUST be able to [key interaction, e.g., "reset their password"]
 - **FR-004**: System MUST [data requirement, e.g., "persist user preferences"]
 - **FR-005**: System MUST [behavior, e.g., "log all security events"]
-- **FR-006**: System MUST preserve code quality gates (linting, type safety,
-  and static analysis) for all modified artifacts.
-- **FR-007**: System MUST include automated tests for critical logic and user
-  journeys affected by this feature.
 
 *Example of marking unclear requirements:*
 
-- **FR-008**: System MUST authenticate users via [NEEDS CLARIFICATION: auth method not specified - email/password, SSO, OAuth?]
-- **FR-009**: System MUST retain user data for [NEEDS CLARIFICATION: retention period not specified]
+- **FR-006**: System MUST authenticate users via [NEEDS CLARIFICATION: auth method not specified - email/password, SSO, OAuth?]
+- **FR-007**: System MUST retain user data for [NEEDS CLARIFICATION: retention period not specified]
 
 ### Key Entities *(include if feature involves data)*
 
@@ -124,5 +113,16 @@
 - **SC-002**: [Measurable metric, e.g., "System handles 1000 concurrent users without degradation"]
 - **SC-003**: [User satisfaction metric, e.g., "90% of users successfully complete primary task on first attempt"]
 - **SC-004**: [Business metric, e.g., "Reduce support tickets related to [X] by 50%"]
-- **SC-005**: [Performance metric, e.g., "95% of primary interactions complete in under 300 ms"]
-- **SC-006**: [UX consistency metric, e.g., "All new states match approved design patterns with zero critical accessibility violations"]
+
+## Assumptions
+
+<!--
+  ACTION REQUIRED: The content in this section represents placeholders.
+  Fill them out with the right assumptions based on reasonable defaults
+  chosen when the feature description did not specify certain details.
+-->
+
+- [Assumption about target users, e.g., "Users have stable internet connectivity"]
+- [Assumption about scope boundaries, e.g., "Mobile support is out of scope for v1"]
+- [Assumption about data/environment, e.g., "Existing authentication system will be reused"]
+- [Dependency on existing system/service, e.g., "Requires access to the existing user profile API"]

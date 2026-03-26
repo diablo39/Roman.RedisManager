@@ -2,7 +2,13 @@
   <div class="sidebar-wrapper">
     <!-- Brand -->
     <div class="sidebar-brand">
-      <img src="@/assets/logo-sidebar.svg" alt="Roman Redis Manager" width="28" height="28" class="sidebar-brand-icon" />
+      <img
+        alt="Roman Redis Manager"
+        class="sidebar-brand-icon"
+        height="28"
+        src="@/assets/logo-sidebar.svg"
+        width="28"
+      >
       <span class="sidebar-brand-text">Redis Manager</span>
     </div>
 
@@ -11,10 +17,10 @@
     <!-- Dashboard link -->
     <v-list color="primary" density="compact" nav>
       <v-list-item
+        exact
         prepend-icon="mdi-view-dashboard"
         title="Dashboard"
         to="/"
-        exact
       />
     </v-list>
 

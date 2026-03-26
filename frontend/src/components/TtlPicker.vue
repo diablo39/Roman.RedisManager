@@ -76,7 +76,7 @@
     if (hours.value > 0) parts.push(`${hours.value}h`)
     if (minutes.value > 0) parts.push(`${minutes.value}m`)
     if (seconds.value > 0) parts.push(`${seconds.value}s`)
-    return parts.length ? parts.join(' ') : ''
+    return parts.length > 0 ? parts.join(' ') : ''
   })
 
   // .NET TimeSpan format: [d.]hh:mm:ss
@@ -96,7 +96,32 @@
     seconds.value = 0
   }
 
+  // Parse incoming .NET TimeSpan format: [d.]hh:mm:ss
+  function parseTimespan (value: string | null) {
+    if (!value) {
+      clear()
+      return
+    }
+    const match = value.match(/^(?:(\d+)\.)?(\d{1,2}):(\d{2}):(\d{2})$/)
+    if (match) {
+      days.value = match[1] ? Number.parseInt(match[1], 10) : 0
+      hours.value = Number.parseInt(match[2] ?? '0', 10)
+      minutes.value = Number.parseInt(match[3] ?? '0', 10)
+      seconds.value = Number.parseInt(match[4] ?? '0', 10)
+    }
+  }
+
+  let updatingFromModel = false
+
+  watch(model, (newVal) => {
+    updatingFromModel = true
+    parseTimespan(newVal)
+    updatingFromModel = false
+  }, { immediate: true })
+
   watch([days, hours, minutes, seconds], () => {
-    model.value = toTimespan()
+    if (!updatingFromModel) {
+      model.value = toTimespan()
+    }
   })
 </script>

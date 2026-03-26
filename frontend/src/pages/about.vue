@@ -1,5 +1,5 @@
 <template>
-  <v-container fluid class="pa-6">
+  <v-container class="pa-6" fluid>
     <div class="mb-6">
       <div class="text-h5 font-weight-medium">About</div>
       <div class="text-body-2 text-medium-emphasis">Application information</div>

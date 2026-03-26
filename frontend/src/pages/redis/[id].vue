@@ -1,5 +1,5 @@
 <template>
-  <v-container fluid class="pa-6">
+  <v-container class="pa-6" fluid>
     <!-- Page header -->
     <div class="d-flex align-center justify-space-between flex-wrap ga-4 mb-6">
       <div>
@@ -59,7 +59,7 @@
     <template v-else-if="server">
       <v-card rounded="lg">
         <div class="card-header-separated">
-          <v-tabs v-model="tab" color="primary" density="compact" class="card-header-tabs">
+          <v-tabs v-model="tab" class="card-header-tabs" color="primary" density="compact">
             <v-tab value="info">Server Info</v-tab>
             <v-tab value="keys">Keys</v-tab>
           </v-tabs>
@@ -75,13 +75,13 @@
                   <v-list density="compact" variant="flat">
                     <v-list-item
                       prepend-icon="mdi-label-outline"
-                      :title="server.name"
                       subtitle="Name"
+                      :title="server.name"
                     />
                     <v-list-item
                       prepend-icon="mdi-lan-connect"
-                      :title="server.topology"
                       subtitle="Topology"
+                      :title="server.topology"
                     />
                   </v-list>
                 </v-col>
@@ -114,7 +114,7 @@
 
           <v-window-item value="keys">
             <v-card-text>
-              <RedisKeysExplorer ref="keysExplorer" :group-id="id" />
+              <RedisKeysExplorer ref="keysExplorer" :group-id="id" @open-key="onOpenKey" />
             </v-card-text>
           </v-window-item>
         </v-window>
@@ -122,6 +122,9 @@
     </template>
 
     <div v-else class="text-body-2 text-medium-emphasis">No server selected.</div>
+
+    <!-- String key detail dialog -->
+    <StringKeyDetailDialog ref="stringKeyDialog" :group-id="id" @close="onKeyDialogClose" />
 
     <!-- Create key dialog -->
     <CreateKeyDialog ref="createKeyDialog" :group-id="id" @created="onKeyCreated" />
@@ -134,10 +137,11 @@
 </template>
 
 <script setup lang="ts">
-  import { getRedisServerGroupDetail } from '@/api/redisServers'
-  import RedisKeysExplorer from '@/components/RedisKeysExplorer.vue'
-  import CreateKeyDialog from '@/components/CreateKeyDialog.vue'
   import type { RedisKeyType } from '@/components/CreateKeyDialog.vue'
+  import { getRedisServerGroupDetail } from '@/api/redisServers'
+  import CreateKeyDialog from '@/components/CreateKeyDialog.vue'
+  import RedisKeysExplorer from '@/components/RedisKeysExplorer.vue'
+  import StringKeyDetailDialog from '@/components/StringKeyDetailDialog.vue'
 
   type Topology = 'Cluster' | 'Standalone' | 'Unknown'
   type NodeRole = 'master' | 'slave' | 'replica' | 'unknown' | string
@@ -154,7 +158,7 @@
     nodes: ServerNode[]
   }
 
-  const keyTypes: { value: RedisKeyType; label: string; icon: string }[] = [
+  const keyTypes: { value: RedisKeyType, label: string, icon: string }[] = [
     { value: 'string', label: 'String', icon: 'mdi-text' },
     { value: 'hash', label: 'Hash', icon: 'mdi-code-braces' },
     { value: 'list', label: 'List', icon: 'mdi-format-list-bulleted' },
@@ -163,9 +167,11 @@
   ]
 
   const route = useRoute()
+  const router = useRouter()
   const id = computed(() => String((route.params as { id?: string }).id ?? ''))
 
-  const tab = ref<'info' | 'keys'>('info')
+  const initialTab = route.query.tab === 'keys' || route.query.key ? 'keys' : 'info'
+  const tab = ref<'info' | 'keys'>(initialTab)
   const loading = ref(true)
   const error = ref<string | null>(null)
   const server = ref<ServerDetail | null>(null)
@@ -173,6 +179,7 @@
 
   const createKeyDialog = ref<InstanceType<typeof CreateKeyDialog> | null>(null)
   const keysExplorer = ref<InstanceType<typeof RedisKeysExplorer> | null>(null)
+  const stringKeyDialog = ref<InstanceType<typeof StringKeyDetailDialog> | null>(null)
 
   const redisServersStore = useRedisServersStore()
   const { servers } = storeToRefs(redisServersStore)
@@ -230,7 +237,54 @@
     }
   }
 
+  watch(tab, (newTab) => {
+    const query: Record<string, string> = {}
+    for (const [k, v] of Object.entries(route.query)) {
+      if (typeof v === 'string') query[k] = v
+    }
+    if (newTab === 'keys') {
+      query.tab = 'keys'
+    } else {
+      delete query.tab
+    }
+    router.replace({ query })
+  })
+
+  function onOpenKey (key: string, type: string) {
+    if (type.toLowerCase() === 'string') {
+      stringKeyDialog.value?.open(key)
+      router.replace({ query: { ...route.query, key, type: 'string' } })
+    }
+  }
+
+  function onKeyDialogClose () {
+    const { key: _key, type: _type, ...rest } = route.query
+    router.replace({ query: rest })
+  }
+
+  // Handle deep link: if URL has ?key=...&type=string, auto-open dialog
+  function checkDeepLink () {
+    const queryKey = route.query.key
+    const queryType = route.query.type
+    if (typeof queryKey === 'string' && queryType === 'string') {
+      tab.value = 'keys'
+      nextTick(() => {
+        stringKeyDialog.value?.open(queryKey)
+      })
+    }
+  }
+
   watch(id, fetchServer, { immediate: true })
+
+  onMounted(() => {
+    // Defer deep link check until server data is loaded
+    const unwatch = watch(loading, (isLoading) => {
+      if (!isLoading && server.value) {
+        checkDeepLink()
+        unwatch()
+      }
+    })
+  })
 </script>
 
 <route lang="yaml">

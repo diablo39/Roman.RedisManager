@@ -57,11 +57,11 @@ export interface AuthenticationBootstrapResult {
 
 let activeUserManager: UserManager | null = null
 
-export function setActiveUserManager(manager: UserManager | null): void {
+export function setActiveUserManager (manager: UserManager | null): void {
   activeUserManager = manager
 }
 
-export function getActiveUserManager(): UserManager | null {
+export function getActiveUserManager (): UserManager | null {
   return activeUserManager
 }
 
@@ -72,7 +72,7 @@ export function getActiveUserManager(): UserManager | null {
 // mapping camelCase backend fields to the snake_case settings object.
 // ---------------------------------------------------------------------------
 
-export function createUserManager(provider: AuthenticationBootstrapProvider): UserManager {
+export function createUserManager (provider: AuthenticationBootstrapProvider): UserManager {
   const { oidc } = provider
 
   const settings: UserManagerSettings = {
@@ -115,7 +115,7 @@ export function createUserManager(provider: AuthenticationBootstrapProvider): Us
 // spread the result into fetch headers regardless.
 // ---------------------------------------------------------------------------
 
-export async function getAuthHeaders(): Promise<Record<string, string>> {
+export async function getAuthHeaders (): Promise<Record<string, string>> {
   // Prefer the active UserManager when available
   if (activeUserManager) {
     const user = await activeUserManager.getUser()
@@ -131,11 +131,17 @@ export async function getAuthHeaders(): Promise<Record<string, string>> {
   try {
     for (let i = 0; i < localStorage.length; i++) {
       const key = localStorage.key(i)
-      if (!key) continue
-      if (!key.startsWith('oidc.user')) continue
+      if (!key) {
+        continue
+      }
+      if (!key.startsWith('oidc.user')) {
+        continue
+      }
 
       const raw = localStorage.getItem(key)
-      if (!raw) continue
+      if (!raw) {
+        continue
+      }
 
       try {
         const parsed = JSON.parse(raw) as {
@@ -145,10 +151,14 @@ export async function getAuthHeaders(): Promise<Record<string, string>> {
         }
         if (parsed.access_token) {
           // prefer explicit `expired` flag when present, otherwise use expires_at
-          if (parsed.expired === true) continue
+          if (parsed.expired === true) {
+            continue
+          }
           if (typeof parsed.expires_at === 'number') {
             const now = Math.floor(Date.now() / 1000)
-            if (parsed.expires_at <= now) continue
+            if (parsed.expires_at <= now) {
+              continue
+            }
           }
 
           return { Authorization: `Bearer ${parsed.access_token}` }
@@ -170,7 +180,7 @@ export async function getAuthHeaders(): Promise<Record<string, string>> {
 // Public endpoint — no auth needed. Fetches provider list and availability.
 // ---------------------------------------------------------------------------
 
-export async function getAuthenticationBootstrap(): Promise<AuthenticationBootstrapResult> {
+export async function getAuthenticationBootstrap (): Promise<AuthenticationBootstrapResult> {
   const response = await fetch(`${apiBaseUrl}api/authentication/bootstrap`)
   if (!response.ok) {
     throw new Error(`Failed to load sign-in providers (${response.status})`)

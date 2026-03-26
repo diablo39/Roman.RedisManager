@@ -1,6 +1,6 @@
 // Test environment polyfills for auto-imported globals used in the app
 import { defineStore, storeToRefs } from 'pinia'
-import { ref, computed, reactive, watch, watchEffect, onMounted, onUnmounted, nextTick } from 'vue'
+import { computed, nextTick, onMounted, onUnmounted, reactive, ref, watch, watchEffect } from 'vue'
 
 Object.assign(globalThis, {
   defineStore,
@@ -14,5 +14,3 @@ Object.assign(globalThis, {
   onUnmounted,
   nextTick,
 })
-
-export {}

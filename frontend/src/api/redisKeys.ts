@@ -54,12 +54,25 @@ export interface AddToSetRequest {
 export interface AddToSortedSetRequest {
   groupId: string
   key: string
-  entries: { member: string; score: number }[]
+  entries: { member: string, score: number }[]
   ttl?: string | null
 }
 
 export interface CommandResult {
   success: boolean
+}
+
+export interface GetStringQueryResult {
+  value: string | null
+}
+
+export interface RedisKeyMetadataDto {
+  type: string
+  ttlMilliseconds: number | null
+}
+
+export interface GetKeyMetadataQueryResult {
+  metadata: RedisKeyMetadataDto
 }
 
 interface ProblemDetails {
@@ -93,9 +106,15 @@ export async function searchRedisKeys (
   signal?: AbortSignal,
 ): Promise<RedisKeysSearchResult> {
   const params = new URLSearchParams({ groupId })
-  if (pattern) params.set('pattern', pattern)
-  if (continuationToken) params.set('continuationToken', continuationToken)
-  if (pageSize) params.set('pageSize', pageSize.toString())
+  if (pattern) {
+    params.set('pattern', pattern)
+  }
+  if (continuationToken) {
+    params.set('continuationToken', continuationToken)
+  }
+  if (pageSize) {
+    params.set('pageSize', pageSize.toString())
+  }
 
   const url = `${apiBaseUrl}api/redis-keys?${params.toString()}`
   const response = await fetch(url, { signal, headers: await getAuthHeaders() })
@@ -146,6 +165,46 @@ async function postJson<T> (path: string, body: unknown, signal?: AbortSignal): 
 
   if (!response.ok) {
     const message = await parseErrorMessage(response, 'Request failed')
+    throw new Error(message)
+  }
+
+  return await response.json()
+}
+
+/**
+ * Gets a Redis string value by key.
+ */
+export async function getStringKeyValue (
+  groupId: string,
+  key: string,
+  signal?: AbortSignal,
+): Promise<GetStringQueryResult> {
+  const params = new URLSearchParams({ groupId, key })
+  const url = `${apiBaseUrl}api/redis/data/strings?${params.toString()}`
+  const response = await fetch(url, { signal, headers: await getAuthHeaders() })
+
+  if (!response.ok) {
+    const message = await parseErrorMessage(response, 'Failed to get string value')
+    throw new Error(message)
+  }
+
+  return await response.json()
+}
+
+/**
+ * Retrieves metadata for a Redis key.
+ */
+export async function getKeyMetadata (
+  key: string,
+  groupId: string,
+  signal?: AbortSignal,
+): Promise<GetKeyMetadataQueryResult> {
+  const params = new URLSearchParams({ groupId })
+  const url = `${apiBaseUrl}api/redis-keys/${encodeURIComponent(key)}/metadata?${params.toString()}`
+  const response = await fetch(url, { signal, headers: await getAuthHeaders() })
+
+  if (!response.ok) {
+    const message = await parseErrorMessage(response, 'Failed to get key metadata')
     throw new Error(message)
   }
 

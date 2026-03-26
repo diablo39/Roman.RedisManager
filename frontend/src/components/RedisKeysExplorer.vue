@@ -5,11 +5,11 @@
       <v-text-field
         v-model="pattern"
         density="compact"
+        flat
         hide-details
         placeholder="Key pattern (e.g. user:* or *)"
         prepend-inner-icon="mdi-magnify"
         variant="solo-filled"
-        flat
         @keydown.enter="search"
       >
         <template #append-inner>
@@ -28,7 +28,14 @@
     </div>
 
     <!-- Error -->
-    <v-alert v-if="error" class="mb-4" closable type="error" variant="tonal" @click:close="error = null">
+    <v-alert
+      v-if="error"
+      class="mb-4"
+      closable
+      type="error"
+      variant="tonal"
+      @click:close="error = null"
+    >
       <div class="d-flex align-center justify-space-between flex-wrap ga-2">
         <span>{{ error }}</span>
         <v-btn color="primary" size="small" variant="text" @click="search">Retry</v-btn>
@@ -73,7 +80,13 @@
         <tbody>
           <tr v-for="item in keys" :key="item.key">
             <td class="font-weight-medium" style="font-family: monospace; font-size: 0.85rem;">
-              {{ item.key }}
+              <a
+                v-if="item.type.toLowerCase() === 'string'"
+                class="key-link text-primary"
+                href="#"
+                @click.prevent="openKeyDetail(item)"
+              >{{ item.key }}</a>
+              <span v-else>{{ item.key }}</span>
             </td>
             <td>
               <v-chip :color="typeColor(item.type)" size="small" variant="tonal">
@@ -124,7 +137,7 @@
           <strong style="font-family: monospace;">{{ deleteTarget?.key }}</strong>?
           This action cannot be undone.
         </v-card-text>
-        <v-card-actions>
+        <v-card-actions class="card-footer-separated">
           <v-spacer />
           <v-btn variant="text" @click="cancelDelete">Cancel</v-btn>
           <v-btn color="error" :loading="deleting" variant="elevated" @click="executeDelete">
@@ -137,10 +150,14 @@
 </template>
 
 <script setup lang="ts">
-  import { searchRedisKeys, deleteRedisKey } from '@/api/redisKeys'
   import type { RedisKeyDto } from '@/api/redisKeys'
+  import { deleteRedisKey, searchRedisKeys } from '@/api/redisKeys'
 
   const props = defineProps<{ groupId: string }>()
+
+  const emit = defineEmits<{
+    'open-key': [key: string, type: string]
+  }>()
 
   const pattern = ref('*')
   const keys = ref<RedisKeyDto[]>([])
@@ -155,14 +172,24 @@
   const showDeleteDialog = ref(false)
   const deleting = ref(false)
 
+  function openKeyDetail (item: RedisKeyDto) {
+    emit('open-key', item.key, item.type)
+  }
+
   function typeColor (type: string): string {
     switch (type.toLowerCase()) {
-      case 'string': return 'blue'
-      case 'hash': return 'orange'
-      case 'list': return 'green'
-      case 'set': return 'purple'
-      case 'zset': return 'teal'
-      default: return 'grey'
+      case 'string': { return 'blue'
+      }
+      case 'hash': { return 'orange'
+      }
+      case 'list': { return 'green'
+      }
+      case 'set': { return 'purple'
+      }
+      case 'zset': { return 'teal'
+      }
+      default: { return 'grey'
+      }
     }
   }
 
@@ -171,8 +198,8 @@
     if (ms < 1000) return '< 1s'
 
     const totalSeconds = Math.floor(ms / 1000)
-    const days = Math.floor(totalSeconds / 86400)
-    const hours = Math.floor((totalSeconds % 86400) / 3600)
+    const days = Math.floor(totalSeconds / 86_400)
+    const hours = Math.floor((totalSeconds % 86_400) / 3600)
     const minutes = Math.floor((totalSeconds % 3600) / 60)
     const seconds = totalSeconds % 60
 
@@ -206,8 +233,8 @@
       hasMoreResults.value = result.hasMoreResults
       searched.value = true
       lastSearchedPattern.value = pattern.value || '*'
-    } catch (e) {
-      error.value = e instanceof Error ? e.message : 'Failed to search keys'
+    } catch (error_) {
+      error.value = error_ instanceof Error ? error_.message : 'Failed to search keys'
     } finally {
       loading.value = false
     }
@@ -240,8 +267,8 @@
       keys.value = keys.value.filter(k => k.key !== deleteTarget.value!.key)
       showDeleteDialog.value = false
       deleteTarget.value = null
-    } catch (e) {
-      error.value = e instanceof Error ? e.message : 'Failed to delete key'
+    } catch (error_) {
+      error.value = error_ instanceof Error ? error_.message : 'Failed to delete key'
       showDeleteDialog.value = false
     } finally {
       deleting.value = false
@@ -275,5 +302,14 @@
 
   .search-bar :deep(.v-field--focused) {
     background-color: #fff;
+  }
+
+  .key-link {
+    text-decoration: none;
+    cursor: pointer;
+  }
+
+  .key-link:hover {
+    text-decoration: underline;
   }
 </style>
