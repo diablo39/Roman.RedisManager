@@ -3,7 +3,7 @@
     <v-card elevation="8" rounded="xl" width="420">
       <!-- Brand -->
       <div class="d-flex flex-column align-center pt-8 pb-2">
-        <v-icon color="primary" icon="mdi-database" size="48" />
+        <img alt="Roman Redis Manager" height="48" src="@/assets/logo-sidebar.svg" width="48">
         <div class="text-h5 font-weight-bold mt-2">Redis Manager</div>
         <div class="text-body-2 text-medium-emphasis mt-1">Sign in to continue</div>
       </div>

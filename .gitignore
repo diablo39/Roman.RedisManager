@@ -362,3 +362,4 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 backend/.vscode/settings.json
+frontend/.playwright-mcp/
