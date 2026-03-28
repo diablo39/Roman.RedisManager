@@ -89,7 +89,7 @@ As a user, I want to share a URL that opens a specific hash key's details dialog
 
 **Acceptance Scenarios**:
 
-1. **Given** I have opened a hash key details dialog, **When** I look at the browser URL, **Then** the URL includes the connection ID and hash key name (e.g., `/redis/123/hash/mykey`)
+1. **Given** I have opened a hash key details dialog, **When** I look at the browser URL, **Then** the URL includes the connection ID and hash key name as query parameters (e.g., `/redis/123?key=mykey&type=hash`)
 2. **Given** I copy a hash key details URL, **When** I paste it in a new browser tab and navigate to it, **Then** the application loads the Keys tab and automatically opens the hash key details dialog
 3. **Given** I share a hash key details URL with a teammate, **When** they open it (and have access), **Then** they see the same hash key details I was viewing
 4. **Given** I open a deep link to a hash key that no longer exists, **When** the page loads, **Then** I see an error message indicating the key was not found
@@ -138,7 +138,7 @@ As a user navigating through multiple hash keys, I want the Keys tab to remember
 - **FR-003**: System MUST display hash key details in a structured format with field names and values clearly separated (e.g., two-column table)
 - **FR-004**: System MUST allow inline editing of hash field values, with save and cancel actions
 - **FR-005**: System MUST persist edited field values to the Redis instance via appropriate API calls
-- **FR-006**: System MUST validate field values before saving (non-empty values, proper encoding)
+- **FR-006**: System MUST validate field values before saving (non-empty values required; encoding is handled by the backend)
 - **FR-007**: System MUST detect JSON-formatted field values (strings starting with `{` or `[` and parseable as JSON)
 - **FR-008**: System MUST format detected JSON values with indentation and syntax highlighting
 - **FR-009**: System MUST provide a button or action to add new fields to the hash
@@ -165,7 +165,7 @@ As a user navigating through multiple hash keys, I want the Keys tab to remember
 
 ### Measurable Outcomes
 
-- **SC-001**: Users can open hash key details from the Keys tab in under 2 seconds on a typical network connection
+- **SC-001**: Users can open hash key details from the Keys tab in under 2 seconds (measured with API response time < 500ms)
 - **SC-002**: Users can edit a hash field value and save changes with no more than 3 clicks (click to edit, modify, click to save)
 - **SC-003**: JSON values in hash fields are automatically detected and formatted without any user action required
 - **SC-004**: Deep links to hash key details work reliably with a 95%+ success rate (valid keys load correctly when URL is shared)
