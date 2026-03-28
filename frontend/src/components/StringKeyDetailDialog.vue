@@ -164,7 +164,7 @@
     return currentValue.value !== originalValue.value || currentTtl.value !== originalTtl.value
   })
 
-  function msToTimespan(ms: number | null): string | null {
+  function msToTimespan (ms: number | null): string | null {
     if (ms === null || ms < 0) return null
 
     const totalSeconds = Math.floor(ms / 1000)
@@ -180,7 +180,7 @@
     return `${dayPrefix}${hh}:${mm}:${ss}`
   }
 
-  function formatJsonIfValid(value: string): string {
+  function formatJsonIfValid (value: string): string {
     try {
       const parsed = JSON.parse(value)
       return JSON.stringify(parsed, null, 2)
@@ -189,7 +189,7 @@
     }
   }
 
-  function formatCurrentJson() {
+  function formatCurrentJson () {
     try {
       const parsed = JSON.parse(currentValue.value)
       currentValue.value = JSON.stringify(parsed, null, 2)
@@ -199,7 +199,7 @@
     }
   }
 
-  function resetState() {
+  function resetState () {
     loading.value = true
     loadError.value = null
     saving.value = false
@@ -210,7 +210,7 @@
     originalTtl.value = null
   }
 
-  async function fetchData() {
+  async function fetchData () {
     loading.value = true
     loadError.value = null
 
@@ -238,7 +238,7 @@
     }
   }
 
-  async function save() {
+  async function save () {
     saving.value = true
     saveError.value = null
 
@@ -258,18 +258,18 @@
     }
   }
 
-  function open(key: string) {
+  function open (key: string) {
     resetState()
     keyName.value = key
     visible.value = true
     fetchData()
   }
 
-  function close() {
+  function close () {
     visible.value = false
   }
 
-  function onDialogChange(value: boolean) {
+  function onDialogChange (value: boolean) {
     if (!value) {
       emit('close')
     }

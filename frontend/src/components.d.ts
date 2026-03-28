@@ -12,6 +12,7 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     CreateKeyDialog: typeof import('./components/CreateKeyDialog.vue')['default']
+    HashKeyDetailDialog: typeof import('./components/HashKeyDetailDialog.vue')['default']
     Menu: typeof import('./components/Menu.vue')['default']
     RedisKeysExplorer: typeof import('./components/RedisKeysExplorer.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']

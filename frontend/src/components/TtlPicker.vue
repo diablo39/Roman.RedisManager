@@ -113,7 +113,7 @@
 
   let updatingFromModel = false
 
-  watch(model, (newVal) => {
+  watch(model, newVal => {
     updatingFromModel = true
     parseTimespan(newVal)
     updatingFromModel = false

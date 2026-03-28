@@ -81,7 +81,7 @@
           <tr v-for="item in keys" :key="item.key">
             <td class="font-weight-medium" style="font-family: monospace; font-size: 0.85rem;">
               <a
-                v-if="item.type.toLowerCase() === 'string'"
+                v-if="['string', 'hash'].includes(item.type.toLowerCase())"
                 class="key-link text-primary"
                 href="#"
                 @click.prevent="openKeyDetail(item)"
