@@ -126,6 +126,9 @@
     <!-- String key detail dialog -->
     <StringKeyDetailDialog ref="stringKeyDialog" :group-id="id" @close="onKeyDialogClose" />
 
+    <!-- Hash key detail dialog -->
+    <HashKeyDetailDialog ref="hashKeyDialog" :group-id="id" @close="onKeyDialogClose" />
+
     <!-- Create key dialog -->
     <CreateKeyDialog ref="createKeyDialog" :group-id="id" @created="onKeyCreated" />
 
@@ -140,6 +143,7 @@
   import type { RedisKeyType } from '@/components/CreateKeyDialog.vue'
   import { getRedisServerGroupDetail } from '@/api/redisServers'
   import CreateKeyDialog from '@/components/CreateKeyDialog.vue'
+  import HashKeyDetailDialog from '@/components/HashKeyDetailDialog.vue'
   import RedisKeysExplorer from '@/components/RedisKeysExplorer.vue'
   import StringKeyDetailDialog from '@/components/StringKeyDetailDialog.vue'
 
@@ -180,6 +184,7 @@
   const createKeyDialog = ref<InstanceType<typeof CreateKeyDialog> | null>(null)
   const keysExplorer = ref<InstanceType<typeof RedisKeysExplorer> | null>(null)
   const stringKeyDialog = ref<InstanceType<typeof StringKeyDetailDialog> | null>(null)
+  const hashKeyDialog = ref<InstanceType<typeof HashKeyDetailDialog> | null>(null)
 
   const redisServersStore = useRedisServersStore()
   const { servers } = storeToRefs(redisServersStore)
@@ -237,7 +242,7 @@
     }
   }
 
-  watch(tab, (newTab) => {
+  watch(tab, newTab => {
     const query: Record<string, string> = {}
     for (const [k, v] of Object.entries(route.query)) {
       if (typeof v === 'string') query[k] = v
@@ -251,9 +256,13 @@
   })
 
   function onOpenKey (key: string, type: string) {
-    if (type.toLowerCase() === 'string') {
+    const lowerType = type.toLowerCase()
+    if (lowerType === 'string') {
       stringKeyDialog.value?.open(key)
       router.replace({ query: { ...route.query, key, type: 'string' } })
+    } else if (lowerType === 'hash') {
+      hashKeyDialog.value?.open(key)
+      router.replace({ query: { ...route.query, key, type: 'hash' } })
     }
   }
 
@@ -266,11 +275,18 @@
   function checkDeepLink () {
     const queryKey = route.query.key
     const queryType = route.query.type
-    if (typeof queryKey === 'string' && queryType === 'string') {
-      tab.value = 'keys'
-      nextTick(() => {
-        stringKeyDialog.value?.open(queryKey)
-      })
+    if (typeof queryKey === 'string') {
+      if (queryType === 'string') {
+        tab.value = 'keys'
+        nextTick(() => {
+          stringKeyDialog.value?.open(queryKey)
+        })
+      } else if (queryType === 'hash') {
+        tab.value = 'keys'
+        nextTick(() => {
+          hashKeyDialog.value?.open(queryKey)
+        })
+      }
     }
   }
 
@@ -278,7 +294,7 @@
 
   onMounted(() => {
     // Defer deep link check until server data is loaded
-    const unwatch = watch(loading, (isLoading) => {
+    const unwatch = watch(loading, isLoading => {
       if (!isLoading && server.value) {
         checkDeepLink()
         unwatch()

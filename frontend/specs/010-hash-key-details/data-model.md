@@ -91,21 +91,22 @@ Already defined in `src/api/redisKeys.ts`. Used to fetch key type and TTL.
 | `keyName` | `string` | `''` | Current hash key name |
 | `loading` | `boolean` | `true` | Initial data fetch in progress |
 | `loadError` | `string \| null` | `null` | Error from initial fetch |
-| `fields` | `HashFieldDto[]` | `[]` | Accumulated hash fields from all pages |
+| `fields` | `HashFieldDto[]` | `[]` | Current working copy of fields (includes local edits) |
+| `originalFields` | `HashFieldDto[]` | `[]` | Snapshot of fields as loaded from Redis (for dirty comparison) |
 | `cursor` | `number` | `0` | Current pagination cursor |
 | `hasMoreFields` | `boolean` | `false` | More pages available |
 | `loadingMore` | `boolean` | `false` | Loading next page |
-| `editingField` | `string \| null` | `null` | Field name currently being edited |
+| `editingField` | `string \| null` | `null` | Field name currently being edited inline |
 | `editValue` | `string` | `''` | Current edit buffer for the field being edited |
-| `saving` | `boolean` | `false` | Save operation in progress |
-| `saveError` | `string \| null` | `null` | Error from save/delete operations |
+| `saving` | `boolean` | `false` | Batch save operation in progress |
+| `saveError` | `string \| null` | `null` | Error from save operation |
 | `addingField` | `boolean` | `false` | Add-field form is visible |
 | `newFieldName` | `string` | `''` | New field name input |
 | `newFieldValue` | `string` | `''` | New field value input |
-| `ttl` | `string \| null` | `null` | Current TTL (from metadata) |
+| `pendingDeletions` | `Set<string>` | `new Set()` | Field names marked for deletion (visual strikethrough) |
+| `currentTtl` | `string \| null` | `null` | Current TTL value |
 | `originalTtl` | `string \| null` | `null` | Original TTL for dirty tracking |
-| `deleting` | `boolean` | `false` | Delete operation in progress |
-| `deleteTarget` | `string \| null` | `null` | Field name pending deletion confirmation |
+| `isDirty` | `computed<boolean>` | `false` | True when fields/TTL differ from original or deletions are pending |
 
 ---
 
@@ -114,25 +115,33 @@ Already defined in `src/api/redisKeys.ts`. Used to fetch key type and TTL.
 ### Dialog Lifecycle
 
 ```
-Closed → open(key) → Loading → [Success] → Ready
+Closed → open(key) → Loading → [Success] → Ready (clean)
                                → [Error]   → Error → retry → Loading
-Ready → edit field → Editing → save → Ready
-                              → cancel → Ready
-Ready → add field → Adding → save → Ready
-                            → cancel → Ready
-Ready → delete field → Confirm → confirm → Ready
-                               → cancel → Ready
+Ready (clean) → edit field → Ready (dirty)
+Ready (clean) → add field → Ready (dirty)
+Ready (clean) → mark delete → Ready (dirty)
+Ready (dirty) → Save → saving → [Success] → Ready (clean, reloaded)
+                               → [Error]   → Ready (dirty, error shown)
+Ready (dirty) → Cancel/Close → Closed (changes discarded)
 Ready → load more → LoadingMore → Ready
-Ready → close → Closed
 ```
 
 ### Field Edit Flow
 
 ```
 ReadOnly → click value → EditMode (editingField = fieldName, editValue = field.value)
-EditMode → Save button → saving=true → API HSET → update fields[] → ReadOnly
-EditMode → Cancel/Escape → restore editValue → ReadOnly
-EditMode → Save fails → show saveError → remain EditMode
+EditMode → confirm edit → update fields[] locally → ReadOnly (dirty)
+EditMode → Cancel/Escape → restore editValue → ReadOnly (unchanged)
+```
+
+### Batch Save Flow
+
+```
+Ready (dirty) → Save button clicked → saving=true →
+  [if pendingDeletions.size > 0] → removeHashFields(deletions) in parallel
+  [if modified/added fields exist] → createHashKey(upserts) in parallel
+  → both succeed → reload fields from API → Ready (clean)
+  → any fails → show saveError → Ready (dirty, changes preserved)
 ```
 
 ### Deep Link Flow

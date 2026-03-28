@@ -58,6 +58,27 @@ export interface AddToSortedSetRequest {
   ttl?: string | null
 }
 
+export interface HashFieldDto {
+  field: string
+  value: string
+}
+
+export interface GetHashFieldsResult {
+  fields: HashFieldDto[]
+  cursor: number
+  hasMoreResults: boolean
+}
+
+export interface RemoveHashFieldsRequest {
+  groupId: string
+  key: string
+  fields: string[]
+}
+
+export interface RemoveHashFieldsResult {
+  removedCount: number
+}
+
 export interface CommandResult {
   success: boolean
 }
@@ -209,6 +230,45 @@ export async function getKeyMetadata (
   }
 
   return await response.json()
+}
+
+/**
+ * Fetches hash fields with cursor-based pagination.
+ */
+export async function getHashFields (
+  groupId: string,
+  key: string,
+  cursor?: number,
+  pageSize?: number,
+  signal?: AbortSignal,
+): Promise<GetHashFieldsResult> {
+  const params = new URLSearchParams({ groupId, key })
+  if (cursor !== undefined && cursor !== 0) {
+    params.set('cursor', cursor.toString())
+  }
+  if (pageSize !== undefined) {
+    params.set('pageSize', pageSize.toString())
+  }
+
+  const url = `${apiBaseUrl}api/redis/data/hashes?${params.toString()}`
+  const response = await fetch(url, { signal, headers: await getAuthHeaders() })
+
+  if (!response.ok) {
+    const message = await parseErrorMessage(response, 'Failed to get hash fields')
+    throw new Error(message)
+  }
+
+  return await response.json()
+}
+
+/**
+ * Removes one or more fields from a Redis hash.
+ */
+export async function removeHashFields (
+  request: RemoveHashFieldsRequest,
+  signal?: AbortSignal,
+): Promise<RemoveHashFieldsResult> {
+  return postJson<RemoveHashFieldsResult>('api/redis/data/hashes/remove', request, signal)
 }
 
 export function createStringKey (request: SetStringRequest, signal?: AbortSignal) {

@@ -22,14 +22,14 @@
 
 **Task**: Determine the best approach for editing hash field values within the dialog.
 
-**Decision**: Click-to-edit with CodeMirror per field value, row-level save/cancel
+**Decision**: Click-to-edit with CodeMirror per field value, batch save for all changes
 
-**Rationale**: The `StringKeyDetailDialog` already uses CodeMirror (vue-codemirror) for value editing with JSON detection and formatting. Reusing this for hash field values maintains UX consistency (Constitution Principle III). Each field row shows the value as read-only text. Clicking the value activates a CodeMirror editor inline (or in an expandable area below the row). Save sends `HSET` for that single field; Cancel reverts. This avoids a full-form save approach where all fields must be saved at once.
+**Rationale**: The `StringKeyDetailDialog` uses a single Save button that persists all changes (value + TTL) at once. The hash dialog follows this same pattern — users make multiple edits locally (modify values, add fields, mark fields for deletion), then click Save to persist everything. This is safer (changes can be discarded by cancelling) and more efficient (fewer API calls). The backend supports this well: `POST /api/redis/data/hashes` accepts `fields: Record<string, string>` for all upserts, and `POST /api/redis/data/hashes/remove` accepts `fields: string[]` for all deletions. Dirty state is tracked by comparing current state against the original loaded state.
 
 **Alternatives considered**:
+- Per-field save (save each edit immediately): Simpler state management but worse UX — no way to undo, more network calls, inconsistent with `StringKeyDetailDialog` pattern.
 - Full-dialog CodeMirror for selected field (modal-in-modal): Disruptive context switch, poor UX for quick edits.
 - Inline `v-text-field` for simple values, CodeMirror only for JSON: Two different editing experiences is inconsistent. CodeMirror handles both plain text and JSON well.
-- Batch save (edit multiple fields, save all): More complex state management, higher risk of data loss. Per-field save is simpler and matches Redis's atomic HSET behavior.
 
 ---
 
@@ -70,12 +70,12 @@ Key names with special characters (colons, unicode, spaces) are handled by stand
 **Task**: Determine the UX for adding new fields and deleting existing fields.
 
 **Decision**:
-- **Add**: "Add Field" button in dialog header opens an inline form row at the top of the field list with field name + value inputs and Save/Cancel buttons.
-- **Delete**: Delete icon button per row with confirmation dialog (matching `RedisKeysExplorer` delete pattern).
+- **Add**: "Add Field" button opens an inline form row at the top of the field list. New fields are added to local state immediately and included in the batch save.
+- **Delete**: Delete icon button per row marks the field for deletion (visual strikethrough + muted styling). An undo button restores it. Actual deletion happens on batch Save via `removeHashFields()`.
 
-**Rationale**: The `CreateKeyDialog` already has a pattern for adding hash fields (dynamic field rows with name/value inputs). The delete confirmation dialog pattern exists in `RedisKeysExplorer`. Reusing these patterns maintains consistency.
+**Rationale**: Batch save means add/delete are local operations until Save. This lets users undo mistakes (undelete a field, remove a just-added field) before committing. The visual strikethrough pattern is common in batch-edit UIs and clearly communicates pending state.
 
-For duplicate field name detection (FR-003/acceptance 4.3): check against loaded fields client-side. If the field name exists, show a warning "This will overwrite the existing value" with a confirm action (not a hard block), since Redis HSET naturally overwrites.
+For duplicate field name detection (FR-003/acceptance 4.3): check against loaded fields client-side. If the field name exists, show a warning "This will overwrite the existing value" but allow it, since Redis HSET naturally overwrites.
 
 **Alternatives considered**:
 - Separate "Add Field" dialog: Adds unnecessary navigation for a simple two-input operation.

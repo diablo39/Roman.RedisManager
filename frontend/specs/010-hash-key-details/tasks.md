@@ -19,9 +19,9 @@
 
 **Purpose**: No new project setup needed — adding to existing codebase. This phase adds the shared API client functions that all user stories depend on.
 
-- [ ] T001 Add `HashFieldDto`, `GetHashFieldsResult`, `RemoveHashFieldsRequest`, and `RemoveHashFieldsResult` interfaces to `src/api/redisKeys.ts` per contracts/api-client.md
-- [ ] T002 Add `getHashFields()` function to `src/api/redisKeys.ts` — GET `/api/redis/data/hashes` with query params `groupId`, `key`, `cursor`, `pageSize`; follow `getStringKeyValue()` pattern
-- [ ] T003 Add `removeHashFields()` function to `src/api/redisKeys.ts` — POST `/api/redis/data/hashes/remove` with JSON body; follow `createHashKey()` / `postJson()` pattern
+- [x] T001 Add `HashFieldDto`, `GetHashFieldsResult`, `RemoveHashFieldsRequest`, and `RemoveHashFieldsResult` interfaces to `src/api/redisKeys.ts` per contracts/api-client.md
+- [x] T002 Add `getHashFields()` function to `src/api/redisKeys.ts` — GET `/api/redis/data/hashes` with query params `groupId`, `key`, `cursor`, `pageSize`; follow `getStringKeyValue()` pattern
+- [x] T003 Add `removeHashFields()` function to `src/api/redisKeys.ts` — POST `/api/redis/data/hashes/remove` with JSON body; follow `createHashKey()` / `postJson()` pattern
 
 ---
 
@@ -31,7 +31,7 @@
 
 **⚠️ CRITICAL**: No user story work delivers value until hash keys can be opened from the list
 
-- [ ] T004 Update `src/components/RedisKeysExplorer.vue` to make hash keys clickable — change the `v-if` condition on the key link `<a>` to include `'hash'` alongside `'string'` so clicking a hash key emits `open-key` with type `'hash'`
+- [x] T004 Update `src/components/RedisKeysExplorer.vue` to make hash keys clickable — change the `v-if` condition on the key link `<a>` to include `'hash'` alongside `'string'` so clicking a hash key emits `open-key` with type `'hash'`
 
 **Checkpoint**: Hash keys in the explorer are now clickable and emit the correct event
 
@@ -55,16 +55,16 @@
 
 ### Implementation for User Story 1
 
-- [ ] T010 [US1] Create `src/components/HashKeyDetailDialog.vue` with dialog scaffold — `v-dialog max-width="900"`, card with `card-header-separated` header (`mdi-code-braces` icon, "Hash Key Details" title, close button), `card-footer-separated` footer with Cancel button. Props: `groupId: string`. Emits: `close`. Expose: `open(key: string)`. Follow `StringKeyDetailDialog` pattern exactly. Add `aria-label` attributes on dialog, close button, and table for accessibility.
-- [ ] T011 [US1] Implement loading state in `src/components/HashKeyDetailDialog.vue` — `v-skeleton-loader` with types `text, text, table-tbody` shown when `loading` is true. FR-016.
-- [ ] T012 [US1] Implement error state in `src/components/HashKeyDetailDialog.vue` — `v-alert type="error" variant="tonal"` with error message and Retry button that re-calls `fetchData()`. FR-017.
-- [ ] T013 [US1] Implement ready state in `src/components/HashKeyDetailDialog.vue` — read-only key name (`v-text-field disabled`), type chip (`v-chip color="orange" variant="tonal"` showing "hash"), field count display. FR-003.
-- [ ] T014 [US1] Implement fields table in `src/components/HashKeyDetailDialog.vue` — `v-table density="compact" hover` with columns: Field Name (monospace), Value (truncated with overflow), Actions. Load fields via `getHashFields()` + `getKeyMetadata()` in parallel on `open()`. FR-002, FR-003.
-- [ ] T015 [US1] Implement empty state in `src/components/HashKeyDetailDialog.vue` — centered icon (`mdi-code-braces-box`, 48px) + "No fields" title + "This hash key has no fields" description, shown when `fields.length === 0` after successful load. FR-018.
-- [ ] T016 [US1] Implement cursor-based pagination in `src/components/HashKeyDetailDialog.vue` — accumulate fields array on load more, show "Load More" `v-btn variant="outlined"` when `hasMoreResults` is true, show `v-progress-linear` during additional page loads, display field count summary. FR-019. Follow `RedisKeysExplorer` load-more pattern per research.md R1.
-- [ ] T017 [US1] Implement TTL display in `src/components/HashKeyDetailDialog.vue` — reuse `TtlPicker` component (read-only for now, editing is not a hash-specific story requirement). Use `msToTimespan()` conversion from `StringKeyDetailDialog`.
-- [ ] T018 [US1] Register HashKeyDetailDialog in `src/pages/redis/[id].vue` — import component, add template ref, add `<HashKeyDetailDialog>` to template with `:group-id="id"` and `@close="onKeyDialogClose"`, extend `onOpenKey()` to handle `type.toLowerCase() === 'hash'` by calling `hashKeyDialog.value?.open(key)`. Note: URL query param update (`router.replace`) is deferred to US5 (T043); `onKeyDialogClose` is safe to call even without query params set.
-- [ ] T019 [US1] Run `npm run build` and `npm run type-check` to verify compilation with no errors
+- [x] T010 [US1] Create `src/components/HashKeyDetailDialog.vue` with dialog scaffold — `v-dialog max-width="900"`, card with `card-header-separated` header (`mdi-code-braces` icon, "Hash Key Details" title, close button), `card-footer-separated` footer with Cancel button. Props: `groupId: string`. Emits: `close`. Expose: `open(key: string)`. Follow `StringKeyDetailDialog` pattern exactly. Add `aria-label` attributes on dialog, close button, and table for accessibility.
+- [x] T011 [US1] Implement loading state in `src/components/HashKeyDetailDialog.vue` — `v-skeleton-loader` with types `text, text, table-tbody` shown when `loading` is true. FR-016.
+- [x] T012 [US1] Implement error state in `src/components/HashKeyDetailDialog.vue` — `v-alert type="error" variant="tonal"` with error message and Retry button that re-calls `fetchData()`. FR-017.
+- [x] T013 [US1] Implement ready state in `src/components/HashKeyDetailDialog.vue` — read-only key name (`v-text-field disabled`), type chip (`v-chip color="orange" variant="tonal"` showing "hash"), field count display. FR-003.
+- [x] T014 [US1] Implement fields table in `src/components/HashKeyDetailDialog.vue` — `v-table density="compact" hover` with columns: Field Name (monospace), Value (truncated with overflow), Actions. Load fields via `getHashFields()` + `getKeyMetadata()` in parallel on `open()`. FR-002, FR-003.
+- [x] T015 [US1] Implement empty state in `src/components/HashKeyDetailDialog.vue` — centered icon (`mdi-code-braces-box`, 48px) + "No fields" title + "This hash key has no fields" description, shown when `fields.length === 0` after successful load. FR-018.
+- [x] T016 [US1] Implement cursor-based pagination in `src/components/HashKeyDetailDialog.vue` — accumulate fields array on load more, show "Load More" `v-btn variant="outlined"` when `hasMoreResults` is true, show `v-progress-linear` during additional page loads, display field count summary. FR-019. Follow `RedisKeysExplorer` load-more pattern per research.md R1.
+- [x] T017 [US1] Implement TTL display in `src/components/HashKeyDetailDialog.vue` — reuse `TtlPicker` component (read-only for now, editing is not a hash-specific story requirement). Use `msToTimespan()` conversion from `StringKeyDetailDialog`.
+- [x] T018 [US1] Register HashKeyDetailDialog in `src/pages/redis/[id].vue` — import component, add template ref, add `<HashKeyDetailDialog>` to template with `:group-id="id"` and `@close="onKeyDialogClose"`, extend `onOpenKey()` to handle `type.toLowerCase() === 'hash'` by calling `hashKeyDialog.value?.open(key)`. Note: URL query param update (`router.replace`) is deferred to US5 (T043); `onKeyDialogClose` is safe to call even without query params set.
+- [x] T019 [US1] Run `npm run build` and `npm run type-check` to verify compilation with no errors
 
 **Checkpoint**: Hash key details dialog opens from Keys tab, displays field-value table with pagination, handles loading/error/empty states. US1 is fully functional and independently testable.
 
@@ -86,11 +86,11 @@
 
 ### Implementation for User Story 2
 
-- [ ] T023 [US2] Implement click-to-edit mode in `src/components/HashKeyDetailDialog.vue` — clicking a field value row sets `editingField` to that field name and `editValue` to the field's current value; row expands to show CodeMirror editor (vue-codemirror) with the value. Only one field editable at a time. FR-004. Per research.md R2.
-- [ ] T024 [US2] Implement per-field Save action in `src/components/HashKeyDetailDialog.vue` — Save button calls `createHashKey()` with `{ groupId, key, fields: { [editingField]: editValue } }`, on success updates the field in the `fields` array and exits edit mode, on failure shows `saveError` alert and remains in edit mode. FR-005. SC-002.
-- [ ] T025 [US2] Implement per-field Cancel action in `src/components/HashKeyDetailDialog.vue` — Cancel button and Escape key restore `editValue` to original, clear `editingField`, exit edit mode without API call. FR-004 scenario 2.3.
-- [ ] T026 [US2] Implement field value validation in `src/components/HashKeyDetailDialog.vue` — prevent saving empty values (show inline validation message "Value cannot be empty"), disable Save button when value is empty. FR-006, SC-009.
-- [ ] T027 [US2] Implement save error handling in `src/components/HashKeyDetailDialog.vue` — on API error, show `v-alert type="error" variant="tonal"` with error message, revert field value to original in the display. FR-017 scenario 2.5.
+- [x] T023 [US2] Implement click-to-edit mode in `src/components/HashKeyDetailDialog.vue` — clicking a field value row sets `editingField` to that field name and `editValue` to the field's current value; row expands to show CodeMirror editor (vue-codemirror) with the value. Only one field editable at a time. FR-004. Per research.md R2.
+- [x] T024 [US2] Implement per-field Save action in `src/components/HashKeyDetailDialog.vue` — Save button calls `createHashKey()` with `{ groupId, key, fields: { [editingField]: editValue } }`, on success updates the field in the `fields` array and exits edit mode, on failure shows `saveError` alert and remains in edit mode. FR-005. SC-002.
+- [x] T025 [US2] Implement per-field Cancel action in `src/components/HashKeyDetailDialog.vue` — Cancel button and Escape key restore `editValue` to original, clear `editingField`, exit edit mode without API call. FR-004 scenario 2.3.
+- [x] T026 [US2] Implement field value validation in `src/components/HashKeyDetailDialog.vue` — prevent saving empty values (show inline validation message "Value cannot be empty"), disable Save button when value is empty. FR-006, SC-009.
+- [x] T027 [US2] Implement save error handling in `src/components/HashKeyDetailDialog.vue` — on API error, show `v-alert type="error" variant="tonal"` with error message, revert field value to original in the display. FR-017 scenario 2.5.
 
 **Checkpoint**: Field values are editable inline with save/cancel/validation. US2 works independently on top of US1.
 
@@ -111,9 +111,9 @@
 
 ### Implementation for User Story 3
 
-- [ ] T030 [US3] Implement JSON detection and read-mode formatting in `src/components/HashKeyDetailDialog.vue` — add `formatJsonIfValid()` helper (reuse pattern from `StringKeyDetailDialog`), apply to field values on display in the table. JSON values shown with CodeMirror (read-only, with `json()` language extension) for syntax highlighting; plain text values shown as regular text. FR-007, FR-008.
-- [ ] T031 [US3] Implement JSON-aware edit mode in `src/components/HashKeyDetailDialog.vue` — when editing a field, apply `json()` CodeMirror extension if value is valid JSON. Add per-field "Format JSON" button (visible only during edit) that calls `formatJsonIfValid()` on the current edit value. FR-008 scenario 3.5. Per research.md R7.
-- [ ] T032 [US3] Handle invalid JSON gracefully in `src/components/HashKeyDetailDialog.vue` — values that look like JSON but fail `JSON.parse()` display as plain text without errors. No formatting attempted on non-JSON values. FR-007 scenario 3.3.
+- [x] T030 [US3] Implement JSON detection and read-mode formatting in `src/components/HashKeyDetailDialog.vue` — add `formatJsonIfValid()` helper (reuse pattern from `StringKeyDetailDialog`), apply to field values on display in the table. JSON values shown with CodeMirror (read-only, with `json()` language extension) for syntax highlighting; plain text values shown as regular text. FR-007, FR-008.
+- [x] T031 [US3] Implement JSON-aware edit mode in `src/components/HashKeyDetailDialog.vue` — when editing a field, apply `json()` CodeMirror extension if value is valid JSON. Add per-field "Format JSON" button (visible only during edit) that calls `formatJsonIfValid()` on the current edit value. FR-008 scenario 3.5. Per research.md R7.
+- [x] T032 [US3] Handle invalid JSON gracefully in `src/components/HashKeyDetailDialog.vue` — values that look like JSON but fail `JSON.parse()` display as plain text without errors. No formatting attempted on non-JSON values. FR-007 scenario 3.3.
 
 **Checkpoint**: JSON values auto-formatted with highlighting, plain text unaffected. US3 enhances US1 read mode and US2 edit mode.
 
@@ -135,11 +135,11 @@
 
 ### Implementation for User Story 4
 
-- [ ] T036 [US4] Implement Add Field UI in `src/components/HashKeyDetailDialog.vue` — "Add Field" button in the card header area (next to field count). Clicking toggles `addingField` state, showing an inline form row at the top of the fields table with `v-text-field` for field name and value, plus Save/Cancel buttons. FR-009, FR-010. Per research.md R5.
-- [ ] T037 [US4] Implement Add Field save logic in `src/components/HashKeyDetailDialog.vue` — Save calls `createHashKey()` with `{ groupId, key, fields: { [newFieldName]: newFieldValue } }`. On success, prepend new `HashFieldDto` to `fields` array, clear form, close add row. Validate: field name non-empty, value non-empty. SC-006.
-- [ ] T038 [US4] Implement duplicate field name warning in `src/components/HashKeyDetailDialog.vue` — when adding a field, check `fields` array for existing field with same name. If found, show warning text "This will overwrite the existing value for '{fieldName}'" but allow save (Redis HSET overwrites). Per research.md R5. FR-010 scenario 4.3.
-- [ ] T039 [US4] Implement Delete Field UI in `src/components/HashKeyDetailDialog.vue` — delete icon button (`mdi-delete-outline`, `color="error"`, `size="small"`) per field row in the Actions column. Clicking sets `deleteTarget` and shows confirmation dialog. Follow `RedisKeysExplorer` delete dialog pattern: `v-dialog max-width="440"` with `card-header-separated` and `card-footer-separated`. FR-011 scenario 4.4.
-- [ ] T040 [US4] Implement Delete Field confirm logic in `src/components/HashKeyDetailDialog.vue` — Confirm button calls `removeHashFields({ groupId, key, fields: [deleteTarget] })`. On success, remove field from `fields` array and close dialog. On failure, show error alert and keep field in list. FR-011 scenarios 4.5–4.6. SC-007.
+- [x] T036 [US4] Implement Add Field UI in `src/components/HashKeyDetailDialog.vue` — "Add Field" button in the card header area (next to field count). Clicking toggles `addingField` state, showing an inline form row at the top of the fields table with `v-text-field` for field name and value, plus Save/Cancel buttons. FR-009, FR-010. Per research.md R5.
+- [x] T037 [US4] Implement Add Field save logic in `src/components/HashKeyDetailDialog.vue` — Save calls `createHashKey()` with `{ groupId, key, fields: { [newFieldName]: newFieldValue } }`. On success, prepend new `HashFieldDto` to `fields` array, clear form, close add row. Validate: field name non-empty, value non-empty. SC-006.
+- [x] T038 [US4] Implement duplicate field name warning in `src/components/HashKeyDetailDialog.vue` — when adding a field, check `fields` array for existing field with same name. If found, show warning text "This will overwrite the existing value for '{fieldName}'" but allow save (Redis HSET overwrites). Per research.md R5. FR-010 scenario 4.3.
+- [x] T039 [US4] Implement Delete Field UI in `src/components/HashKeyDetailDialog.vue` — delete icon button (`mdi-delete-outline`, `color="error"`, `size="small"`) per field row in the Actions column. Clicking sets `deleteTarget` and shows confirmation dialog. Follow `RedisKeysExplorer` delete dialog pattern: `v-dialog max-width="440"` with `card-header-separated` and `card-footer-separated`. FR-011 scenario 4.4.
+- [x] T040 [US4] Implement Delete Field confirm logic in `src/components/HashKeyDetailDialog.vue` — Confirm button calls `removeHashFields({ groupId, key, fields: [deleteTarget] })`. On success, remove field from `fields` array and close dialog. On failure, show error alert and keep field in list. FR-011 scenarios 4.5–4.6. SC-007.
 
 **Checkpoint**: Full CRUD for hash fields. US4 adds create/delete on top of US1 view and US2 edit.
 
@@ -160,9 +160,9 @@
 
 ### Implementation for User Story 5
 
-- [ ] T043 [US5] Update URL on hash dialog open in `src/pages/redis/[id].vue` — in the `onOpenKey()` handler for `type === 'hash'`, call `router.replace({ query: { ...route.query, key, type: 'hash' } })` to update the browser URL. FR-012. Per research.md R4.
-- [ ] T044 [US5] Extend `checkDeepLink()` in `src/pages/redis/[id].vue` — add condition: if `queryType === 'hash'`, set `tab.value = 'keys'` and call `hashKeyDialog.value?.open(queryKey)` via `nextTick()`. FR-013. Handle non-existent keys via the dialog's existing error state (404 from API). Scenario 5.4.
-- [ ] T045 [US5] Verify deep link with authentication redirect in `src/pages/redis/[id].vue` — no code change needed; existing auth guard in router preserves query params through login redirect. Verify scenario 5.5 manually or via Playwright.
+- [x] T043 [US5] Update URL on hash dialog open in `src/pages/redis/[id].vue` — in the `onOpenKey()` handler for `type === 'hash'`, call `router.replace({ query: { ...route.query, key, type: 'hash' } })` to update the browser URL. FR-012. Per research.md R4.
+- [x] T044 [US5] Extend `checkDeepLink()` in `src/pages/redis/[id].vue` — add condition: if `queryType === 'hash'`, set `tab.value = 'keys'` and call `hashKeyDialog.value?.open(queryKey)` via `nextTick()`. FR-013. Handle non-existent keys via the dialog's existing error state (404 from API). Scenario 5.4.
+- [x] T045 [US5] Verify deep link with authentication redirect in `src/pages/redis/[id].vue` — no code change needed; existing auth guard in router preserves query params through login redirect. Verify scenario 5.5 manually or via Playwright.
 
 **Checkpoint**: Deep links work for hash keys. URL is shareable and bookmarkable. US5 is independently testable.
 
@@ -178,8 +178,8 @@
 
 ### Implementation for User Story 6
 
-- [ ] T046 [US6] Verify scroll preservation behavior in `src/components/HashKeyDetailDialog.vue` — per research.md R3, `v-dialog` renders as overlay and `RedisKeysExplorer` DOM is preserved. No code changes needed. Manually verify scenarios 6.1–6.4 and document in test results. FR-014.
-- [ ] T047 [US6] Verify selected key highlighting after dialog close — FR-015 is satisfied by the existing DOM preservation (the clicked key's `<a>` retains focus/visited state). If visual highlighting is needed beyond default browser link styling, add a `selectedKey` ref to `RedisKeysExplorer` and apply a `bg-blue-lighten-5` class to the matching row. Verify manually. FR-015.
+- [x] T046 [US6] Verify scroll preservation behavior in `src/components/HashKeyDetailDialog.vue` — per research.md R3, `v-dialog` renders as overlay and `RedisKeysExplorer` DOM is preserved. No code changes needed. Manually verify scenarios 6.1–6.4 and document in test results. FR-014.
+- [x] T047 [US6] Verify selected key highlighting after dialog close — FR-015 is satisfied by the existing DOM preservation (the clicked key's `<a>` retains focus/visited state). If visual highlighting is needed beyond default browser link styling, add a `selectedKey` ref to `RedisKeysExplorer` and apply a `bg-blue-lighten-5` class to the matching row. Verify manually. FR-015.
 - [ ] T048 [US6] Create Playwright visual verification for scroll preservation — navigate to keys tab, search, scroll down, open hash dialog, close, take screenshot confirming scroll position preserved. Save to `.playwright-mcp/hash-scroll-preservation.png`. SC-005.
 
 **Checkpoint**: List context preserved on dialog open/close. US6 confirmed working via v-dialog overlay behavior.
@@ -190,13 +190,13 @@
 
 **Purpose**: Build verification, edge case handling, and final quality checks
 
-- [ ] T049 [P] Run `npm run build` to verify production build succeeds with all changes
-- [ ] T050 [P] Run `npm run type-check` to verify TypeScript strict mode passes
-- [ ] T051 [P] Run `npm run lint` to verify ESLint passes with no warnings
-- [ ] T052 Handle edge case: key deleted while dialog is open in `src/components/HashKeyDetailDialog.vue` — if an edit/delete/load-more API call returns 404, show error "This key no longer exists" and disable further operations. Per spec Edge Cases.
-- [ ] T053 Handle edge case: large field values in `src/components/HashKeyDetailDialog.vue` — in read-only table rows, truncate displayed values to 500 characters with "..." suffix. Clicking a truncated value or entering edit mode shows the full value in CodeMirror. For values exceeding 1 MB, show a warning "Value is very large (X MB). Editor performance may be affected." (matching `StringKeyDetailDialog` large value pattern). Per spec Edge Cases.
-- [ ] T054 Handle edge case: rapid key navigation in `src/components/HashKeyDetailDialog.vue` — use `AbortController` to cancel pending fetch requests when `open()` is called with a new key before the previous load completes. Per spec Edge Cases.
-- [ ] T055 Handle edge case: close during in-flight save in `src/components/HashKeyDetailDialog.vue` — if `saving` or `deleting` is true when the user clicks Cancel/X/Escape, let the in-flight API call complete in the background (do not abort it). The dialog closes immediately; success/failure of the background operation is silently ignored. Per spec Edge Cases.
+- [x] T049 [P] Run `npm run build` to verify production build succeeds with all changes
+- [x] T050 [P] Run `npm run type-check` to verify TypeScript strict mode passes
+- [x] T051 [P] Run `npm run lint` to verify ESLint passes with no warnings
+- [x] T052 Handle edge case: key deleted while dialog is open in `src/components/HashKeyDetailDialog.vue` — if an edit/delete/load-more API call returns 404, show error "This key no longer exists" and disable further operations. Per spec Edge Cases.
+- [x] T053 Handle edge case: large field values in `src/components/HashKeyDetailDialog.vue` — in read-only table rows, truncate displayed values to 500 characters with "..." suffix. Clicking a truncated value or entering edit mode shows the full value in CodeMirror. For values exceeding 1 MB, show a warning "Value is very large (X MB). Editor performance may be affected." (matching `StringKeyDetailDialog` large value pattern). Per spec Edge Cases.
+- [x] T054 Handle edge case: rapid key navigation in `src/components/HashKeyDetailDialog.vue` — use `AbortController` to cancel pending fetch requests when `open()` is called with a new key before the previous load completes. Per spec Edge Cases.
+- [x] T055 Handle edge case: close during in-flight save in `src/components/HashKeyDetailDialog.vue` — if `saving` or `deleting` is true when the user clicks Cancel/X/Escape, let the in-flight API call complete in the background (do not abort it). The dialog closes immediately; success/failure of the background operation is silently ignored. Per spec Edge Cases.
 - [ ] T056 Playwright visual smoke test — navigate to hash key details at `http://localhost:3000`, capture screenshots for: dialog loading, dialog ready with fields, dialog empty state, dialog error state, inline editing, add field form, delete confirmation. Save to `.playwright-mcp/` directory.
 - [ ] T057 Run full test suite with `npx vitest run` and verify all tests pass
 

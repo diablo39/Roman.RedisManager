@@ -24,21 +24,22 @@ As a user browsing Redis keys, I want to open a hash key from the Keys tab and v
 
 ---
 
-### User Story 2 - Edit Hash Field Values (Priority: P2)
+### User Story 2 - Edit Hash Field Values with Batch Save (Priority: P2)
 
-As a user viewing hash key details, I want to edit existing field values inline so that I can update Redis hash data without switching to a separate tool or CLI.
+As a user viewing hash key details, I want to make multiple edits (modify values, add fields, delete fields) and then save all changes at once so that I can work efficiently and undo mistakes before committing.
 
-**Why this priority**: Editing is the primary action users need after viewing data. This transforms the viewer from read-only to a full management tool, significantly increasing utility.
+**Why this priority**: Editing is the primary action users need after viewing data. Batch save is safer than per-field save — users can review all changes before committing, and discard unwanted changes by closing without saving.
 
-**Independent Test**: Can be tested independently by opening a hash key, clicking on a field value, modifying it, and verifying the change persists in Redis. Delivers value by enabling data correction and updates.
+**Independent Test**: Can be tested independently by opening a hash key, editing multiple field values, adding a new field, marking a field for deletion, then clicking Save to persist all changes. Verify all changes reflected in Redis. Delivers value by enabling safe, efficient bulk editing.
 
 **Acceptance Scenarios**:
 
 1. **Given** I am viewing hash key details, **When** I click on a field value, **Then** the value becomes editable (inline edit mode activated)
-2. **Given** I have edited a field value, **When** I save the change (blur or press Enter), **Then** the new value is sent to Redis and persisted
-3. **Given** I have edited a field value, **When** I press Escape or cancel, **Then** the original value is restored without saving
-4. **Given** I attempt to save an empty field value, **When** I try to save, **Then** I see a validation error indicating values cannot be empty
-5. **Given** a save operation fails (network error, Redis error), **When** the error occurs, **Then** I see an error message and the field reverts to its original value
+2. **Given** I have made changes (edits, additions, deletions), **When** I click the Save button, **Then** all pending changes are sent to Redis in a single batch operation
+3. **Given** I have made changes, **When** I click Cancel or close the dialog, **Then** all pending changes are discarded without saving
+4. **Given** I have made changes, **When** I look at the Save button, **Then** the button is enabled and indicates there are unsaved changes (dirty state)
+5. **Given** I attempt to save with an empty field value, **When** I try to save, **Then** I see a validation error indicating values cannot be empty
+6. **Given** a save operation fails (network error, Redis error), **When** the error occurs, **Then** I see an error message and my pending changes remain in the dialog for retry
 
 ---
 
@@ -71,11 +72,11 @@ As a user managing hash keys, I want to add new fields or delete existing fields
 **Acceptance Scenarios**:
 
 1. **Given** I am viewing hash key details, **When** I click "Add Field" button, **Then** a new empty row appears where I can enter a field name and value
-2. **Given** I have entered a new field name and value, **When** I save, **Then** the field is added to the Redis hash and appears in the list
-3. **Given** I attempt to add a field with a name that already exists, **When** I try to save, **Then** I see a validation error or confirmation dialog about overwriting
-4. **Given** I am viewing a hash field, **When** I click a delete icon/button for that field, **Then** I see a confirmation dialog
-5. **Given** I confirm deletion of a field, **When** I confirm, **Then** the field is removed from Redis and disappears from the list
-6. **Given** I attempt to delete a field but the operation fails, **When** the error occurs, **Then** I see an error message and the field remains in the list
+2. **Given** I have entered a new field name and value, **When** I click Save, **Then** the field is added to the Redis hash as part of the batch save
+3. **Given** I attempt to add a field with a name that already exists, **When** I enter the name, **Then** I see a warning that this will overwrite the existing value
+4. **Given** I am viewing a hash field, **When** I click a delete icon/button for that field, **Then** the field is marked for deletion (visually indicated with strikethrough) and will be removed on Save
+5. **Given** I have marked a field for deletion, **When** I click Save, **Then** the field is removed from Redis as part of the batch save
+6. **Given** I have marked a field for deletion, **When** I click the undo/restore button on that field, **Then** the deletion is cancelled and the field returns to normal state
 
 ---
 
@@ -136,14 +137,14 @@ As a user navigating through multiple hash keys, I want the Keys tab to remember
 - **FR-001**: System MUST provide a clickable action in the Keys tab to open hash key details (e.g., double-click, context menu, or dedicated action button)
 - **FR-002**: System MUST fetch all field-value pairs for a selected hash key and display them in a dialog or dedicated view
 - **FR-003**: System MUST display hash key details in a structured format with field names and values clearly separated (e.g., two-column table)
-- **FR-004**: System MUST allow inline editing of hash field values, with save and cancel actions
-- **FR-005**: System MUST persist edited field values to the Redis instance via appropriate API calls
+- **FR-004**: System MUST allow inline editing of hash field values with dirty state tracking and a single Save action for all changes
+- **FR-005**: System MUST persist all pending changes (edits, additions, deletions) to the Redis instance in a batch operation when Save is clicked
 - **FR-006**: System MUST validate field values before saving (non-empty values required; encoding is handled by the backend)
 - **FR-007**: System MUST detect JSON-formatted field values (strings starting with `{` or `[` and parseable as JSON)
 - **FR-008**: System MUST format detected JSON values with indentation and syntax highlighting
 - **FR-009**: System MUST provide a button or action to add new fields to the hash
 - **FR-010**: System MUST allow users to specify both field name and value when adding a new field
-- **FR-011**: System MUST provide a delete action for each hash field with confirmation before deletion
+- **FR-011**: System MUST provide a delete action for each hash field that marks it for deletion (with visual indicator), reversible until Save is clicked
 - **FR-012**: System MUST include the connection ID and hash key name in the browser URL when hash key details are open
 - **FR-013**: System MUST support deep linking by parsing URL parameters and opening the specified hash key details dialog on page load
 - **FR-014**: System MUST preserve the Keys tab list scroll position when opening and closing the hash key details dialog
@@ -166,7 +167,7 @@ As a user navigating through multiple hash keys, I want the Keys tab to remember
 ### Measurable Outcomes
 
 - **SC-001**: Users can open hash key details from the Keys tab in under 2 seconds (measured with API response time < 500ms)
-- **SC-002**: Users can edit a hash field value and save changes with no more than 3 clicks (click to edit, modify, click to save)
+- **SC-002**: Users can edit multiple hash field values and save all changes with a single Save click (edit fields inline, then one Save for all)
 - **SC-003**: JSON values in hash fields are automatically detected and formatted without any user action required
 - **SC-004**: Deep links to hash key details work reliably with a 95%+ success rate (valid keys load correctly when URL is shared)
 - **SC-005**: List context (scroll position and selection) is preserved in 100% of dialog open/close cycles
@@ -183,7 +184,7 @@ As a user navigating through multiple hash keys, I want the Keys tab to remember
 - JSON detection uses simple heuristics (starts with `{` or `[`) and attempts to parse; invalid JSON is treated as plain text
 - List context preservation relies on browser state management (component state or Pinia store), not server-side session
 - Dialog can be opened from the Keys tab's existing UI structure (likely the `RedisKeysExplorer` component)
-- Changes to hash fields are persisted immediately upon save (no batch/transaction mode required)
+- Changes to hash fields are collected locally and persisted as a batch when the user clicks Save (up to 2 API calls: one for upserts, one for deletions)
 - The application already has components for dialog display, form validation, and error handling that can be reused
 - Deep linking follows existing route structure for Redis connections (`/redis/[id]`) with additional parameters for key type and key name
 - Users have stable internet connectivity for API operations; offline editing is out of scope

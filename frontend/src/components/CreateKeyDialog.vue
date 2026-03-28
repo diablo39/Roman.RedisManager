@@ -322,18 +322,18 @@
     }
   })
 
-  function open(keyType: RedisKeyType) {
+  function open (keyType: RedisKeyType) {
     type.value = keyType
     resetForm()
     dialogOpen.value = true
   }
 
-  function close() {
+  function close () {
     dialogOpen.value = false
     error.value = null
   }
 
-  function resetForm() {
+  function resetForm () {
     keyName.value = ''
     ttl.value = null
     error.value = null
@@ -345,7 +345,7 @@
     zsetEntries.value = [{ member: '', score: 0 }]
   }
 
-  function formatStringJson() {
+  function formatStringJson () {
     try {
       const parsed = JSON.parse(stringValue.value)
       stringValue.value = JSON.stringify(parsed, null, 2)
@@ -355,7 +355,7 @@
     }
   }
 
-  async function submit() {
+  async function submit () {
     submitting.value = true
     error.value = null
 

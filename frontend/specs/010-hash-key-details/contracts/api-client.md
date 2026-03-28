@@ -107,10 +107,11 @@ defineExpose({
 |--------|----------|---------|---------|
 | Open dialog | `getHashFields()` + `getKeyMetadata()` | Show field table | Show error alert with Retry |
 | Load more | `getHashFields(cursor)` | Append to fields | Show error alert |
-| Edit field | `createHashKey({ fields: {name: value} })` | Update field in list | Show error, revert value |
-| Add field | `createHashKey({ fields: {name: value} })` | Prepend to list, clear form | Show error |
-| Delete field | `removeHashFields({ fields: [name] })` | Remove from list | Show error |
-| Close | — | Emit `close`, clear query params | — |
+| Edit field | (local only) | Update field in working copy, mark dirty | — |
+| Add field | (local only) | Prepend to working copy, mark dirty | — |
+| Mark delete | (local only) | Add to `pendingDeletions` set, mark dirty | — |
+| Save (batch) | `createHashKey({ fields: allUpserts })` + `removeHashFields({ fields: allDeletions })` | Reload fields from API, reset dirty | Show error, preserve changes for retry |
+| Close/Cancel | — | Emit `close`, discard changes, clear query params | — |
 
 ## URL Query Parameter Contract
 
