@@ -81,7 +81,7 @@
           <tr v-for="item in keys" :key="item.key">
             <td class="font-weight-medium" style="font-family: monospace; font-size: 0.85rem;">
               <a
-                v-if="['string', 'hash'].includes(item.type.toLowerCase())"
+                v-if="['string', 'hash', 'set', 'list', 'zset', 'sortedset'].includes(item.type.toLowerCase())"
                 class="key-link text-primary"
                 href="#"
                 @click.prevent="openKeyDetail(item)"
@@ -186,7 +186,8 @@
       }
       case 'set': { return 'purple'
       }
-      case 'zset': { return 'teal'
+      case 'zset':
+      case 'sortedset': { return 'teal'
       }
       default: { return 'grey'
       }

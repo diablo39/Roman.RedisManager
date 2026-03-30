@@ -129,6 +129,15 @@
     <!-- Hash key detail dialog -->
     <HashKeyDetailDialog ref="hashKeyDialog" :group-id="id" @close="onKeyDialogClose" />
 
+    <!-- Set key detail dialog -->
+    <SetKeyDetailDialog ref="setKeyDialog" :group-id="id" @close="onKeyDialogClose" />
+
+    <!-- List key detail dialog -->
+    <ListKeyDetailDialog ref="listKeyDialog" :group-id="id" @close="onKeyDialogClose" />
+
+    <!-- Sorted set key detail dialog -->
+    <SortedSetKeyDetailDialog ref="sortedSetKeyDialog" :group-id="id" @close="onKeyDialogClose" />
+
     <!-- Create key dialog -->
     <CreateKeyDialog ref="createKeyDialog" :group-id="id" @created="onKeyCreated" />
 
@@ -144,7 +153,10 @@
   import { getRedisServerGroupDetail } from '@/api/redisServers'
   import CreateKeyDialog from '@/components/CreateKeyDialog.vue'
   import HashKeyDetailDialog from '@/components/HashKeyDetailDialog.vue'
+  import ListKeyDetailDialog from '@/components/ListKeyDetailDialog.vue'
   import RedisKeysExplorer from '@/components/RedisKeysExplorer.vue'
+  import SetKeyDetailDialog from '@/components/SetKeyDetailDialog.vue'
+  import SortedSetKeyDetailDialog from '@/components/SortedSetKeyDetailDialog.vue'
   import StringKeyDetailDialog from '@/components/StringKeyDetailDialog.vue'
 
   type Topology = 'Cluster' | 'Standalone' | 'Unknown'
@@ -185,6 +197,9 @@
   const keysExplorer = ref<InstanceType<typeof RedisKeysExplorer> | null>(null)
   const stringKeyDialog = ref<InstanceType<typeof StringKeyDetailDialog> | null>(null)
   const hashKeyDialog = ref<InstanceType<typeof HashKeyDetailDialog> | null>(null)
+  const setKeyDialog = ref<InstanceType<typeof SetKeyDetailDialog> | null>(null)
+  const listKeyDialog = ref<InstanceType<typeof ListKeyDetailDialog> | null>(null)
+  const sortedSetKeyDialog = ref<InstanceType<typeof SortedSetKeyDetailDialog> | null>(null)
 
   const redisServersStore = useRedisServersStore()
   const { servers } = storeToRefs(redisServersStore)
@@ -257,12 +272,39 @@
 
   function onOpenKey (key: string, type: string) {
     const lowerType = type.toLowerCase()
-    if (lowerType === 'string') {
-      stringKeyDialog.value?.open(key)
-      router.replace({ query: { ...route.query, key, type: 'string' } })
-    } else if (lowerType === 'hash') {
-      hashKeyDialog.value?.open(key)
-      router.replace({ query: { ...route.query, key, type: 'hash' } })
+    switch (lowerType) {
+      case 'string': {
+        stringKeyDialog.value?.open(key)
+        router.replace({ query: { ...route.query, key, type: 'string' } })
+
+        break
+      }
+      case 'hash': {
+        hashKeyDialog.value?.open(key)
+        router.replace({ query: { ...route.query, key, type: 'hash' } })
+
+        break
+      }
+      case 'set': {
+        setKeyDialog.value?.open(key)
+        router.replace({ query: { ...route.query, key, type: 'set' } })
+
+        break
+      }
+      case 'list': {
+        listKeyDialog.value?.open(key)
+        router.replace({ query: { ...route.query, key, type: 'list' } })
+
+        break
+      }
+      case 'zset':
+      case 'sortedset': {
+        sortedSetKeyDialog.value?.open(key)
+        router.replace({ query: { ...route.query, key, type: 'zset' } })
+
+        break
+      }
+    // No default
     }
   }
 
@@ -276,16 +318,48 @@
     const queryKey = route.query.key
     const queryType = route.query.type
     if (typeof queryKey === 'string') {
-      if (queryType === 'string') {
-        tab.value = 'keys'
-        nextTick(() => {
-          stringKeyDialog.value?.open(queryKey)
-        })
-      } else if (queryType === 'hash') {
-        tab.value = 'keys'
-        nextTick(() => {
-          hashKeyDialog.value?.open(queryKey)
-        })
+      switch (queryType) {
+        case 'string': {
+          tab.value = 'keys'
+          nextTick(() => {
+            stringKeyDialog.value?.open(queryKey)
+          })
+
+          break
+        }
+        case 'hash': {
+          tab.value = 'keys'
+          nextTick(() => {
+            hashKeyDialog.value?.open(queryKey)
+          })
+
+          break
+        }
+        case 'set': {
+          tab.value = 'keys'
+          nextTick(() => {
+            setKeyDialog.value?.open(queryKey)
+          })
+
+          break
+        }
+        case 'list': {
+          tab.value = 'keys'
+          nextTick(() => {
+            listKeyDialog.value?.open(queryKey)
+          })
+
+          break
+        }
+        case 'zset': {
+          tab.value = 'keys'
+          nextTick(() => {
+            sortedSetKeyDialog.value?.open(queryKey)
+          })
+
+          break
+        }
+      // No default
       }
     }
   }

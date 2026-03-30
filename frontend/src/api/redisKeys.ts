@@ -79,6 +79,56 @@ export interface RemoveHashFieldsResult {
   removedCount: number
 }
 
+export interface GetSetMembersResult {
+  members: string[]
+  cursor: number
+  hasMoreResults: boolean
+}
+
+export interface RemoveFromSetRequest {
+  groupId: string
+  key: string
+  members: string[]
+}
+
+export interface RemoveFromSetResult {
+  removedCount: number
+}
+
+export interface GetListRangeResult {
+  values: string[]
+}
+
+export interface RemoveFromListRequest {
+  groupId: string
+  key: string
+  value: string
+  count: number
+}
+
+export interface RemoveFromListResult {
+  removedCount: number
+}
+
+export interface SortedSetEntryDto {
+  member: string
+  score: number
+}
+
+export interface GetSortedSetRangeResult {
+  entries: SortedSetEntryDto[]
+}
+
+export interface RemoveFromSortedSetRequest {
+  groupId: string
+  key: string
+  members: string[]
+}
+
+export interface RemoveFromSortedSetResult {
+  removedCount: number
+}
+
 export interface CommandResult {
   success: boolean
 }
@@ -289,4 +339,112 @@ export function createSetKey (request: AddToSetRequest, signal?: AbortSignal) {
 
 export function createSortedSetKey (request: AddToSortedSetRequest, signal?: AbortSignal) {
   return postJson<CommandResult>('api/redis/data/sorted-sets', request, signal)
+}
+
+/**
+ * Fetches set members with cursor-based pagination.
+ */
+export async function getSetMembers (
+  groupId: string,
+  key: string,
+  cursor?: number,
+  pageSize?: number,
+  signal?: AbortSignal,
+): Promise<GetSetMembersResult> {
+  const params = new URLSearchParams({ groupId, key })
+  if (cursor !== undefined && cursor !== 0) {
+    params.set('cursor', cursor.toString())
+  }
+  if (pageSize !== undefined) {
+    params.set('pageSize', pageSize.toString())
+  }
+
+  const url = `${apiBaseUrl}api/redis/data/sets?${params.toString()}`
+  const response = await fetch(url, { signal, headers: await getAuthHeaders() })
+
+  if (!response.ok) {
+    const message = await parseErrorMessage(response, 'Failed to get set members')
+    throw new Error(message)
+  }
+
+  return await response.json()
+}
+
+/**
+ * Removes one or more members from a Redis set.
+ */
+export function removeFromSet (request: RemoveFromSetRequest, signal?: AbortSignal) {
+  return postJson<RemoveFromSetResult>('api/redis/data/sets/remove', request, signal)
+}
+
+/**
+ * Fetches list items by index range.
+ */
+export async function getListRange (
+  groupId: string,
+  key: string,
+  start?: number,
+  stop?: number,
+  signal?: AbortSignal,
+): Promise<GetListRangeResult> {
+  const params = new URLSearchParams({ groupId, key })
+  if (start !== undefined && start !== 0) {
+    params.set('start', start.toString())
+  }
+  if (stop !== undefined && stop !== -1) {
+    params.set('stop', stop.toString())
+  }
+
+  const url = `${apiBaseUrl}api/redis/data/lists?${params.toString()}`
+  const response = await fetch(url, { signal, headers: await getAuthHeaders() })
+
+  if (!response.ok) {
+    const message = await parseErrorMessage(response, 'Failed to get list items')
+    throw new Error(message)
+  }
+
+  return await response.json()
+}
+
+/**
+ * Removes items from a Redis list by value.
+ */
+export function removeFromList (request: RemoveFromListRequest, signal?: AbortSignal) {
+  return postJson<RemoveFromListResult>('api/redis/data/lists/remove', request, signal)
+}
+
+/**
+ * Fetches sorted set entries by index range (sorted by score).
+ */
+export async function getSortedSetRange (
+  groupId: string,
+  key: string,
+  start?: number,
+  stop?: number,
+  signal?: AbortSignal,
+): Promise<GetSortedSetRangeResult> {
+  const params = new URLSearchParams({ groupId, key })
+  if (start !== undefined && start !== 0) {
+    params.set('start', start.toString())
+  }
+  if (stop !== undefined && stop !== -1) {
+    params.set('stop', stop.toString())
+  }
+
+  const url = `${apiBaseUrl}api/redis/data/sorted-sets?${params.toString()}`
+  const response = await fetch(url, { signal, headers: await getAuthHeaders() })
+
+  if (!response.ok) {
+    const message = await parseErrorMessage(response, 'Failed to get sorted set entries')
+    throw new Error(message)
+  }
+
+  return await response.json()
+}
+
+/**
+ * Removes one or more members from a Redis sorted set.
+ */
+export function removeFromSortedSet (request: RemoveFromSortedSetRequest, signal?: AbortSignal) {
+  return postJson<RemoveFromSortedSetResult>('api/redis/data/sorted-sets/remove', request, signal)
 }

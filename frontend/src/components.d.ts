@@ -13,10 +13,13 @@ declare module 'vue' {
   export interface GlobalComponents {
     CreateKeyDialog: typeof import('./components/CreateKeyDialog.vue')['default']
     HashKeyDetailDialog: typeof import('./components/HashKeyDetailDialog.vue')['default']
+    ListKeyDetailDialog: typeof import('./components/ListKeyDetailDialog.vue')['default']
     Menu: typeof import('./components/Menu.vue')['default']
     RedisKeysExplorer: typeof import('./components/RedisKeysExplorer.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+    SetKeyDetailDialog: typeof import('./components/SetKeyDetailDialog.vue')['default']
+    SortedSetKeyDetailDialog: typeof import('./components/SortedSetKeyDetailDialog.vue')['default']
     StringKeyDetailDialog: typeof import('./components/StringKeyDetailDialog.vue')['default']
     TtlPicker: typeof import('./components/TtlPicker.vue')['default']
   }
